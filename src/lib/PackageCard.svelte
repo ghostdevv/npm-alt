@@ -1,10 +1,6 @@
 <script lang="ts">
 	import IconLicense from 'virtual:icons/catppuccin/license';
-	import IconJSON from 'virtual:icons/catppuccin/json';
-	import IconHTTP from 'virtual:icons/catppuccin/http';
-	import IconNPM from 'virtual:icons/catppuccin/npm';
-	import IconGit from 'virtual:icons/catppuccin/git';
-	import InspectModal from './InspectModal.svelte';
+	import PackageLinks from './PackageLinks.svelte';
 	import type { Package } from './types/search';
 	import type { Component } from 'svelte';
 
@@ -47,42 +43,7 @@
 			'Package License',
 		)}
 
-		<a
-			href={pkg.links.npm}
-			rel="noreferrer noopener"
-			title="Open on NPM"
-			class="button icon"
-		>
-			<IconNPM />
-		</a>
-
-		{#if pkg.links.repository}
-			<a
-				href={pkg.links.repository}
-				rel="noreferrer noopener"
-				title="Open Git Repository"
-				class="button icon"
-			>
-				<IconGit />
-			</a>
-		{/if}
-
-		{#if pkg.links.homepage}
-			<a
-				href={pkg.links.homepage}
-				rel="noreferrer noopener"
-				title="Open Homepage"
-				class="button icon"
-			>
-				<IconHTTP />
-			</a>
-		{/if}
-
-		<InspectModal value={pkg}>
-			<button class="icon">
-				<IconJSON />
-			</button>
-		</InspectModal>
+		<PackageLinks {pkg} />
 	</div>
 </details>
 
@@ -120,16 +81,6 @@
 			flex-flow: row wrap;
 			align-items: center;
 			gap: 8px;
-
-			a {
-				display: grid;
-				place-items: center;
-			}
-
-			button,
-			.button {
-				padding: 0px;
-			}
 		}
 	}
 
