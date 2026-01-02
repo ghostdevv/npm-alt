@@ -1,10 +1,10 @@
-export interface SearchResult {
+export interface SearchResponse {
 	objects: Object[];
 	total: number;
 	time: string;
 }
 
-interface Object {
+export interface Object {
 	downloads: Downloads;
 	dependents: any;
 	updated: string;

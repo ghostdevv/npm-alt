@@ -22,6 +22,7 @@
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"prettier": "^3.7.4",
 		"prettier-plugin-svelte": "^3.4.0",
+		"runed": "^0.37.1",
 		"svelte": "^5.45.6",
 		"svelte-check": "^4.3.4",
 		"svelte-inspect-value": "^0.10.0",

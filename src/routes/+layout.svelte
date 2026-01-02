@@ -15,7 +15,7 @@
 
 <style>
 	main {
-		padding-block: 8px;
+		padding-block: 16px;
 		padding-inline: 16px;
 		max-width: 1200px;
 		margin: 0 auto;

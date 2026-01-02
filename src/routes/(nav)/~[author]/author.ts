@@ -1,4 +1,4 @@
-import type { Package, SearchResult } from '$lib/types/search';
+import type { Package, SearchResponse } from '$lib/types/search';
 
 const BATCH_SIZE = 250;
 
@@ -12,7 +12,7 @@ export async function listPackages(author: string) {
 		url.searchParams.set('from', `${packages.length}`);
 
 		const res = await fetch(url);
-		const data: SearchResult = await res.json();
+		const data: SearchResponse = await res.json();
 
 		for (const object of data.objects) {
 			packages.push(object.package);

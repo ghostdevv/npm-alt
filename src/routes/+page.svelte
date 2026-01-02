@@ -1,38 +1,45 @@
 <script lang="ts">
+	import Expansion from '$lib/expansions/Expansion.svelte';
 	import IconSearch from 'virtual:icons/lucide/search';
-	import { search } from './search.remote';
 
 	const id = $props.id();
 </script>
 
-<form {...search}>
-	<label for="search-{id}"> Author/Org Name </label>
+<div>
+	<Expansion />
 
-	<div class="search">
-		<input
-			id="search-{id}"
-			placeholder="Somebody great"
-			{...search.fields.query.as('text')}
-		/>
+	<form action="/search">
+		<label for="search-{id}" class="sr-only"> Search NPM </label>
 
-		<button class="icon" title="Search for author/org">
-			<IconSearch />
-		</button>
-	</div>
+		<div class="search">
+			<input
+				type="search"
+				name="q"
+				id="search-{id}"
+				placeholder="Search for...?"
+			/>
 
-	{#each search.fields.query.issues() as issue}
-		<p class="issue">{issue.message}</p>
-	{/each}
-</form>
+			<button class="icon" title="Search NPM">
+				<IconSearch />
+			</button>
+		</div>
+	</form>
+</div>
 
 <style>
-	form {
-		display: grid;
-		grid-template-columns: minmax(0, 400px);
-		grid-template-rows: auto;
+	div {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 		justify-content: center;
-		align-content: center;
-		height: 100%;
+		gap: 22px;
+		height: 80%;
+
+		form,
+		.search {
+			width: 100%;
+			max-width: 500px;
+		}
 
 		.search {
 			position: relative;
@@ -42,10 +49,6 @@
 				inset-block: 0;
 				inset-inline-end: 12px;
 			}
-		}
-
-		.issue {
-			color: var(--red);
 		}
 	}
 </style>
