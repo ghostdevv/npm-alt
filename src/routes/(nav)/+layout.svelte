@@ -54,8 +54,8 @@
 			gap: 8px;
 
 			background-color: var(--background-secondary);
-			padding-block: 8px;
-			padding-inline: 8px;
+			padding-block: 4px;
+			padding-inline: 10px;
 			border-radius: 12px;
 		}
 
