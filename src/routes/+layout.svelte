@@ -9,4 +9,16 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{@render children()}
+<main>
+	{@render children()}
+</main>
+
+<style>
+	main {
+		padding-block: 8px;
+		padding-inline: 16px;
+		max-width: 1200px;
+		margin: 0 auto;
+		height: 100dvh;
+	}
+</style>
