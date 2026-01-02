@@ -1,10 +1,8 @@
 import type { Package, SearchResult } from '$lib/types/search';
-import { username } from '$lib/valibot';
-import { query } from '$app/server';
 
 const BATCH_SIZE = 250;
 
-export const listPackages = query(username, async (author) => {
+export async function listPackages(author: string) {
 	const packages: Package[] = [];
 
 	do {
@@ -22,4 +20,4 @@ export const listPackages = query(username, async (author) => {
 	} while (packages.length % BATCH_SIZE === 0);
 
 	return packages;
-});
+}

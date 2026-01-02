@@ -4,9 +4,9 @@
 	import IconHTTP from 'virtual:icons/catppuccin/http';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconGit from 'virtual:icons/catppuccin/git';
-	import { listPackages } from './author.remote';
 	import { Inspect } from 'svelte-inspect-value';
 	import type { Component } from 'svelte';
+	import { listPackages } from './author';
 	import Modal from '$lib/Modal.svelte';
 	import { page } from '$app/state';
 
