@@ -1,10 +1,10 @@
 <script lang="ts">
 	import PackageCard from '$lib/PackageCard.svelte';
-	import type { Component } from 'svelte';
 	import { listPackages } from './author';
-	import { page } from '$app/state';
 
-	let author = $derived(page.params.author);
+	const { params } = $props();
+
+	let author = $derived(params.author);
 	let packages = $derived(await listPackages(author!));
 </script>
 

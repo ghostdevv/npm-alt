@@ -1,8 +1,7 @@
 <script lang="ts">
+	import InspectModal from '$lib/InspectModal.svelte';
 	import PackageCard from '$lib/PackageCard.svelte';
-	import Inspect from 'svelte-inspect-value';
 	import { search } from './search.svelte';
-	import Modal from '$lib/Modal.svelte';
 
 	const { total, results, done } = $derived(await search.results());
 </script>
@@ -13,20 +12,11 @@
 			Found {total} packages.
 		</p>
 
-		<Modal>
-			{#snippet activator()}
-				<button
-					class="icon"
-					style="padding: 0px; display: inline-block;"
-				>
-					View raw.
-				</button>
-			{/snippet}
-
-			{#snippet children()}
-				<Inspect value={{ total, results, done }} />
-			{/snippet}
-		</Modal>
+		<InspectModal value={{ total, results, done }}>
+			<button class="icon" style="padding: 0px; display: inline-block;">
+				View raw.
+			</button>
+		</InspectModal>
 	</div>
 
 	<div class="results">

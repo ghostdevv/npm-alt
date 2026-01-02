@@ -4,10 +4,9 @@
 	import IconHTTP from 'virtual:icons/catppuccin/http';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconGit from 'virtual:icons/catppuccin/git';
-	import { Inspect } from 'svelte-inspect-value';
+	import InspectModal from './InspectModal.svelte';
 	import type { Package } from './types/search';
 	import type { Component } from 'svelte';
-	import Modal from '$lib/Modal.svelte';
 
 	interface Props {
 		pkg: Package;
@@ -25,7 +24,9 @@
 
 <details class="package" open>
 	<summary>
-		{pkg.name}<span class="version">@{pkg.version}</span>
+		<a href="/package/{pkg.name}">
+			{pkg.name}<span class="version">@{pkg.version}</span>
+		</a>
 	</summary>
 
 	<p class="description">
@@ -77,17 +78,11 @@
 			</a>
 		{/if}
 
-		<Modal>
-			{#snippet activator()}
-				<button class="icon">
-					<IconJSON />
-				</button>
-			{/snippet}
-
-			{#snippet children()}
-				<Inspect value={pkg} />
-			{/snippet}
-		</Modal>
+		<InspectModal value={pkg}>
+			<button class="icon">
+				<IconJSON />
+			</button>
+		</InspectModal>
 	</div>
 </details>
 
@@ -106,10 +101,14 @@
 		summary {
 			margin: 0px;
 			font-family: monospace;
-		}
 
-		.version {
-			color: var(--text-grey);
+			a {
+				color: var(--text);
+			}
+
+			.version {
+				color: var(--text-grey);
+			}
 		}
 
 		.description {
