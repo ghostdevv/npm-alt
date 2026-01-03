@@ -50,8 +50,10 @@
 </script>
 
 <svelte:boundary {failed}>
-	{#if browser}
+	{#if readme && browser}
 		{@html await renderREADME(readme)}
+	{:else if !readme}
+		<p style="color: var(--text-grey);">No README found</p>
 	{/if}
 
 	{#if $effect.pending()}
