@@ -1,4 +1,5 @@
 import type { Packument, PackumentVersion } from '@npm/types';
+import { serendipity } from '$lib/assets/serendipity-shiki';
 import { registry, USER_AGENT } from './registry.server';
 import { packageName, semver } from '$lib/valibot';
 import createDOMPurify from 'dompurify';
@@ -122,7 +123,7 @@ export const packageTypeStatus = query(
 const marked = new Marked(
 	markedShiki({
 		async highlight(code, lang) {
-			return await codeToHtml(code, { lang, theme: 'nord' });
+			return await codeToHtml(code, { lang, theme: serendipity });
 		},
 	}),
 );
