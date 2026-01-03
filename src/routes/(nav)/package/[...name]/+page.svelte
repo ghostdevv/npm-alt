@@ -50,6 +50,7 @@
 
 		<DropdownCodeblock
 			title="Select a package manager to install with"
+			--colour="#BE95FF"
 			options={[
 				{
 					title: 'pnpm',
@@ -81,7 +82,7 @@
 
 		<h6>Use in Browser</h6>
 		<!-- prettier-ignore -->
-		<pre><code>import &#123;&#125; from 'https://esm.sh/{pkg.name}@{pkg.version}'</code></pre>
+		<pre><code><span style="color: #BE95FF;">import</span> &#123;&#125; <span style="color: #BE95FF;">from</span> <span style="color: #F29E74;">'https://esm.sh/{pkg.name}@{pkg.version}'</span><span style="color: #F6F6F6B3;">;</span></code></pre>
 
 		<hr />
 

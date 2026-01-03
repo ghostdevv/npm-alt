@@ -73,4 +73,8 @@
 		border: 2px solid var(--background-tertiary);
 		border-radius: 8px;
 	}
+
+	code {
+		color: var(--colour);
+	}
 </style>
