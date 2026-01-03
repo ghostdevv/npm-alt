@@ -47,9 +47,10 @@ export async function hasTypes(
 		}
 	}
 
-	const res = await fetch(
-		`https://registry.npmjs.org/${definitelyTypedName(pkgJSON.name)}`,
-	);
+	const dtName = pkgJSON.name.startsWith('@')
+		? pkgJSON.name.slice(1).replace('/', '__')
+		: pkgJSON.name;
 
+	const res = await fetch(`https://registry.npmjs.org/${dtName}`);
 	return res.ok ? 'dt' : false;
 }
