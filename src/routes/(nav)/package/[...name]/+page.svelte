@@ -110,6 +110,10 @@
 </section>
 
 <style>
+	section {
+		margin-block: 6px;
+	}
+
 	.name {
 		display: flex;
 		align-items: center;
