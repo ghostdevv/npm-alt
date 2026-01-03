@@ -1,17 +1,31 @@
 <script lang="ts">
+	import IconQuestion from 'virtual:icons/lucide/circle-question-mark';
 	import DropdownCodeblock from '$lib/DropdownCodeblock.svelte';
+	import IconTS from 'virtual:icons/catppuccin/typescript';
 	import IconPNPM from 'virtual:icons/catppuccin/pnpm';
 	import IconYarn from 'virtual:icons/catppuccin/yarn';
 	import IconDeno from 'virtual:icons/catppuccin/deno';
 	import PackageLinks from '$lib/PackageLinks.svelte';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconBun from 'virtual:icons/catppuccin/bun';
-	import { getPackage } from './package';
+	import IconCheck from 'virtual:icons/lucide/check';
+	import IconMinus from 'virtual:icons/lucide/minus';
 	import README from './README.svelte';
+	import {
+		definitelyTypedName,
+		getPackageJSON,
+		getPackage,
+		hasTypes,
+	} from './package';
 
 	const { params } = $props();
 
 	const pkg = $derived(await getPackage(params.name));
+	const pkgJSON = $derived(getPackageJSON(pkg));
+	const types = $derived(await hasTypes(pkgJSON));
+	const installPackages = $derived(
+		`${pkg.name}${types === 'dt' ? ` @types/${definitelyTypedName(pkg.name)}` : ''}`,
+	);
 </script>
 
 <section>
@@ -40,27 +54,27 @@
 				{
 					title: 'pnpm',
 					icon: IconPNPM,
-					content: `pnpm add ${pkg.name}`,
+					content: `pnpm add ${installPackages}`,
 				},
 				{
 					title: 'npm',
 					icon: IconNPM,
-					content: `npm install ${pkg.name}`,
+					content: `npm install ${installPackages}`,
 				},
 				{
 					title: 'yarn',
 					icon: IconYarn,
-					content: `yarn add ${pkg.name}`,
+					content: `yarn add ${installPackages}`,
 				},
 				{
 					title: 'deno',
 					icon: IconDeno,
-					content: `deno add ${pkg.name}`,
+					content: `deno add ${installPackages}`,
 				},
 				{
 					title: 'bun',
 					icon: IconBun,
-					content: `bun add ${pkg.name}`,
+					content: `bun add ${installPackages}`,
 				},
 			]}
 		/>
@@ -73,6 +87,34 @@
 			></pre>
 
 		<hr />
+
+		<h6>Meta</h6>
+
+		<ul>
+			<li>
+				<IconTS /> Type Definitions
+
+				{#if types === 'built-in'}
+					<span title="Types Built In" style="color: var(--green);">
+						<IconCheck />
+					</span>
+				{:else if types === 'dt'}
+					<span
+						title="Only DefinitelyTyped"
+						style="color: var(--orange);"
+					>
+						<IconMinus />
+					</span>
+				{:else}
+					<span
+						title="No Types Found, but the logic isn't perfect yet. Check NPM to be sure."
+						style="color: var(--red);"
+					>
+						<IconQuestion />
+					</span>
+				{/if}
+			</li>
+		</ul>
 	</div>
 </section>
 
@@ -98,6 +140,23 @@
 
 		.sidebar {
 			max-width: 300px;
+
+			ul {
+				list-style: none;
+				margin-top: 12px;
+
+				li {
+					display: flex;
+					align-items: center;
+					gap: 6px;
+
+					& > :last-child {
+						display: grid;
+						place-items: center;
+						margin-left: auto;
+					}
+				}
+			}
 		}
 	}
 </style>
