@@ -132,6 +132,11 @@
 		display: grid;
 		grid-template-columns: 1fr max-content;
 		grid-gap: 32px;
+		max-width: 100%;
+
+		.readme {
+			overflow-x: auto;
+		}
 
 		.sidebar {
 			max-width: 300px;
