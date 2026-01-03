@@ -17,7 +17,7 @@
 
 <div class="wrapper">
 	<header>
-		<Expansion />
+		<a href="/"><Expansion /></a>
 
 		<label>
 			<span class="sr-only">Search NPM</span>
@@ -58,6 +58,10 @@
 			padding-block: 4px;
 			padding-inline: 10px;
 			border-radius: 12px;
+
+			a {
+				color: var(--text);
+			}
 		}
 
 		.children {
