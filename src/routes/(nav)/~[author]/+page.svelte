@@ -1,11 +1,11 @@
 <script lang="ts">
+	import { listAuthorPackages } from '$lib/data/search.remote';
 	import PackageCard from '$lib/PackageCard.svelte';
-	import { listPackages } from './author';
 
 	const { params } = $props();
 
 	let author = $derived(params.author);
-	let packages = $derived(await listPackages(author!));
+	let packages = $derived(await listAuthorPackages(author!));
 </script>
 
 <section>

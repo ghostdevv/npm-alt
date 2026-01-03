@@ -30,7 +30,7 @@
 			{params.name}<span class="version">@{pkg.version}</span>
 		</h1>
 
-		<PackageLinks {pkg} inspectValue={{ pkg, types }} />
+		<PackageLinks links={pkg.links} inspectValue={{ pkg, types }} />
 	</div>
 </section>
 

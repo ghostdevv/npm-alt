@@ -7,6 +7,7 @@
 	let { children } = $props();
 
 	let query = $state(page.url.searchParams.get('q') || '');
+	// svelte-ignore state_referenced_locally
 	search.query = query;
 
 	const updateSearch = useThrottle(() => {

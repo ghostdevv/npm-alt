@@ -14,15 +14,17 @@ function getPackageJSON(pkg: Packument, _version: string) {
 	return pkg['versions'][pkg['dist-tags']['latest']!];
 }
 
+export interface PackageLinks {
+	repository?: string;
+	homepage?: string;
+	npm: string;
+}
+
 export interface Package {
 	name: string;
 	version: string;
 	packageJSON: PackumentVersion;
-	links: {
-		repository?: string;
-		homepage?: string;
-		npm: string;
-	};
+	links: PackageLinks;
 }
 
 export const getPackage = query(

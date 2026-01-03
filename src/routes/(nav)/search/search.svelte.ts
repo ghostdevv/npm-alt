@@ -1,38 +1,9 @@
-import { page } from '$app/state';
-import type { SearchResponse } from '$lib/types/search';
-import { settled, tick } from 'svelte';
+import { searchRegistry } from '$lib/data/search.remote';
 
-const BATCH_SIZE = 20;
-const CACHE_KEY = 'npm-search-cache';
-
-interface SearchResult {
-	results: SearchResponse['objects'];
-	total: number;
-}
-
-async function _search(query: string, from?: number) {
-	if (!query.length) {
-		return { done: true, total: 0, results: [] };
-	}
-
-	const url = new URL('https://registry.npmjs.org/-/v1/search');
-	url.searchParams.set('text', query);
-	url.searchParams.set('size', `${BATCH_SIZE}`);
-	url.searchParams.set('from', `${from || 0}`);
-
-	const res = await fetch(url);
-	const data: SearchResponse = await res.json();
-
-	return {
-		total: data.total,
-		results: data.objects,
-		done: data.objects.length % BATCH_SIZE !== 0,
-	};
-}
+const SEARCH_BATCH_SIZE = 20;
 
 class Search {
 	private _from = $state(0);
-	// private _query = $state(page.url.searchParams.get('q') || '');
 	private _query = $state('');
 
 	get query() {
@@ -45,14 +16,15 @@ class Search {
 	}
 
 	async results() {
-		// if (!this.query.trim()) {
-		// 	return { done: true, total: 0, results: [] };
-		// }
-
 		const results = await Promise.all(
 			Array.from(
-				{ length: Math.ceil(this._from / BATCH_SIZE + 1) },
-				(_, i) => _search(this.query, i === 0 ? 0 : i * BATCH_SIZE),
+				{ length: Math.ceil(this._from / SEARCH_BATCH_SIZE + 1) },
+				async (_, i) => {
+					return await searchRegistry({
+						query: this.query,
+						from: i === 0 ? 0 : i * SEARCH_BATCH_SIZE,
+					});
+				},
 			),
 		);
 
@@ -66,7 +38,7 @@ class Search {
 	}
 
 	loadMore() {
-		this._from += BATCH_SIZE;
+		this._from += SEARCH_BATCH_SIZE;
 	}
 }
 

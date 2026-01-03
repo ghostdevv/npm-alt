@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconLicense from 'virtual:icons/catppuccin/license';
-	import type { SearchPackage } from './types/search';
+	import type { SearchPackage } from './data/search.remote';
 	import PackageLinks from './PackageLinks.svelte';
 	import type { Component } from 'svelte';
 
@@ -43,7 +43,7 @@
 			'Package License',
 		)}
 
-		<PackageLinks {pkg} />
+		<PackageLinks links={pkg.links} inspectValue={pkg} />
 	</div>
 </details>
 
