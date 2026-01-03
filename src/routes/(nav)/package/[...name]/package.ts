@@ -22,7 +22,7 @@ function hasExports(
 
 export function definitelyTypedName(pkgName: string) {
 	return pkgName.startsWith('@')
-		? pkgName.slice(1).replace('/', '__')
+		? pkgName.replace('/', '__').replace('@', '@types/')
 		: pkgName;
 }
 
@@ -47,10 +47,9 @@ export async function hasTypes(
 		}
 	}
 
-	const dtName = pkgJSON.name.startsWith('@')
-		? pkgJSON.name.slice(1).replace('/', '__')
-		: pkgJSON.name;
+	const res = await fetch(
+		`https://registry.npmjs.org/${definitelyTypedName(pkgJSON.name)}`,
+	);
 
-	const res = await fetch(`https://registry.npmjs.org/${dtName}`);
 	return res.ok ? 'dt' : false;
 }
