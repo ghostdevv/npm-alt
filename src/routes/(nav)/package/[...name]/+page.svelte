@@ -63,7 +63,7 @@
 				{
 					title: 'deno',
 					icon: IconDeno,
-					content: `deno add ${installPackages}`,
+					content: `deno add npm:${installPackages}`,
 				},
 				{
 					title: 'bun',
