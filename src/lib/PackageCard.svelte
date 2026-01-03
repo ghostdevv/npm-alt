@@ -1,11 +1,11 @@
 <script lang="ts">
 	import IconLicense from 'virtual:icons/catppuccin/license';
+	import type { SearchPackage } from './types/search';
 	import PackageLinks from './PackageLinks.svelte';
-	import type { Package } from './types/search';
 	import type { Component } from 'svelte';
 
 	interface Props {
-		pkg: Package;
+		pkg: SearchPackage;
 	}
 
 	const { pkg }: Props = $props();

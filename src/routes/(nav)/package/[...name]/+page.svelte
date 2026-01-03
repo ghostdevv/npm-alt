@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getPackage, packageTypeStatus } from '$lib/data/package.remote';
 	import IconQuestion from 'virtual:icons/lucide/circle-question-mark';
 	import DropdownCodeblock from '$lib/DropdownCodeblock.svelte';
 	import IconTS from 'virtual:icons/catppuccin/typescript';
@@ -11,38 +12,31 @@
 	import IconCheck from 'virtual:icons/lucide/check';
 	import IconMinus from 'virtual:icons/lucide/minus';
 	import README from './README.svelte';
-	import {
-		definitelyTypedName,
-		getPackageJSON,
-		getPackage,
-		hasTypes,
-	} from './package';
 
 	const { params } = $props();
 
-	const pkg = $derived(await getPackage(params.name));
-	const pkgJSON = $derived(getPackageJSON(pkg));
-	const types = $derived(await hasTypes(pkgJSON));
+	const remoteKey = $derived({ name: params.name, version: 'latest' });
+	const pkg = $derived(await getPackage(remoteKey));
+	const types = $derived(await packageTypeStatus(remoteKey));
+
 	const installPackages = $derived(
-		`${pkg.name}${types === 'dt' ? ` ${definitelyTypedName(pkg.name)}` : ''}`,
+		`${pkg.name}${types.status === 'definitely-typed' ? ` ${types.definitelyTypedPkg}` : ''}`,
 	);
 </script>
 
 <section>
 	<div class="name">
 		<h1>
-			{params.name}<span class="version">
-				@{pkg['dist-tags'].latest}
-			</span>
+			{params.name}<span class="version">@{pkg.version}</span>
 		</h1>
 
-		<PackageLinks {pkg} />
+		<PackageLinks {pkg} inspectValue={{ pkg, types }} />
 	</div>
 </section>
 
 <section class="main">
 	<div class="readme">
-		<README readme={pkg.readme} />
+		<README {...remoteKey} />
 	</div>
 
 	<div class="sidebar">
@@ -80,11 +74,8 @@
 		/>
 
 		<h6>Use in Browser</h6>
-		<pre><code
-				>import &#123;&#125; from 'https://esm.sh/{pkg.name}@{pkg[
-					'dist-tags'
-				].latest}'</code
-			></pre>
+		<!-- prettier-ignore -->
+		<pre><code>import &#123;&#125; from 'https://esm.sh/{pkg.name}@{pkg.version}'</code></pre>
 
 		<hr />
 
@@ -94,11 +85,11 @@
 			<li>
 				<IconTS /> Type Definitions
 
-				{#if types === 'built-in'}
+				{#if types.status === 'built-in'}
 					<span title="Types Built In" style="color: var(--green);">
 						<IconCheck />
 					</span>
-				{:else if types === 'dt'}
+				{:else if types.status === 'definitely-typed'}
 					<span
 						title="Only DefinitelyTyped"
 						style="color: var(--orange);"

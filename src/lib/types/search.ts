@@ -9,7 +9,7 @@ export interface Object {
 	dependents: any;
 	updated: string;
 	searchScore: number;
-	package: Package;
+	package: SearchPackage;
 	score: Score;
 	flags: Flags;
 }
@@ -19,7 +19,7 @@ interface Downloads {
 	weekly: number;
 }
 
-export interface Package {
+export interface SearchPackage {
 	name: string;
 	keywords: string[];
 	version: string;

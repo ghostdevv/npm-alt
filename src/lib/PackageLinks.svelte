@@ -1,33 +1,22 @@
 <script lang="ts">
 	import IconJSON from 'virtual:icons/catppuccin/json';
+	import type { Package } from './data/package.remote';
 	import IconHTTP from 'virtual:icons/catppuccin/http';
+	import type { SearchPackage } from './types/search';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconGit from 'virtual:icons/catppuccin/git';
 	import InspectModal from './InspectModal.svelte';
-	import type { Package } from './types/search';
-	import type { Packument } from '@npm/types';
 
 	interface Props {
-		pkg: Package | Packument;
+		pkg: SearchPackage | Package;
+		inspectValue: unknown;
 	}
 
-	const { pkg }: Props = $props();
-
-	const links = $derived.by(() => {
-		if ('links' in pkg) {
-			return pkg.links;
-		}
-
-		return {
-			npm: `https://www.npmjs.com/package/${pkg.name}`,
-			repository: pkg.repository?.url,
-			homepage: pkg.homepage,
-		};
-	});
+	const { pkg, inspectValue }: Props = $props();
 </script>
 
 <a
-	href={links.npm}
+	href={pkg.links.npm}
 	rel="noreferrer noopener"
 	title="Open on NPM"
 	class="button icon"
@@ -35,9 +24,9 @@
 	<IconNPM />
 </a>
 
-{#if links.repository}
+{#if pkg.links.repository}
 	<a
-		href={links.repository}
+		href={pkg.links.repository}
 		rel="noreferrer noopener"
 		title="Open Git Repository"
 		class="button icon"
@@ -46,9 +35,9 @@
 	</a>
 {/if}
 
-{#if links.homepage}
+{#if pkg.links.homepage}
 	<a
-		href={links.homepage}
+		href={pkg.links.homepage}
 		rel="noreferrer noopener"
 		title="Open Homepage"
 		class="button icon"
@@ -57,7 +46,7 @@
 	</a>
 {/if}
 
-<InspectModal value={pkg}>
+<InspectModal value={inspectValue}>
 	<button class="icon">
 		<IconJSON />
 	</button>

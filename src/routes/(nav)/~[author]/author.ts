@@ -1,9 +1,9 @@
-import type { Package, SearchResponse } from '$lib/types/search';
+import type { SearchPackage, SearchResponse } from '$lib/types/search';
 
 const BATCH_SIZE = 250;
 
 export async function listPackages(author: string) {
-	const packages: Package[] = [];
+	const packages: SearchPackage[] = [];
 
 	do {
 		const url = new URL('https://registry.npmjs.org/-/v1/search');

@@ -1,58 +1,20 @@
 <script lang="ts">
-	import { markedHighlight } from 'marked-highlight';
+	import { renderREADME } from '$lib/data/package.remote';
 	import { failed } from '$lib/failed.svelte';
-	import { browser } from '$app/environment';
-	import { Marked } from 'marked';
-	import Prism from 'prismjs';
-	import 'prism-svelte';
-	import 'prismjs/components/prism-typescript';
-	import 'prismjs/components/prism-javascript';
-	import 'prismjs/components/prism-bash';
-	import 'prismjs/themes/prism-dark.css';
 
 	interface Props {
-		readme: string | undefined;
+		name: string;
+		version: string;
 	}
 
-	const { readme }: Props = $props();
-
-	async function renderREADME(readme: string | undefined) {
-		if (!browser || !readme) return null;
-
-		const DOMPurify = await import('dompurify');
-
-		const marked = new Marked(
-			markedHighlight({
-				async: false,
-				highlight(code: string, lang: string) {
-					try {
-						if (Prism.languages[lang]) {
-							return Prism.highlight(
-								code,
-								Prism.languages[lang],
-								lang,
-							);
-						}
-
-						return code;
-					} catch (error) {
-						console.error('Failed to highlight code:', error);
-					}
-
-					return code;
-				},
-			}),
-		);
-
-		const html = marked.parse(readme, { gfm: true });
-		return DOMPurify.default.sanitize(await html);
-	}
+	const props: Props = $props();
+	const readme = $derived(await renderREADME(props));
 </script>
 
 <svelte:boundary {failed}>
-	{#if readme && browser}
-		{@html await renderREADME(readme)}
-	{:else if !readme}
+	{#if readme}
+		{@html readme}
+	{:else}
 		<p style="color: var(--text-grey);">No README found</p>
 	{/if}
 
