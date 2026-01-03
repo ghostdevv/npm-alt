@@ -24,7 +24,7 @@
 	const pkgJSON = $derived(getPackageJSON(pkg));
 	const types = $derived(await hasTypes(pkgJSON));
 	const installPackages = $derived(
-		`${pkg.name}${types === 'dt' ? ` @types/${definitelyTypedName(pkg.name)}` : ''}`,
+		`${pkg.name}${types === 'dt' ? ` ${definitelyTypedName(pkg.name)}` : ''}`,
 	);
 </script>
 
