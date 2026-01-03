@@ -26,6 +26,7 @@
 		"marked": "^17.0.1",
 		"marked-shiki": "^1.2.1",
 		"melt": "^0.43.0",
+		"module-replacements": "^2.10.1",
 		"ofetch": "^1.5.1",
 		"prettier": "^3.7.4",
 		"prettier-plugin-svelte": "^3.4.0",

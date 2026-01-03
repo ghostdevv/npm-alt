@@ -2,7 +2,7 @@
 	import IconLicense from 'virtual:icons/catppuccin/license';
 	import type { SearchPackage } from './data/search.remote';
 	import PackageLinks from './PackageLinks.svelte';
-	import type { Component } from 'svelte';
+	import Tag from './Tag.svelte';
 
 	interface Props {
 		pkg: SearchPackage;
@@ -10,13 +10,6 @@
 
 	const { pkg }: Props = $props();
 </script>
-
-{#snippet tag(Icon: Component, label: string, colour?: string, title?: string)}
-	<div class="tag" style:--colour={colour} {title}>
-		<Icon />
-		{label}
-	</div>
-{/snippet}
 
 <details class="package" open>
 	<summary>
@@ -36,12 +29,12 @@
 	</p>
 
 	<div class="tags">
-		{@render tag(
-			IconLicense,
-			pkg.license || 'None provided',
-			`var(--${pkg.license ? 'green' : 'red'})`,
-			'Package License',
-		)}
+		<Tag
+			icon={IconLicense}
+			label={pkg.license || 'None provided'}
+			colour="var(--{pkg.license ? 'green' : 'red'})"
+			title="Package License"
+		/>
 
 		<PackageLinks links={pkg.links} inspectValue={pkg} />
 	</div>
@@ -82,18 +75,5 @@
 			align-items: center;
 			gap: 8px;
 		}
-	}
-
-	.tag {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-
-		width: fit-content;
-		padding-inline: 6px;
-		padding-block: 4px;
-
-		border-radius: 6px;
-		background-color: color(from var(--colour) srgb r g b / 0.2);
 	}
 </style>

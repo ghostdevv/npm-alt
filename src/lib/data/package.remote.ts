@@ -3,12 +3,18 @@ import { registry, USER_AGENT } from './registry.server';
 import { packageName, semver } from '$lib/valibot';
 import createDOMPurify from 'dompurify';
 import markedShiki from 'marked-shiki';
+import { error } from '@sveltejs/kit';
 import { query } from '$app/server';
 import { codeToHtml } from 'shiki';
 import { ofetch } from 'ofetch';
 import { Marked } from 'marked';
 import { JSDOM } from 'jsdom';
 import * as v from 'valibot';
+import {
+	all,
+	type DocumentedModuleReplacement,
+	type ModuleReplacement,
+} from 'module-replacements';
 
 function getPackageJSON(pkg: Packument, _version: string) {
 	return pkg['versions'][pkg['dist-tags']['latest']!];
@@ -25,6 +31,7 @@ export interface Package {
 	version: string;
 	packageJSON: PackumentVersion;
 	links: PackageLinks;
+	moduleReplacements: ModuleReplacement[];
 }
 
 export const getPackage = query(
@@ -32,6 +39,10 @@ export const getPackage = query(
 	async ({ name, version }) => {
 		const pkg = await registry<Packument>(`/${name}`);
 		const packageJSON = getPackageJSON(pkg, version);
+
+		const moduleReplacements = all.moduleReplacements.filter(
+			(m) => m.type !== 'none' && m.moduleName === name,
+		);
 
 		return {
 			name: pkg.name,
@@ -42,6 +53,7 @@ export const getPackage = query(
 				homepage: pkg.homepage,
 				npm: `https://www.npmjs.com/package/${pkg.name}`,
 			},
+			moduleReplacements,
 		};
 	},
 );
@@ -115,6 +127,15 @@ const marked = new Marked(
 	}),
 );
 
+async function renderMarkdown(markdown: string) {
+	const md = await marked.parse(markdown, { gfm: true });
+
+	const window = new JSDOM('').window;
+	const dompurify = createDOMPurify(window);
+
+	return dompurify.sanitize(md);
+}
+
 export const renderREADME = query(
 	v.object({ name: packageName, version: semver }),
 	async ({ name, version }) => {
@@ -130,13 +151,30 @@ export const renderREADME = query(
 			return null;
 		}
 
-		const md = await marked.parse(readme, { gfm: true });
+		return await renderMarkdown(readme);
+	},
+);
 
-		const window = new JSDOM('').window;
-		const dompurify = createDOMPurify(window);
+export const renderDocumentedModuleReplacement = query(
+	packageName,
+	async (name) => {
+		const replacement = all.moduleReplacements.find(
+			(r) => r.type === 'documented' && r.moduleName == name,
+		) as DocumentedModuleReplacement | undefined;
 
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+		if (!replacement) {
+			error(404, 'failed to find requested replacement');
+		}
 
-		return dompurify.sanitize(md);
+		const doc = await ofetch(
+			`https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${replacement.docPath}.md`,
+			{ responseType: 'text', headers: { 'User-Agent': USER_AGENT } },
+		).catch(() => null);
+
+		if (!doc) {
+			error(404, 'failed to find requested documentation');
+		}
+
+		return await renderMarkdown(doc.replace(/^---\n.*\n---/, '').trim());
 	},
 );

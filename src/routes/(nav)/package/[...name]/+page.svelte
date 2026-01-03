@@ -2,6 +2,7 @@
 	import { getPackage, packageTypeStatus } from '$lib/data/package.remote';
 	import IconQuestion from 'virtual:icons/lucide/circle-question-mark';
 	import DropdownCodeblock from '$lib/DropdownCodeblock.svelte';
+	import ModuleReplacements from './ModuleReplacements.svelte';
 	import IconTS from 'virtual:icons/catppuccin/typescript';
 	import IconPNPM from 'virtual:icons/catppuccin/pnpm';
 	import IconYarn from 'virtual:icons/catppuccin/yarn';
@@ -11,11 +12,16 @@
 	import IconBun from 'virtual:icons/catppuccin/bun';
 	import IconCheck from 'virtual:icons/lucide/check';
 	import IconMinus from 'virtual:icons/lucide/minus';
+	import IconE18e from 'virtual:icons/custom/e18e';
 	import README from './README.svelte';
 
 	const { params } = $props();
 
-	const remoteKey = $derived({ name: params.name, version: 'latest' });
+	const remoteKey = $derived({
+		name: params.name.toLowerCase(),
+		version: 'latest',
+	});
+
 	const pkg = $derived(await getPackage(remoteKey));
 	const types = $derived(await packageTypeStatus(remoteKey));
 
@@ -79,7 +85,7 @@
 
 		<hr />
 
-		<h6>Meta</h6>
+		<h6>Stuff</h6>
 
 		<ul>
 			<li>
@@ -104,6 +110,11 @@
 						<IconQuestion />
 					</span>
 				{/if}
+			</li>
+
+			<li>
+				<IconE18e /> e18e notes
+				<ModuleReplacements replacements={pkg.moduleReplacements} />
 			</li>
 		</ul>
 	</div>
@@ -150,7 +161,7 @@
 					align-items: center;
 					gap: 6px;
 
-					& > :last-child {
+					&:global(> :nth-child(2)) {
 						display: grid;
 						place-items: center;
 						margin-left: auto;
