@@ -9,7 +9,7 @@
 
 	const { children, params } = $props();
 
-	const TAB_IDS = ['overview'] as const;
+	const TAB_IDS = ['overview', 'versions'] as const;
 	type TabId = (typeof TAB_IDS)[number];
 
 	function isTab(id: string): id is TabId {
