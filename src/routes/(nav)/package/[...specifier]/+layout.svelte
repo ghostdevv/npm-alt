@@ -101,7 +101,7 @@
 
 	[data-melt-tabs-trigger-list] {
 		border-bottom: 2px solid var(--primary);
-		margin-block-end: 22px;
+		margin-block-end: 16px;
 	}
 
 	[data-melt-tabs-trigger] {

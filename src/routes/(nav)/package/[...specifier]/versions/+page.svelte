@@ -14,6 +14,8 @@
 </script>
 
 <section>
+	<p class="count">Found {versions.length} versions</p>
+
 	<ol>
 		{#each versions as pkv}
 			<li>
@@ -72,6 +74,10 @@
 </section>
 
 <style>
+	.count {
+		margin-block-end: 16px;
+	}
+
 	ol {
 		list-style: none;
 
