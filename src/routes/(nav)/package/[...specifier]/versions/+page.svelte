@@ -9,8 +9,8 @@
 	import { resolve } from '$app/paths';
 
 	const { params } = $props();
-	const versions = $derived(await getPackageVersions(params.specifier));
 	const pkg = $derived(await getPackage(params.specifier));
+	const versions = $derived(await getPackageVersions(params.specifier));
 </script>
 
 <section>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import NavigationIndicator from '$lib/components/NavigationIndicator.svelte';
 	import Expansion from '$lib/expansions/Expansion.svelte';
 	import { search } from './search/search.svelte';
 	import { useThrottle } from 'runed';
@@ -14,6 +15,8 @@
 		search.query = query;
 	});
 </script>
+
+<NavigationIndicator />
 
 <div class="wrapper">
 	<header>

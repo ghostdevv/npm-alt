@@ -59,7 +59,6 @@ export interface PackageLinks {
 export interface Package {
 	name: string;
 	version: string;
-	packageJSON: PackumentVersion;
 	links: PackageLinks;
 	moduleReplacements: ModuleReplacement[];
 	types: PackageTypeStatus;
@@ -76,7 +75,7 @@ export const getPackage = query(vSpecifier, async (specifier) => {
 		`package:${name}-${version}`,
 		event.platform!,
 		600,
-		async () => {
+		async (): Promise<Package> => {
 			const pkg = await registry<Packument>(`/${name}`);
 			const packageJSON = getApproxPackageJSON(pkg, version);
 
@@ -96,7 +95,6 @@ export const getPackage = query(vSpecifier, async (specifier) => {
 				},
 				moduleReplacements,
 				types,
-				packageJSON,
 			};
 		},
 	);
@@ -160,7 +158,7 @@ export const getPackageVersions = query(vSpecifier, async ({ name }) => {
 	);
 });
 
-interface PackageTypeStatus {
+export interface PackageTypeStatus {
 	status: 'built-in' | 'definitely-typed' | 'none';
 	definitelyTypedPkg: string;
 }

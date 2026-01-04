@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { failed, pending } from '$lib/boundary.svelte';
 	import { getPackage } from '$lib/data/package.remote';
 	import PackageLinks from '$lib/PackageLinks.svelte';
-	import { failed } from '$lib/failed.svelte';
+	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { Tabs } from 'melt/builders';
 	import { resolve } from '$app/paths';
@@ -50,12 +51,14 @@
 </div>
 
 <div class="slot">
-	<svelte:boundary {failed}>
-		{@render children()}
-
+	<svelte:boundary {failed} {pending}>
 		{#if $effect.pending()}
-			Loading...
+			<div class="pending" in:fade>
+				{@render pending()}
+			</div>
 		{/if}
+
+		{@render children()}
 	</svelte:boundary>
 </div>
 
@@ -71,6 +74,23 @@
 			.version {
 				color: var(--text-grey);
 			}
+		}
+	}
+
+	.slot {
+		position: relative;
+
+		.pending {
+			position: absolute;
+			z-index: 100;
+			top: -8px;
+			left: 0;
+
+			width: 100%;
+			height: calc(100% + 8px);
+
+			backdrop-filter: blur(4px);
+			padding: 8px;
 		}
 	}
 

@@ -2,9 +2,9 @@
 	import { renderDocumentedModuleReplacement } from '$lib/data/package.remote';
 	import IconQuestion from 'virtual:icons/lucide/circle-question-mark';
 	import type { ModuleReplacement } from 'module-replacements';
+	import { failed, pending } from '$lib/boundary.svelte';
 	import IconNode from 'virtual:icons/custom/node';
 	import IconMDN from 'virtual:icons/custom/mdn';
-	import { failed } from '$lib/failed.svelte';
 	import IconX from 'virtual:icons/lucide/x';
 	import Modal from '$lib/Modal.svelte';
 	import Tag from '$lib/Tag.svelte';
@@ -71,7 +71,7 @@
 					{:else if replacement.type === 'documented'}
 						<h3>Documented Steps</h3>
 
-						<svelte:boundary {failed}>
+						<svelte:boundary {failed} {pending}>
 							{@html await renderDocumentedModuleReplacement(
 								replacement.moduleName,
 							)}
