@@ -1,14 +1,13 @@
 <script lang="ts">
-	import { getPackage, renderREADME } from '$lib/data/package.remote';
 	import ModuleReplacements from './ModuleReplacements.svelte';
 	import IconTS from 'virtual:icons/catppuccin/typescript';
+	import { renderREADME } from '$lib/data/package.remote';
 	import IconE18e from 'virtual:icons/custom/e18e';
 	import TypeStatus from './TypeStatus.svelte';
 	import Usage from './Usage.svelte';
 
-	const { params } = $props();
+	const { params, data } = $props();
 
-	const pkg = $derived(await getPackage(params.specifier));
 	const readme = $derived(await renderREADME(params.specifier));
 </script>
 
@@ -24,7 +23,7 @@
 	<div class="sidebar">
 		<h6>Use Locally</h6>
 
-		<Usage {pkg} />
+		<Usage pkg={data.pkg} />
 
 		<hr />
 
@@ -33,12 +32,14 @@
 		<ul>
 			<li>
 				<IconTS /> Type Definitions
-				<TypeStatus types={pkg.types} />
+				<TypeStatus types={data.pkg.types} />
 			</li>
 
 			<li>
 				<IconE18e /> e18e notes
-				<ModuleReplacements replacements={pkg.moduleReplacements} />
+				<ModuleReplacements
+					replacements={data.pkg.moduleReplacements}
+				/>
 			</li>
 		</ul>
 	</div>

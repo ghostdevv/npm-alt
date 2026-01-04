@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { failed, pending } from '$lib/boundary.svelte';
-	import { getPackage } from '$lib/data/package.remote';
 	import PackageLinks from '$lib/PackageLinks.svelte';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
@@ -8,7 +7,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 
-	const { children, params } = $props();
+	const { children, params, data } = $props();
 
 	const TAB_IDS = ['overview', 'versions'] as const;
 	type TabId = (typeof TAB_IDS)[number];
@@ -28,17 +27,15 @@
 			goto(resolve(`/(nav)/package/[...specifier]/${tab}`, params));
 		},
 	});
-
-	const pkg = $derived(await getPackage(params.specifier));
 </script>
 
 <section>
 	<div class="name">
 		<h1>
-			{pkg.name}<span class="version">@{pkg.version}</span>
+			{data.pkg.name}<span class="version">@{data.pkg.version}</span>
 		</h1>
 
-		<PackageLinks links={pkg.links} inspectValue={pkg} />
+		<PackageLinks links={data.pkg.links} inspectValue={data.pkg} />
 	</div>
 </section>
 

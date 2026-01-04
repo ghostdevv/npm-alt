@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getPackage, getPackageVersions } from '$lib/data/package.remote';
+	import { getPackageVersions } from '$lib/data/package.remote';
 	import IconCalendar from 'virtual:icons/lucide/calendar';
 	import { format as formatBytes } from '@std/fmt/bytes';
 	import IconWeight from 'virtual:icons/lucide/weight';
@@ -8,8 +8,7 @@
 	import { formatDistanceToNow } from 'date-fns';
 	import { resolve } from '$app/paths';
 
-	const { params } = $props();
-	const pkg = $derived(await getPackage(params.specifier));
+	const { params, data } = $props();
 	const versions = $derived(await getPackageVersions(params.specifier));
 </script>
 
@@ -22,7 +21,7 @@
 				<a
 					data-sveltekit-preload-data="tap"
 					href={resolve('/(nav)/package/[...specifier]/overview', {
-						specifier: `${pkg.name}@${pkv.version}`,
+						specifier: `${data.pkg.name}@${pkv.version}`,
 					})}
 					class={[pkv.groupState]}
 				>
