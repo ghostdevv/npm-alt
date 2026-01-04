@@ -1,8 +1,9 @@
 import { packageName, vSpecifier, type Specifier } from '$lib/valibot';
 import { cached, registry, USER_AGENT } from './common.server';
-import type { Packument, PackumentVersion } from '@npm/types';
+import type { Packument, PackumentVersion, Repository } from '@npm/types';
 import { serendipity } from '$lib/assets/serendipity-shiki';
 import { getRequestEvent, query } from '$app/server';
+import { join as joinPaths } from '@std/path';
 import createDOMPurify from 'dompurify';
 import markedShiki from 'marked-shiki';
 import { error } from '@sveltejs/kit';
@@ -214,21 +215,59 @@ async function packageTypeStatus(
 	};
 }
 
-const marked = new Marked(
-	markedShiki({
-		async highlight(code, lang) {
-			return await codeToHtml(code, { lang, theme: serendipity });
-		},
-	}),
-);
+async function renderMarkdown(markdown: string, linkBase?: string) {
+	const marked = new Marked(
+		markedShiki({
+			async highlight(code, lang) {
+				return await codeToHtml(code, { lang, theme: serendipity });
+			},
+		}),
+	);
 
-async function renderMarkdown(markdown: string) {
+	// todo rewrite to use lol-html
+	if (linkBase) {
+		marked.use({
+			walkTokens(token) {
+				if (token.type === 'link' || token.type === 'image') {
+					if (!URL.canParse(token.href)) {
+						token.href = joinPaths(linkBase, token.href);
+					}
+				}
+			},
+		});
+	}
+
 	const md = await marked.parse(markdown, { gfm: true });
 
 	const window = new JSDOM('').window;
 	const dompurify = createDOMPurify(window);
 
 	return dompurify.sanitize(md);
+}
+
+function getLinkBase(repo?: Repository) {
+	if (!repo || !repo.url) return null;
+
+	const url = URL.parse(
+		repo.url.startsWith('git+') ? repo.url.slice(4) : repo.url,
+	);
+
+	if (
+		!url ||
+		!['http:', 'https:'].includes(url.protocol) ||
+		url?.hostname !== 'github.com'
+	) {
+		return null;
+	}
+
+	const [, user, repoName] = url.pathname.split('/');
+
+	url.hostname = 'raw.githubusercontent.com';
+	url.protocol = 'https:';
+	// todo needs better sanitising
+	url.pathname = `/${joinPaths(user, repoName.replace(/\.git$/, ''), 'HEAD', repo.directory || '')}`;
+
+	return url.toString();
 }
 
 export const renderREADME = query(vSpecifier, async (specifier) => {
@@ -243,6 +282,9 @@ export const renderREADME = query(vSpecifier, async (specifier) => {
 		event.platform!,
 		600,
 		async () => {
+			const pkg = await registry<Packument>(`/${name}`);
+			const linkBase = getLinkBase(pkg.repository);
+
 			const readme = await ofetch(
 				`https://unpkg.com/${name}@${version}/README.md`,
 				{
@@ -255,7 +297,7 @@ export const renderREADME = query(vSpecifier, async (specifier) => {
 				return null;
 			}
 
-			return await renderMarkdown(readme);
+			return await renderMarkdown(readme, linkBase || undefined);
 		},
 	);
 });
