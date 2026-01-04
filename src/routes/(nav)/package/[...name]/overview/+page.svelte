@@ -38,7 +38,6 @@
 
 		<DropdownCodeblock
 			title="Select a package manager to install with"
-			--colour="#BE95FF"
 			options={[
 				{
 					title: 'pnpm',

@@ -12,9 +12,10 @@
 	interface Props {
 		title: string;
 		options: Option[];
+		textColour?: string;
 	}
 
-	const { title, options }: Props = $props();
+	const { title, options, textColour }: Props = $props();
 	// svelte-ignore state_referenced_locally
 	const select = new Select<Option>({ value: options[0], sameWidth: false });
 	const Icon = $derived(select.value?.icon);
@@ -41,7 +42,7 @@
 		{/each}
 	</div>
 
-	<pre><code>{select.value?.content}</code></pre>
+	<pre><code style:color={textColour}>{select.value?.content}</code></pre>
 </div>
 
 <style>
@@ -72,9 +73,5 @@
 		background-color: var(--background-primary);
 		border: 2px solid var(--background-tertiary);
 		border-radius: 8px;
-	}
-
-	code {
-		color: var(--colour);
 	}
 </style>
