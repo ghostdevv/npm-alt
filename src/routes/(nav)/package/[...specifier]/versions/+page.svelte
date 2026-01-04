@@ -8,10 +8,7 @@
 	import { formatDistanceToNow } from 'date-fns';
 
 	const { params } = $props();
-
-	const versions = $derived(
-		await getPackageVersions(params.name.toLowerCase()),
-	);
+	const versions = $derived(await getPackageVersions(params.specifier));
 </script>
 
 <section>

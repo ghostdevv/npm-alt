@@ -16,12 +16,7 @@
 
 	const { params } = $props();
 
-	const remoteKey = $derived({
-		name: params.name.toLowerCase(),
-		specifier: 'latest',
-	});
-
-	const pkg = $derived(await getPackage(remoteKey));
+	const pkg = $derived(await getPackage(params.specifier));
 
 	const installPackages = $derived(
 		`${pkg.name}${pkg.types.status === 'definitely-typed' ? ` ${pkg.types.definitelyTypedPkg}` : ''}`,
@@ -30,7 +25,7 @@
 
 <section class="main">
 	<div class="readme">
-		<README {...remoteKey} />
+		<README specifier={params.specifier} />
 	</div>
 
 	<div class="sidebar">

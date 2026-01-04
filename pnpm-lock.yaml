@@ -20,9 +20,6 @@ importers:
       '@std/fmt':
         specifier: jsr:^1.0.8
         version: '@jsr/std__fmt@1.0.8'
-      '@std/semver':
-        specifier: jsr:^1.0.7
-        version: '@jsr/std__semver@1.0.7'
       '@sveltejs/adapter-cloudflare':
         specifier: ^7.2.4
         version: 7.2.4(@sveltejs/kit@2.49.2(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.46.1)(vite@7.3.0(@types/node@25.0.3)))(svelte@5.46.1)(vite@7.3.0(@types/node@25.0.3)))(wrangler@4.56.0(@cloudflare/workers-types@4.20260103.0))
@@ -35,6 +32,12 @@ importers:
       '@types/jsdom':
         specifier: ^27.0.0
         version: 27.0.0
+      '@types/npm-package-arg':
+        specifier: ^6.1.4
+        version: 6.1.4
+      '@types/semver':
+        specifier: ^7.7.1
+        version: 7.7.1
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -56,6 +59,9 @@ importers:
       module-replacements:
         specifier: ^2.10.1
         version: 2.10.1
+      npm-package-arg:
+        specifier: ^13.0.2
+        version: 13.0.2
       ofetch:
         specifier: ^1.5.1
         version: 1.5.1
@@ -68,6 +74,9 @@ importers:
       runed:
         specifier: ^0.37.1
         version: 0.37.1(@sveltejs/kit@2.49.2(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.46.1)(vite@7.3.0(@types/node@25.0.3)))(svelte@5.46.1)(vite@7.3.0(@types/node@25.0.3)))(svelte@5.46.1)
+      semver:
+        specifier: ^7.7.3
+        version: 7.7.3
       shiki:
         specifier: ^3.20.0
         version: 3.20.0
@@ -671,9 +680,6 @@ packages:
   '@jsr/std__fmt@1.0.8':
     resolution: {integrity: sha512-miZHzj9OgjuajrcMKzpqNVwFb9O71UHZzV/FHVq0E0Uwmv/1JqXgmXAoBNPrn+MP0fHT3mMgaZ6XvQO7dam67Q==, tarball: https://npm.jsr.io/~/11/@jsr/std__fmt/1.0.8.tgz}
 
-  '@jsr/std__semver@1.0.7':
-    resolution: {integrity: sha512-/WpDSNegE6lI50L1+VnItLkuuQlZK8e8QbxrjV1sH+3YqiH+sQ/Tx3yYvewkKVVSwcidQUlqSIHSPrhay1zLCg==, tarball: https://npm.jsr.io/~/11/@jsr/std__semver/1.0.7.tgz}
-
   '@npm/types@2.1.0':
     resolution: {integrity: sha512-humQVe2BrWR7Yum5hGDYBnIPnnZJvKSOH/I4QN1ZL2bdb4c4zQHaHupEJ3cOkSJ07G3YfN793ptbNh196BWLgA==}
     engines: {node: '>=18.6.0'}
@@ -890,6 +896,12 @@ packages:
 
   '@types/node@25.0.3':
     resolution: {integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==}
+
+  '@types/npm-package-arg@6.1.4':
+    resolution: {integrity: sha512-vDgdbMy2QXHnAruzlv68pUtXCjmqUk3WrBAsRboRovsOmxbfn/WiYCjmecyKjGztnMps5dWp4Uq2prp+Ilo17Q==}
+
+  '@types/semver@7.7.1':
+    resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -1121,6 +1133,10 @@ packages:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
 
+  hosted-git-info@9.0.2:
+    resolution: {integrity: sha512-M422h7o/BR3rmCQ8UHi7cyyMqKltdP9Uo+J2fXK+RSAY+wTcKOIRyhTuKv4qn+DJf3g+PL890AzId5KZpX+CBg==}
+    engines: {node: ^20.17.0 || >=22.9.0}
+
   html-encoding-sniffer@6.0.0:
     resolution: {integrity: sha512-CV9TW3Y3f8/wT0BRFc1/KAVQ3TUHiXmaAb6VW9vtiMFf7SLoMd1PdAc4W3KFOFETBJUb90KatHqlsZMWV+R9Gg==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
@@ -1279,6 +1295,10 @@ packages:
   node-fetch-native@1.6.7:
     resolution: {integrity: sha512-g9yhqoedzIUm0nTnTqAQvueMPVOuIY16bqgAJJC8XOOubYFNwz6IER9qs0Gq2Xd0+CecCKFjtdDTMA4u4xG06Q==}
 
+  npm-package-arg@13.0.2:
+    resolution: {integrity: sha512-IciCE3SY3uE84Ld8WZU23gAPPV9rIYod4F+rc+vJ7h7cwAJt9Vk6TVsK60ry7Uj3SRS3bqRRIGuTp9YVlk6WNA==}
+    engines: {node: ^20.17.0 || >=22.9.0}
+
   ofetch@1.5.1:
     resolution: {integrity: sha512-2W4oUZlVaqAPAil6FUg/difl6YhqhUR7x2eZY4bQCko22UXg3hptq9KLQdqFClV+Wu85UX7hNtdGTngi/1BxcA==}
 
@@ -1334,6 +1354,10 @@ packages:
   pretty-format@29.7.0:
     resolution: {integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
+
+  proc-log@6.1.0:
+    resolution: {integrity: sha512-iG+GYldRf2BQ0UDUAd6JQ/RwzaQy6mXmsk/IzlYyal4A4SNFw54MeH4/tLkF4I5WoWG9SQwuqWzS99jaFQHBuQ==}
+    engines: {node: ^20.17.0 || >=22.9.0}
 
   property-information@7.1.0:
     resolution: {integrity: sha512-TwEZ+X+yCJmYfL7TPUOcvBZ4QfoT5YenQiJuX//0th53DE6w0xxLEtfK3iyryQFddXuvkIk51EEgrJQ0WJkOmQ==}
@@ -1566,6 +1590,10 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  validate-npm-package-name@7.0.1:
+    resolution: {integrity: sha512-BM0Upcemlce8/9+HE+/VpWqn3u3mYh6Om/FEC8yPMnEHwf710fW5Q6fhjT1SQyRlZD1G9CJbgfH+rWgAcIvjlQ==}
+    engines: {node: ^20.17.0 || >=22.9.0}
 
   vfile-message@4.0.3:
     resolution: {integrity: sha512-QTHzsGd1EhbZs4AsQ20JX1rC3cOlt/IWJruk893DfLRr57lcnOeMaWG4K0JrRta4mIJZKth2Au3mM3u03/JWKw==}
@@ -2081,8 +2109,6 @@ snapshots:
 
   '@jsr/std__fmt@1.0.8': {}
 
-  '@jsr/std__semver@1.0.7': {}
-
   '@npm/types@2.1.0': {}
 
   '@polka/url@1.0.0-next.29': {}
@@ -2278,6 +2304,10 @@ snapshots:
   '@types/node@25.0.3':
     dependencies:
       undici-types: 7.16.0
+
+  '@types/npm-package-arg@6.1.4': {}
+
+  '@types/semver@7.7.1': {}
 
   '@types/tough-cookie@4.0.5': {}
 
@@ -2511,6 +2541,10 @@ snapshots:
 
   highlight.js@11.11.1: {}
 
+  hosted-git-info@9.0.2:
+    dependencies:
+      lru-cache: 11.2.4
+
   html-encoding-sniffer@6.0.0:
     dependencies:
       '@exodus/bytes': 1.8.0
@@ -2706,6 +2740,13 @@ snapshots:
 
   node-fetch-native@1.6.7: {}
 
+  npm-package-arg@13.0.2:
+    dependencies:
+      hosted-git-info: 9.0.2
+      proc-log: 6.1.0
+      semver: 7.7.3
+      validate-npm-package-name: 7.0.1
+
   ofetch@1.5.1:
     dependencies:
       destr: 2.0.5
@@ -2768,6 +2809,8 @@ snapshots:
       '@jest/schemas': 29.6.3
       ansi-styles: 5.2.0
       react-is: 18.3.1
+
+  proc-log@6.1.0: {}
 
   property-information@7.1.0: {}
 
@@ -3039,6 +3082,8 @@ snapshots:
   valibot@1.2.0(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
+
+  validate-npm-package-name@7.0.1: {}
 
   vfile-message@4.0.3:
     dependencies:

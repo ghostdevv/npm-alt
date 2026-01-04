@@ -3,12 +3,11 @@
 	import { failed } from '$lib/failed.svelte';
 
 	interface Props {
-		name: string;
 		specifier: string;
 	}
 
 	const props: Props = $props();
-	const readme = $derived(await renderREADME(props));
+	const readme = $derived(await renderREADME(props.specifier));
 </script>
 
 <svelte:boundary {failed}>

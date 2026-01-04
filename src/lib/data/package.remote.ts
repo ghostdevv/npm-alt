@@ -1,17 +1,16 @@
+import { packageName, vSpecifier, type Specifier } from '$lib/valibot';
 import { cached, registry, USER_AGENT } from './common.server';
 import type { Packument, PackumentVersion } from '@npm/types';
 import { serendipity } from '$lib/assets/serendipity-shiki';
-import { packageName, semverOrTag } from '$lib/valibot';
 import { getRequestEvent, query } from '$app/server';
 import createDOMPurify from 'dompurify';
 import markedShiki from 'marked-shiki';
 import { error } from '@sveltejs/kit';
-import * as semver from '@std/semver';
 import { codeToHtml } from 'shiki';
 import { ofetch } from 'ofetch';
 import { Marked } from 'marked';
 import { JSDOM } from 'jsdom';
-import * as v from 'valibot';
+import semver from 'semver';
 import {
 	all,
 	type DocumentedModuleReplacement,
@@ -66,45 +65,42 @@ export interface Package {
 	types: PackageTypeStatus;
 }
 
-export const getPackage = query(
-	v.object({ name: packageName, specifier: semverOrTag }),
-	async ({ name, specifier }) => {
-		const event = getRequestEvent();
-		const version = await getRealVersion(name, specifier, event.platform!);
+export const getPackage = query(vSpecifier, async (specifier) => {
+	const event = getRequestEvent();
+	const { name, version } = await resolveSpecifier(
+		specifier,
+		event.platform!,
+	);
 
-		return await cached(
-			`package:${name}-${version}`,
-			event.platform!,
-			600,
-			async () => {
-				const pkg = await registry<Packument>(`/${name}`);
-				const packageJSON = getApproxPackageJSON(pkg, version);
+	return await cached(
+		`package:${name}-${version}`,
+		event.platform!,
+		600,
+		async () => {
+			const pkg = await registry<Packument>(`/${name}`);
+			const packageJSON = getApproxPackageJSON(pkg, version);
 
-				const moduleReplacements = all.moduleReplacements.filter(
-					(m) => m.type !== 'none' && m.moduleName === name,
-				);
+			const moduleReplacements = all.moduleReplacements.filter(
+				(m) => m.type !== 'none' && m.moduleName === name,
+			);
 
-				const types = await packageTypeStatus(
-					packageJSON,
-					event.platform!,
-				);
+			const types = await packageTypeStatus(packageJSON, event.platform!);
 
-				return {
-					name: pkg.name,
-					version,
-					links: {
-						repository: pkg.repository?.url,
-						homepage: pkg.homepage,
-						npm: `https://www.npmjs.com/package/${pkg.name}`,
-					},
-					moduleReplacements,
-					types,
-					packageJSON,
-				};
-			},
-		);
-	},
-);
+			return {
+				name: pkg.name,
+				version,
+				links: {
+					repository: pkg.repository?.url,
+					homepage: pkg.homepage,
+					npm: `https://www.npmjs.com/package/${pkg.name}`,
+				},
+				moduleReplacements,
+				types,
+				packageJSON,
+			};
+		},
+	);
+});
 
 export interface PackageVersion {
 	version: string;
@@ -115,7 +111,7 @@ export interface PackageVersion {
 	publishedAt: Date | null;
 }
 
-export const getPackageVersions = query(packageName, async (name) => {
+export const getPackageVersions = query(vSpecifier, async ({ name }) => {
 	const event = getRequestEvent();
 
 	return await cached(
@@ -128,7 +124,7 @@ export const getPackageVersions = query(packageName, async (name) => {
 			const versions = Object.values(pkg.versions)
 				.map((pkv): PackageVersion & { _v: semver.SemVer } => {
 					const date = new Date(pkg.time[pkv.version]);
-					const versionParsed = semver.parse(pkv.version);
+					const versionParsed = semver.parse(pkv.version)!;
 
 					return {
 						version: pkv.version,
@@ -237,40 +233,34 @@ async function renderMarkdown(markdown: string) {
 	return dompurify.sanitize(md);
 }
 
-export const renderREADME = query(
-	v.object({ name: packageName, specifier: semverOrTag }),
-	async ({ name, specifier }) => {
-		const event = getRequestEvent();
-		const version = await getRealVersion(name, specifier, event.platform!);
+export const renderREADME = query(vSpecifier, async (specifier) => {
+	const event = getRequestEvent();
+	const { name, version } = await resolveSpecifier(
+		specifier,
+		event.platform!,
+	);
 
-		return await cached(
-			`readme:${name}-${version}`,
-			event.platform!,
-			600,
-			async () => {
-				const pkg = await registry<PackumentVersion>(
-					`/${name}/${version}`,
-				);
+	return await cached(
+		`readme:${name}-${version}`,
+		event.platform!,
+		600,
+		async () => {
+			const readme = await ofetch(
+				`https://unpkg.com/${name}@${version}/README.md`,
+				{
+					responseType: 'text',
+					headers: { 'User-Agent': USER_AGENT },
+				},
+			).catch(() => null);
 
-				let readme = pkg.readme || null;
+			if (!readme) {
+				return null;
+			}
 
-				readme ??= await ofetch(
-					`https://unpkg.com/${name}@${version}/README.md`,
-					{
-						responseType: 'text',
-						headers: { 'User-Agent': USER_AGENT },
-					},
-				).catch(() => null);
-
-				if (!readme) {
-					return null;
-				}
-
-				return await renderMarkdown(readme);
-			},
-		);
-	},
-);
+			return await renderMarkdown(readme);
+		},
+	);
+});
 
 export const renderDocumentedModuleReplacement = query(
 	packageName,
@@ -310,24 +300,40 @@ export const renderDocumentedModuleReplacement = query(
 	},
 );
 
-async function getRealVersion(
-	name: string,
-	specifier: string,
-	platform: App.Platform,
-) {
-	if (semver.canParse(specifier)) {
-		return specifier;
+async function resolveSpecifier(specifier: Specifier, platform: App.Platform) {
+	if (specifier.type === 'version') {
+		return { name: specifier.name, version: specifier.fetchSpec };
 	}
 
 	return await cached(
-		`real-version:${name}-${specifier}`,
+		`parsed-specifier:${specifier}`,
 		platform,
 		60,
 		async () => {
-			const res = await registry<PackumentVersion>(
-				`/${name}/${specifier}`,
-			);
-			return res.version;
+			const pkg = await registry<Packument>(`/${specifier.name}`);
+			let version: string | null = null;
+
+			if (specifier.type === 'tag') {
+				version = pkg['dist-tags'][specifier.fetchSpec] || null;
+			} else if (
+				specifier.type === 'range' &&
+				['*', 'latest'].includes(specifier.fetchSpec)
+			) {
+				version = pkg['dist-tags'].latest || null;
+			} else if (specifier.type === 'range') {
+				let maxVersion = pkg['dist-tags'].latest || null;
+				if (!semver.satisfies(maxVersion!, specifier.fetchSpec))
+					maxVersion = null;
+
+				for (const ver of Object.keys(pkg.versions)) {
+					if (semver.satisfies(ver, specifier.fetchSpec)) {
+						if (!maxVersion || semver.lte(ver, maxVersion))
+							version = ver;
+					}
+				}
+			}
+
+			return { name: specifier.name, version: version! };
 		},
 	);
 }

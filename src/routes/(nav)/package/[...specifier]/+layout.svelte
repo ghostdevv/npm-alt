@@ -24,22 +24,17 @@
 	const tabs = new Tabs<TabId>({
 		value: () => urlTabId,
 		onValueChange(tab) {
-			goto(resolve(`/(nav)/package/[...name]/${tab}`, params));
+			goto(resolve(`/(nav)/package/[...specifier]/${tab}`, params));
 		},
 	});
 
-	const pkg = $derived(
-		await getPackage({
-			name: params.name.toLowerCase(),
-			specifier: 'latest',
-		}),
-	);
+	const pkg = $derived(await getPackage(params.specifier));
 </script>
 
 <section>
 	<div class="name">
 		<h1>
-			{params.name}<span class="version">@{pkg.version}</span>
+			{pkg.name}<span class="version">@{pkg.version}</span>
 		</h1>
 
 		<PackageLinks links={pkg.links} inspectValue={pkg} />

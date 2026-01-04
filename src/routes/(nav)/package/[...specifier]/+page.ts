@@ -1,5 +1,5 @@
 import { redirect } from '@sveltejs/kit';
 
 export function load({ params }) {
-	redirect(307, `/package/${params.name}/overview`);
+	redirect(307, `/package/${params.specifier}/overview`);
 }
