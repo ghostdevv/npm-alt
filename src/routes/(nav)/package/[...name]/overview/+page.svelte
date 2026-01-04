@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { getPackage, packageTypeStatus } from '$lib/data/package.remote';
 	import IconQuestion from 'virtual:icons/lucide/circle-question-mark';
 	import DropdownCodeblock from '$lib/DropdownCodeblock.svelte';
 	import ModuleReplacements from './ModuleReplacements.svelte';
 	import IconTS from 'virtual:icons/catppuccin/typescript';
+	import { getPackage } from '$lib/data/package.remote';
 	import IconPNPM from 'virtual:icons/catppuccin/pnpm';
 	import IconYarn from 'virtual:icons/catppuccin/yarn';
 	import IconDeno from 'virtual:icons/catppuccin/deno';
-	import PackageLinks from '$lib/PackageLinks.svelte';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconBun from 'virtual:icons/catppuccin/bun';
 	import IconCheck from 'virtual:icons/lucide/check';
@@ -23,10 +22,9 @@
 	});
 
 	const pkg = $derived(await getPackage(remoteKey));
-	const types = $derived(await packageTypeStatus(remoteKey));
 
 	const installPackages = $derived(
-		`${pkg.name}${types.status === 'definitely-typed' ? ` ${types.definitelyTypedPkg}` : ''}`,
+		`${pkg.name}${pkg.types.status === 'definitely-typed' ? ` ${pkg.types.definitelyTypedPkg}` : ''}`,
 	);
 </script>
 
@@ -82,11 +80,11 @@
 			<li>
 				<IconTS /> Type Definitions
 
-				{#if types.status === 'built-in'}
+				{#if pkg.types.status === 'built-in'}
 					<span title="Types Built In" style="color: var(--green);">
 						<IconCheck />
 					</span>
-				{:else if types.status === 'definitely-typed'}
+				{:else if pkg.types.status === 'definitely-typed'}
 					<span
 						title="Only DefinitelyTyped"
 						style="color: var(--orange);"

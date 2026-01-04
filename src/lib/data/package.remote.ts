@@ -33,6 +33,7 @@ export interface Package {
 	packageJSON: PackumentVersion;
 	links: PackageLinks;
 	moduleReplacements: ModuleReplacement[];
+	types: PackageTypeStatus;
 }
 
 export const getPackage = query(
@@ -45,6 +46,8 @@ export const getPackage = query(
 			(m) => m.type !== 'none' && m.moduleName === name,
 		);
 
+		const types = await packageTypeStatus(packageJSON);
+
 		return {
 			name: pkg.name,
 			version: packageJSON.version,
@@ -55,6 +58,7 @@ export const getPackage = query(
 				npm: `https://www.npmjs.com/package/${pkg.name}`,
 			},
 			moduleReplacements,
+			types,
 		};
 	},
 );
@@ -80,45 +84,42 @@ interface PackageTypeStatus {
 	definitelyTypedPkg?: string;
 }
 
-export const packageTypeStatus = query(
-	v.object({ name: packageName, version: semver }),
-	async ({ name, version }): Promise<PackageTypeStatus> => {
-		const pkg = await registry<PackumentVersion>(`/${name}/${version}`);
-		const definitelyTypedPkg = definitelyTypedName(pkg.name);
+async function packageTypeStatus(
+	pkg: PackumentVersion,
+): Promise<PackageTypeStatus> {
+	const definitelyTypedPkg = definitelyTypedName(pkg.name);
 
-		if (pkg.types) {
+	if (pkg.types) {
+		return { status: 'built-in', definitelyTypedPkg };
+	}
+
+	if (hasExports(pkg)) {
+		const builtIn =
+			// "exports": "./foo.ts"
+			(typeof pkg.exports === 'string' && pkg.exports.endsWith('ts')) ||
+			// "exports": { ".": "./foo.ts" }
+			(typeof pkg.exports !== 'string' &&
+				typeof pkg.exports?.['.'] === 'string' &&
+				pkg.exports?.['.'].endsWith('ts')) ||
+			// "exports": { ".": { types: "./foo.ts" } }
+			(typeof pkg.exports !== 'string' &&
+				typeof pkg.exports?.['.'] !== 'string' &&
+				pkg.exports?.['.']?.types.endsWith('ts'));
+
+		if (builtIn) {
 			return { status: 'built-in', definitelyTypedPkg };
 		}
+	}
 
-		if (hasExports(pkg)) {
-			const builtIn =
-				// "exports": "./foo.ts"
-				(typeof pkg.exports === 'string' &&
-					pkg.exports.endsWith('ts')) ||
-				// "exports": { ".": "./foo.ts" }
-				(typeof pkg.exports !== 'string' &&
-					typeof pkg.exports?.['.'] === 'string' &&
-					pkg.exports?.['.'].endsWith('ts')) ||
-				// "exports": { ".": { types: "./foo.ts" } }
-				(typeof pkg.exports !== 'string' &&
-					typeof pkg.exports?.['.'] !== 'string' &&
-					pkg.exports?.['.']?.types.endsWith('ts'));
+	const res = await registry(`/${definitelyTypedPkg}/latest`)
+		// prettier-ignore
+		.catch(() => null);
 
-			if (builtIn) {
-				return { status: 'built-in', definitelyTypedPkg };
-			}
-		}
-
-		const res = await registry(`/${definitelyTypedPkg}/latest`)
-			// prettier-ignore
-			.catch(() => null);
-
-		return {
-			status: res ? 'definitely-typed' : 'none',
-			definitelyTypedPkg,
-		};
-	},
-);
+	return {
+		status: res ? 'definitely-typed' : 'none',
+		definitelyTypedPkg,
+	};
+}
 
 const marked = new Marked(
 	markedShiki({
