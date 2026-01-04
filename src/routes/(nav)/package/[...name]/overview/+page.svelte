@@ -30,16 +30,6 @@
 	);
 </script>
 
-<section>
-	<div class="name">
-		<h1>
-			{params.name}<span class="version">@{pkg.version}</span>
-		</h1>
-
-		<PackageLinks links={pkg.links} inspectValue={{ pkg, types }} />
-	</div>
-</section>
-
 <section class="main">
 	<div class="readme">
 		<README {...remoteKey} />
@@ -122,24 +112,6 @@
 </section>
 
 <style>
-	section {
-		margin-block: 6px;
-	}
-
-	.name {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-
-		h1 {
-			margin-right: auto;
-
-			.version {
-				color: var(--text-grey);
-			}
-		}
-	}
-
 	.main {
 		display: grid;
 		grid-template-columns: 1fr max-content;
