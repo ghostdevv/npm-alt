@@ -18,8 +18,37 @@ import {
 	type ModuleReplacement,
 } from 'module-replacements';
 
-function getPackageJSON(pkg: Packument, _version: string) {
-	return pkg['versions'][pkg['dist-tags']['latest']!];
+const PACKUMENT_VERSION_FIELDS = [
+	'_hasShrinkwrap',
+	'_id',
+	'_nodeVersion',
+	'_npmUser',
+	'_npmVersion',
+	'browser',
+	'deprecated',
+	'gitHead',
+	'readmeFilename',
+] as const;
+
+type OmitWithIndex<T, K extends keyof T> = {
+	[P in keyof T as P extends K ? never : P]: T[P];
+};
+
+type ApproxPackageJSON = OmitWithIndex<
+	PackumentVersion,
+	(typeof PACKUMENT_VERSION_FIELDS)[number]
+> & {
+	exports?: string | Record<string, string | Record<string, string>>;
+};
+
+function getApproxPackageJSON(pac: Packument, version: string) {
+	return Object.fromEntries(
+		Object.entries(pac['versions'][version]).filter(
+			([key]) =>
+				!PACKUMENT_VERSION_FIELDS.includes(key as any) &&
+				!key.startsWith('_'),
+		),
+	) as ApproxPackageJSON;
 }
 
 export interface PackageLinks {
@@ -49,7 +78,7 @@ export const getPackage = query(
 			600,
 			async () => {
 				const pkg = await registry<Packument>(`/${name}`);
-				const packageJSON = getPackageJSON(pkg, version);
+				const packageJSON = getApproxPackageJSON(pkg, version);
 
 				const moduleReplacements = all.moduleReplacements.filter(
 					(m) => m.type !== 'none' && m.moduleName === name,
@@ -62,8 +91,7 @@ export const getPackage = query(
 
 				return {
 					name: pkg.name,
-					version: packageJSON.version,
-					packageJSON,
+					version,
 					links: {
 						repository: pkg.repository?.url,
 						homepage: pkg.homepage,
@@ -71,6 +99,7 @@ export const getPackage = query(
 					},
 					moduleReplacements,
 					types,
+					packageJSON,
 				};
 			},
 		);
@@ -135,53 +164,37 @@ export const getPackageVersions = query(packageName, async (name) => {
 	);
 });
 
-interface PackumentVersionWithExports extends PackumentVersion {
-	exports?: string | Record<string, string | Record<string, string>>;
-}
-
-function hasExports(
-	pkgJSON: PackumentVersion,
-): pkgJSON is PackumentVersionWithExports {
-	return 'exports' in pkgJSON;
-}
-
-function definitelyTypedName(pkgName: string) {
-	return pkgName.startsWith('@')
-		? pkgName.replace('/', '__').replace('@', '@types/')
-		: pkgName;
-}
-
 interface PackageTypeStatus {
 	status: 'built-in' | 'definitely-typed' | 'none';
-	definitelyTypedPkg?: string;
+	definitelyTypedPkg: string;
 }
 
 async function packageTypeStatus(
-	pkg: PackumentVersion,
+	pkg: ApproxPackageJSON,
 	platform: App.Platform,
 ): Promise<PackageTypeStatus> {
-	const definitelyTypedPkg = definitelyTypedName(pkg.name);
+	const definitelyTypedPkg = pkg.name.startsWith('@')
+		? pkg.name.replace('/', '__').replace('@', '@types/')
+		: pkg.name;
 
 	if (pkg.types) {
 		return { status: 'built-in', definitelyTypedPkg };
 	}
 
-	if (hasExports(pkg)) {
-		const builtIn =
-			// "exports": "./foo.ts"
-			(typeof pkg.exports === 'string' && pkg.exports.endsWith('ts')) ||
-			// "exports": { ".": "./foo.ts" }
-			(typeof pkg.exports !== 'string' &&
-				typeof pkg.exports?.['.'] === 'string' &&
-				pkg.exports?.['.'].endsWith('ts')) ||
-			// "exports": { ".": { types: "./foo.ts" } }
-			(typeof pkg.exports !== 'string' &&
-				typeof pkg.exports?.['.'] !== 'string' &&
-				pkg.exports?.['.']?.types.endsWith('ts'));
+	const builtIn =
+		// "exports": "./foo.ts"
+		(typeof pkg.exports === 'string' && pkg.exports.endsWith('ts')) ||
+		// "exports": { ".": "./foo.ts" }
+		(typeof pkg.exports !== 'string' &&
+			typeof pkg.exports?.['.'] === 'string' &&
+			pkg.exports?.['.'].endsWith('ts')) ||
+		// "exports": { ".": { types: "./foo.ts" } }
+		(typeof pkg.exports !== 'string' &&
+			typeof pkg.exports?.['.'] !== 'string' &&
+			pkg.exports?.['.']?.types.endsWith('ts'));
 
-		if (builtIn) {
-			return { status: 'built-in', definitelyTypedPkg };
-		}
+	if (builtIn) {
+		return { status: 'built-in', definitelyTypedPkg };
 	}
 
 	const dtExists = await cached(
