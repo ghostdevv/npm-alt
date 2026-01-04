@@ -20,6 +20,7 @@
 
 <DropdownCodeblock
 	title="Select a package manager to install with"
+	textColour="#BE95FF"
 	options={[
 		{
 			title: 'pnpm',
