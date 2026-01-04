@@ -38,7 +38,7 @@ const SEARCH_BATCH_SIZE = 20;
 
 export const searchRegistry = query(
 	v.object({
-		query: v.pipe(v.string(), v.minLength(1), v.maxLength(1000)),
+		query: v.pipe(v.string(), v.minLength(2), v.maxLength(1000)),
 		from: v.pipe(v.number(), v.integer()),
 	}),
 	async ({ query, from }) => {
