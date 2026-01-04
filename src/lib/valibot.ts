@@ -8,3 +8,6 @@ export const packageName = v.pipe(v.string(), v.minLength(1));
 
 // todo validate semver
 export const semver = v.pipe(v.string(), v.minLength(1));
+
+// todo properly
+export const semverOrTag = v.union([semver, v.literal('latest')]);

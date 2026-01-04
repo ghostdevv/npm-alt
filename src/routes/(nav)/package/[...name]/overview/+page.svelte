@@ -18,7 +18,7 @@
 
 	const remoteKey = $derived({
 		name: params.name.toLowerCase(),
-		version: 'latest',
+		specifier: 'latest',
 	});
 
 	const pkg = $derived(await getPackage(remoteKey));

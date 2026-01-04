@@ -4,7 +4,7 @@
 
 	interface Props {
 		name: string;
-		version: string;
+		specifier: string;
 	}
 
 	const props: Props = $props();

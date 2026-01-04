@@ -31,7 +31,7 @@
 	const pkg = $derived(
 		await getPackage({
 			name: params.name.toLowerCase(),
-			version: 'latest',
+			specifier: 'latest',
 		}),
 	);
 </script>

@@ -1,11 +1,12 @@
+import { cached, registry, USER_AGENT } from './common.server';
 import type { Packument, PackumentVersion } from '@npm/types';
 import { serendipity } from '$lib/assets/serendipity-shiki';
-import { registry, USER_AGENT } from './registry.server';
-import { packageName, semver } from '$lib/valibot';
+import { packageName, semverOrTag } from '$lib/valibot';
+import { getRequestEvent, query } from '$app/server';
 import createDOMPurify from 'dompurify';
 import markedShiki from 'marked-shiki';
 import { error } from '@sveltejs/kit';
-import { query } from '$app/server';
+import * as semver from '@std/semver';
 import { codeToHtml } from 'shiki';
 import { ofetch } from 'ofetch';
 import { Marked } from 'marked';
@@ -37,29 +38,42 @@ export interface Package {
 }
 
 export const getPackage = query(
-	v.object({ name: packageName, version: semver }),
-	async ({ name, version }) => {
-		const pkg = await registry<Packument>(`/${name}`);
-		const packageJSON = getPackageJSON(pkg, version);
+	v.object({ name: packageName, specifier: semverOrTag }),
+	async ({ name, specifier }) => {
+		const event = getRequestEvent();
+		const version = await getRealVersion(name, specifier, event.platform!);
 
-		const moduleReplacements = all.moduleReplacements.filter(
-			(m) => m.type !== 'none' && m.moduleName === name,
-		);
+		return await cached(
+			`get-package:${name}-${version}`,
+			event.platform!,
+			600,
+			async () => {
+				const pkg = await registry<Packument>(`/${name}`);
+				const packageJSON = getPackageJSON(pkg, version);
 
-		const types = await packageTypeStatus(packageJSON);
+				const moduleReplacements = all.moduleReplacements.filter(
+					(m) => m.type !== 'none' && m.moduleName === name,
+				);
 
-		return {
-			name: pkg.name,
-			version: packageJSON.version,
-			packageJSON,
-			links: {
-				repository: pkg.repository?.url,
-				homepage: pkg.homepage,
-				npm: `https://www.npmjs.com/package/${pkg.name}`,
+				const types = await packageTypeStatus(
+					packageJSON,
+					event.platform!,
+				);
+
+				return {
+					name: pkg.name,
+					version: packageJSON.version,
+					packageJSON,
+					links: {
+						repository: pkg.repository?.url,
+						homepage: pkg.homepage,
+						npm: `https://www.npmjs.com/package/${pkg.name}`,
+					},
+					moduleReplacements,
+					types,
+				};
 			},
-			moduleReplacements,
-			types,
-		};
+		);
 	},
 );
 
@@ -86,6 +100,7 @@ interface PackageTypeStatus {
 
 async function packageTypeStatus(
 	pkg: PackumentVersion,
+	platform: App.Platform,
 ): Promise<PackageTypeStatus> {
 	const definitelyTypedPkg = definitelyTypedName(pkg.name);
 
@@ -111,12 +126,25 @@ async function packageTypeStatus(
 		}
 	}
 
-	const res = await registry(`/${definitelyTypedPkg}/latest`)
-		// prettier-ignore
-		.catch(() => null);
+	const dtExists = await cached(
+		`dt-exists:${pkg.name}`,
+		platform,
+		600,
+		async () => {
+			try {
+				await registry<PackumentVersion>(
+					`/${definitelyTypedPkg}/latest`,
+				);
+
+				return true;
+			} catch (error) {
+				return false;
+			}
+		},
+	);
 
 	return {
-		status: res ? 'definitely-typed' : 'none',
+		status: dtExists ? 'definitely-typed' : 'none',
 		definitelyTypedPkg,
 	};
 }
@@ -139,44 +167,96 @@ async function renderMarkdown(markdown: string) {
 }
 
 export const renderREADME = query(
-	v.object({ name: packageName, version: semver }),
-	async ({ name, version }) => {
-		const pkg = await registry<PackumentVersion>(`/${name}/${version}`);
-		let readme = pkg.readme || null;
+	v.object({ name: packageName, specifier: semverOrTag }),
+	async ({ name, specifier }) => {
+		const event = getRequestEvent();
+		const version = await getRealVersion(name, specifier, event.platform!);
 
-		readme ??= await ofetch(
-			`https://unpkg.com/${name}@${version}/README.md`,
-			{ responseType: 'text', headers: { 'User-Agent': USER_AGENT } },
-		).catch(() => null);
+		return await cached(
+			`readme:${name}-${version}`,
+			event.platform!,
+			600,
+			async () => {
+				const pkg = await registry<PackumentVersion>(
+					`/${name}/${version}`,
+				);
 
-		if (!readme) {
-			return null;
-		}
+				let readme = pkg.readme || null;
 
-		return await renderMarkdown(readme);
+				readme ??= await ofetch(
+					`https://unpkg.com/${name}@${version}/README.md`,
+					{
+						responseType: 'text',
+						headers: { 'User-Agent': USER_AGENT },
+					},
+				).catch(() => null);
+
+				if (!readme) {
+					return null;
+				}
+
+				return await renderMarkdown(readme);
+			},
+		);
 	},
 );
 
 export const renderDocumentedModuleReplacement = query(
 	packageName,
 	async (name) => {
-		const replacement = all.moduleReplacements.find(
-			(r) => r.type === 'documented' && r.moduleName == name,
-		) as DocumentedModuleReplacement | undefined;
+		const event = getRequestEvent();
 
-		if (!replacement) {
-			error(404, 'failed to find requested replacement');
-		}
+		return await cached(
+			`module-replacement-render:${name}`,
+			event.platform!,
+			600,
+			async () => {
+				const replacement = all.moduleReplacements.find(
+					(r) => r.type === 'documented' && r.moduleName == name,
+				) as DocumentedModuleReplacement | undefined;
 
-		const doc = await ofetch(
-			`https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${replacement.docPath}.md`,
-			{ responseType: 'text', headers: { 'User-Agent': USER_AGENT } },
-		).catch(() => null);
+				if (!replacement) {
+					error(404, 'failed to find requested replacement');
+				}
 
-		if (!doc) {
-			error(404, 'failed to find requested documentation');
-		}
+				const doc = await ofetch(
+					`https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${replacement.docPath}.md`,
+					{
+						responseType: 'text',
+						headers: { 'User-Agent': USER_AGENT },
+					},
+				).catch(() => null);
 
-		return await renderMarkdown(doc.replace(/^---\n.*\n---/, '').trim());
+				if (!doc) {
+					error(404, 'failed to find requested documentation');
+				}
+
+				return await renderMarkdown(
+					doc.replace(/^---\n.*\n---/, '').trim(),
+				);
+			},
+		);
 	},
 );
+
+async function getRealVersion(
+	name: string,
+	specifier: string,
+	platform: App.Platform,
+) {
+	if (semver.canParse(specifier)) {
+		return specifier;
+	}
+
+	return await cached(
+		`real-version:${name}-${specifier}`,
+		platform,
+		60,
+		async () => {
+			const res = await registry<PackumentVersion>(
+				`/${name}/${specifier}`,
+			);
+			return res.version;
+		},
+	);
+}

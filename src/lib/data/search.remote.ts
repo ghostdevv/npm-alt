@@ -1,8 +1,8 @@
 import type { PackageLinks } from './package.remote';
+import { registry } from './common.server';
 import { username } from '$lib/valibot';
 import { query } from '$app/server';
 import * as v from 'valibot';
-import { registry } from './registry.server';
 
 interface SearchResponse {
 	objects: Object[];
