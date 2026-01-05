@@ -322,6 +322,8 @@ async function resolveSpecifier(specifier: Specifier, platform: App.Platform) {
 			const pkg = await registry<Packument>(`/${specifier.name}`);
 			let version: string | null = null;
 
+			// Based on MIT Licensed code from Anthony Fu
+			// https://github.com/antfu/fast-npm-meta/blob/334e913beaaf8c03595b42feaee5aed7b8d24b75/server/routes/%5B...pkg%5D.ts#L15-L35
 			if (specifier.type === 'tag') {
 				version = pkg['dist-tags'][specifier.fetchSpec] || null;
 			} else if (
