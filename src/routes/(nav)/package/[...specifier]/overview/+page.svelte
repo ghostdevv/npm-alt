@@ -1,10 +1,17 @@
 <script lang="ts">
+	import IconCalendarUp from 'virtual:icons/lucide/calendar-arrow-up';
+	import IconCalendarClock from 'virtual:icons/lucide/calendar-clock';
+	import IconCalendarPlus from 'virtual:icons/lucide/calendar-plus';
 	import ModuleReplacements from './ModuleReplacements.svelte';
+	import IconLicense from 'virtual:icons/catppuccin/license';
 	import IconTS from 'virtual:icons/catppuccin/typescript';
 	import { renderREADME } from '$lib/data/package.remote';
+	import { format as formatBytes } from '@std/fmt/bytes';
 	import { failed, pending } from '$lib/boundary.svelte';
+	import IconWeight from 'virtual:icons/lucide/weight';
 	import Notice from '$lib/components/Notice.svelte';
 	import IconE18e from 'virtual:icons/custom/e18e';
+	import { formatDistanceToNow } from 'date-fns';
 	import TypeStatus from './TypeStatus.svelte';
 	import Usage from './Usage.svelte';
 	import DOMPurify from 'dompurify';
@@ -71,7 +78,7 @@
 
 		<hr />
 
-		<h6>Stuff</h6>
+		<h6>Version Notes</h6>
 
 		<ul>
 			<li>
@@ -80,10 +87,57 @@
 			</li>
 
 			<li>
-				<IconE18e /> e18e notes
+				<IconE18e /> e18e suggestions
 				<ModuleReplacements
 					replacements={data.pkg.moduleReplacements}
 				/>
+			</li>
+
+			<li>
+				<IconLicense /> License
+				<span>{data.pkg.license ?? '???'}</span>
+			</li>
+
+			<li>
+				<IconCalendarClock color="#206eaa" /> Published At
+				<span title={data.pkg.publishedAt.toISOString()}>
+					{formatDistanceToNow(data.pkg.publishedAt, {
+						addSuffix: true,
+					})}
+				</span>
+			</li>
+
+			<li>
+				<IconWeight color="#39454f" /> Unpacked Size
+				<span>
+					{#if data.pkg.unpackedSize}
+						{formatBytes(data.pkg.unpackedSize)}
+					{:else}
+						???
+					{/if}
+				</span>
+			</li>
+		</ul>
+
+		<hr />
+
+		<h6>Package Notes</h6>
+
+		<ul>
+			<li>
+				<IconCalendarUp color="#b745ac" /> Last Updated
+				<span title={data.pkg.updatedAt.toISOString()}>
+					{formatDistanceToNow(data.pkg.updatedAt, {
+						addSuffix: true,
+					})}
+				</span>
+			</li>
+
+			<li>
+				<IconCalendarPlus color="#7035d6" /> Created At
+				<span title={data.pkg.createdAt.toISOString()}>
+					{Intl.DateTimeFormat().format(data.pkg.createdAt)}
+				</span>
 			</li>
 		</ul>
 	</div>
@@ -105,7 +159,7 @@
 
 			ul {
 				list-style: none;
-				margin-top: 12px;
+				margin-block: 12px;
 
 				li {
 					display: flex;
@@ -118,6 +172,10 @@
 						margin-left: auto;
 					}
 				}
+			}
+
+			hr {
+				margin-block: 12px;
 			}
 		}
 	}

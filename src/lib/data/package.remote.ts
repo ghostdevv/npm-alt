@@ -57,6 +57,11 @@ export interface Package {
 	moduleReplacements: ModuleReplacement[];
 	types: PackageTypeStatus;
 	deprecated?: string;
+	license?: string;
+	unpackedSize?: number;
+	publishedAt: Date;
+	createdAt: Date;
+	updatedAt: Date;
 }
 
 export const getPackage = query(vSpecifier, async (specifier) => {
@@ -91,6 +96,11 @@ export const getPackage = query(vSpecifier, async (specifier) => {
 				moduleReplacements,
 				types,
 				deprecated: packageJSON.deprecated,
+				license: packageJSON.license,
+				unpackedSize: packageJSON.dist.unpackedSize,
+				publishedAt: new Date(pkg.time[version]),
+				createdAt: new Date(pkg.time.created),
+				updatedAt: new Date(pkg.time.modified),
 			};
 		},
 	);
