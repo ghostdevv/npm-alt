@@ -6,7 +6,7 @@
 import type { ThemeRegistration } from 'shiki';
 
 export const serendipity: ThemeRegistration = {
-	name: 'serendipity-sunset-v-1',
+	name: 'serendipity-sunset-v1',
 	type: 'dark',
 	colors: {
 		focusBorder: '#596171',
