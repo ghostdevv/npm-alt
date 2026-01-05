@@ -1,9 +1,10 @@
-import type { Packument, PackumentVersion, Repository } from '@npm/types';
 import { packageName, vSpecifier, type Specifier } from '$lib/valibot';
 import { allModuleReplacements } from './module-replacements.server';
 import { cached, registry, USER_AGENT } from './common.server';
+import type { Packument, PackumentVersion } from '@npm/types';
 import { getRequestEvent, query } from '$app/server';
 import { join as joinPaths } from '@std/path';
+import hostedGitInfo from 'hosted-git-info';
 import { error } from '@sveltejs/kit';
 import { ofetch } from 'ofetch';
 import semver from 'semver';
@@ -57,7 +58,11 @@ export const getPackage = query(vSpecifier, async (specifier) => {
 				name: pkg.name,
 				version,
 				links: {
-					repository: pkg.repository?.url,
+					repository: pkg.repository?.url
+						? hostedGitInfo
+								.fromUrl(pkg.repository.url)
+								?.https({ noGitPlus: true })
+						: undefined,
 					homepage: pkg.homepage,
 					npm: `https://www.npmjs.com/package/${pkg.name}`,
 				},
@@ -192,31 +197,6 @@ async function packageTypeStatus(
 	};
 }
 
-function getLinkBase(repo?: Repository) {
-	if (!repo || !repo.url) return null;
-
-	const url = URL.parse(
-		repo.url.startsWith('git+') ? repo.url.slice(4) : repo.url,
-	);
-
-	if (
-		!url ||
-		!['http:', 'https:'].includes(url.protocol) ||
-		url?.hostname !== 'github.com'
-	) {
-		return null;
-	}
-
-	const [, user, repoName] = url.pathname.split('/');
-
-	url.hostname = 'raw.githubusercontent.com';
-	url.protocol = 'https:';
-	// todo needs better sanitising
-	url.pathname = `/${joinPaths(user, repoName.replace(/\.git$/, ''), 'HEAD', repo.directory || '')}`;
-
-	return url.toString();
-}
-
 export const renderREADME = query(vSpecifier, async (specifier) => {
 	const event = getRequestEvent();
 	const { name, version } = await resolveSpecifier(
@@ -232,7 +212,11 @@ export const renderREADME = query(vSpecifier, async (specifier) => {
 			const { renderMarkdown } = await import('./markdown.server');
 
 			const pkg = await registry<Packument>(`/${name}`);
-			const linkBase = getLinkBase(pkg.repository);
+			const linkBase = pkg.repository?.url
+				? hostedGitInfo
+						.fromUrl(pkg.repository.url)
+						?.file(joinPaths(pkg.repository.directory || ''))
+				: undefined;
 
 			const readme = await ofetch(
 				`https://unpkg.com/${name}@${version}/README.md`,
