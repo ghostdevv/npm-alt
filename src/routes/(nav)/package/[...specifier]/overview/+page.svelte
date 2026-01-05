@@ -2,22 +2,29 @@
 	import ModuleReplacements from './ModuleReplacements.svelte';
 	import IconTS from 'virtual:icons/catppuccin/typescript';
 	import { renderREADME } from '$lib/data/package.remote';
+	import { failed, pending } from '$lib/boundary.svelte';
 	import IconE18e from 'virtual:icons/custom/e18e';
 	import TypeStatus from './TypeStatus.svelte';
 	import Usage from './Usage.svelte';
 
 	const { params, data } = $props();
-
-	const readme = $derived(await renderREADME(params.specifier));
 </script>
 
 <section class="main">
 	<div class="readme">
-		{#if readme}
-			{@html readme}
-		{:else}
-			<p style="color: var(--text-grey);">No README found</p>
-		{/if}
+		<svelte:boundary {failed} {pending}>
+			{@const readme = await renderREADME(params.specifier)}
+
+			{#if $effect.pending()}
+				{@render pending()}
+			{/if}
+
+			{#if readme}
+				{@html readme}
+			{:else}
+				<p style="color: var(--text-grey);">No README found</p>
+			{/if}
+		</svelte:boundary>
 	</div>
 
 	<div class="sidebar">
