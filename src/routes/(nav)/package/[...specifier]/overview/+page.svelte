@@ -3,6 +3,7 @@
 	import IconTS from 'virtual:icons/catppuccin/typescript';
 	import { renderREADME } from '$lib/data/package.remote';
 	import { failed, pending } from '$lib/boundary.svelte';
+	import Notice from '$lib/components/Notice.svelte';
 	import IconE18e from 'virtual:icons/custom/e18e';
 	import TypeStatus from './TypeStatus.svelte';
 	import Usage from './Usage.svelte';
@@ -12,6 +13,41 @@
 
 <section class="main">
 	<div class="readme">
+		{#if data.pkg.deprecated}
+			<Notice
+				id="deprecated:{data.pkg.name}@{data.pkg.version}"
+				colour="var(--red)"
+			>
+				<h4>Package Deprecated</h4>
+				<p>{data.pkg.deprecated}</p>
+			</Notice>
+		{/if}
+
+		{#if data.pkg.moduleReplacements.length}
+			<Notice
+				id="module-replacements:{data.pkg.name}@{data.pkg.version}"
+				colour="var(--orange)"
+			>
+				<h4 class="row">
+					<IconE18e /> e18e recommendations found
+				</h4>
+
+				<p>
+					e18e is working to improve ecosystem health through cleaning
+					up packages, or recommending alternatives. There is {data
+						.pkg.moduleReplacements.length} recommendation{data.pkg
+						.moduleReplacements.length === 1
+						? ''
+						: 's'} found for this package.
+				</p>
+
+				<ModuleReplacements
+					replacements={data.pkg.moduleReplacements}
+					inline={false}
+				/>
+			</Notice>
+		{/if}
+
 		<svelte:boundary {failed} {pending}>
 			{@const readme = await renderREADME(params.specifier)}
 

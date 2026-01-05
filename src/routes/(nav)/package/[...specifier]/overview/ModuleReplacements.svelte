@@ -11,9 +11,10 @@
 
 	interface Props {
 		replacements: ModuleReplacement[];
+		inline?: boolean;
 	}
 
-	const { replacements }: Props = $props();
+	const { replacements, inline = true }: Props = $props();
 </script>
 
 {#if replacements.length === 0}
@@ -24,11 +25,14 @@
 	<Modal>
 		{#snippet activator()}
 			<button
-				class="icon"
 				title="{replacements.length} recommendation(s) found, click to learn more"
-				style="color: var(--red);"
+				class={{ icon: inline, outline: !inline, inline }}
 			>
-				<IconQuestion />
+				{#if inline}
+					<IconQuestion />
+				{:else}
+					View Recommendation(s)
+				{/if}
 			</button>
 		{/snippet}
 
@@ -93,6 +97,22 @@
 	}
 
 	button {
-		padding: 0px;
+		padding-block: 8px;
+		padding-inline: 12px;
+		margin: 0px;
+
+		&.inline {
+			padding: 0px;
+			margin: 0px;
+			color: var(--red);
+		}
+
+		border-color: var(--colour);
+
+		&:focus:not(:disabled),
+		&:active:not(:disabled),
+		&:hover:not(:disabled) {
+			background-color: var(--colour);
+		}
 	}
 </style>

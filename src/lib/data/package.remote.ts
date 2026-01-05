@@ -25,7 +25,6 @@ const PACKUMENT_VERSION_FIELDS = [
 	'_npmUser',
 	'_npmVersion',
 	'browser',
-	'deprecated',
 	'gitHead',
 	'readmeFilename',
 ] as const;
@@ -63,6 +62,7 @@ export interface Package {
 	links: PackageLinks;
 	moduleReplacements: ModuleReplacement[];
 	types: PackageTypeStatus;
+	deprecated?: string;
 }
 
 export const getPackage = query(vSpecifier, async (specifier) => {
@@ -96,6 +96,7 @@ export const getPackage = query(vSpecifier, async (specifier) => {
 				},
 				moduleReplacements,
 				types,
+				deprecated: packageJSON.deprecated,
 			};
 		},
 	);
