@@ -19,6 +19,7 @@
 </script>
 
 <DropdownCodeblock
+	id="install-pkg-manager"
 	title="Select a package manager to install with"
 	textColour="#BE95FF"
 	options={[

@@ -2,6 +2,7 @@
 	import IconChevronDown from 'virtual:icons/lucide/chevron-down';
 	import type { Component } from 'svelte';
 	import { Select } from 'melt/builders';
+	import { PersistedState } from 'runed';
 
 	interface Option {
 		icon: Component;
@@ -10,14 +11,28 @@
 	}
 
 	interface Props {
+		id: string;
 		title: string;
 		options: Option[];
 		textColour?: string;
 	}
 
-	const { title, options, textColour }: Props = $props();
+	const { id, title, options, textColour }: Props = $props();
+
 	// svelte-ignore state_referenced_locally
-	const select = new Select<Option>({ value: options[0], sameWidth: false });
+	const value = new PersistedState(id, options[0].title);
+
+	const select = new Select<Option>({
+		// svelte-ignore state_referenced_locally
+		value: options.find((v) => v.title === value.current) || options[0],
+		sameWidth: false,
+		onValueChange(newValue) {
+			if (newValue) {
+				value.current = newValue.title;
+			}
+		},
+	});
+
 	const Icon = $derived(select.value?.icon);
 </script>
 
