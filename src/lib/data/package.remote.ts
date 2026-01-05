@@ -12,38 +12,6 @@ import type {
 	ModuleReplacement,
 } from 'module-replacements';
 
-const PACKUMENT_VERSION_FIELDS = [
-	'_hasShrinkwrap',
-	'_id',
-	'_nodeVersion',
-	'_npmUser',
-	'_npmVersion',
-	'browser',
-	'gitHead',
-	'readmeFilename',
-] as const;
-
-type OmitWithIndex<T, K extends keyof T> = {
-	[P in keyof T as P extends K ? never : P]: T[P];
-};
-
-type ApproxPackageJSON = OmitWithIndex<
-	PackumentVersion,
-	(typeof PACKUMENT_VERSION_FIELDS)[number]
-> & {
-	exports?: string | Record<string, string | Record<string, string>>;
-};
-
-function getApproxPackageJSON(pac: Packument, version: string) {
-	return Object.fromEntries(
-		Object.entries(pac['versions'][version]).filter(
-			([key]) =>
-				!PACKUMENT_VERSION_FIELDS.includes(key as any) &&
-				!key.startsWith('_'),
-		),
-	) as ApproxPackageJSON;
-}
-
 export interface PackageLinks {
 	repository?: string;
 	homepage?: string;
@@ -77,7 +45,7 @@ export const getPackage = query(vSpecifier, async (specifier) => {
 		600,
 		async (): Promise<Package> => {
 			const pkg = await registry<Packument>(`/${name}`);
-			const packageJSON = getApproxPackageJSON(pkg, version);
+			const packageJSON = pkg['versions'][version];
 
 			const moduleReplacements = allModuleReplacements.filter(
 				(m) => m.type !== 'none' && m.moduleName === name,
@@ -169,8 +137,12 @@ export interface PackageTypeStatus {
 	definitelyTypedPkg: string;
 }
 
+interface ExportsPackumentVersion extends PackumentVersion {
+	exports?: string | Record<string, string | Record<string, string>>;
+}
+
 async function packageTypeStatus(
-	pkg: ApproxPackageJSON,
+	pkg: ExportsPackumentVersion,
 	platform: App.Platform,
 ): Promise<PackageTypeStatus> {
 	const definitelyTypedPkg = pkg.name.startsWith('@')
