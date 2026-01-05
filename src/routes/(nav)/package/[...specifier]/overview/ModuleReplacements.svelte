@@ -8,6 +8,7 @@
 	import IconX from 'virtual:icons/lucide/x';
 	import Modal from '$lib/Modal.svelte';
 	import Tag from '$lib/Tag.svelte';
+	import DOMPurify from 'dompurify';
 
 	interface Props {
 		replacements: ModuleReplacement[];
@@ -76,9 +77,9 @@
 						<h3>Documented Steps</h3>
 
 						<svelte:boundary {failed} {pending}>
-							{@html await renderDocumentedModuleReplacement(
-								replacement.moduleName,
-							)}
+							<!-- prettier-ignore -->
+							{@const doc = await renderDocumentedModuleReplacement(replacement.moduleName)}
+							{@html DOMPurify.sanitize(doc.unsafeHTML)}
 						</svelte:boundary>
 					{/if}
 				</section>

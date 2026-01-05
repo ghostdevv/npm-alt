@@ -2,7 +2,7 @@
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "npm-alt",
 	"compatibility_date": "2026-01-04",
-	"compatibility_flags": ["nodejs_als"],
+	"compatibility_flags": ["nodejs_compat"],
 	"main": ".svelte-kit/cloudflare/_worker.js",
 	"assets": {
 		"binding": "ASSETS",
@@ -13,7 +13,10 @@
 	"kv_namespaces": [
 		{
 			"binding": "CACHE",
-			"id": "todo",
+			"id": "0a5cfb16c9094aaaa8240be3b92e39f3",
 		},
 	],
+	"observability": {
+		"enabled": true,
+	},
 }

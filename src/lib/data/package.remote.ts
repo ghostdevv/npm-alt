@@ -1,21 +1,15 @@
-import { packageName, vSpecifier, type Specifier } from '$lib/valibot';
-import { cached, registry, USER_AGENT } from './common.server';
 import type { Packument, PackumentVersion, Repository } from '@npm/types';
-import { serendipity } from '$lib/assets/serendipity-shiki';
+import { packageName, vSpecifier, type Specifier } from '$lib/valibot';
+import { allModuleReplacements } from './module-replacements.server';
+import { cached, registry, USER_AGENT } from './common.server';
 import { getRequestEvent, query } from '$app/server';
 import { join as joinPaths } from '@std/path';
-import createDOMPurify from 'dompurify';
-import markedShiki from 'marked-shiki';
 import { error } from '@sveltejs/kit';
-import { codeToHtml } from 'shiki';
 import { ofetch } from 'ofetch';
-import { Marked } from 'marked';
-import { JSDOM } from 'jsdom';
 import semver from 'semver';
-import {
-	all,
-	type DocumentedModuleReplacement,
-	type ModuleReplacement,
+import type {
+	DocumentedModuleReplacement,
+	ModuleReplacement,
 } from 'module-replacements';
 
 const PACKUMENT_VERSION_FIELDS = [
@@ -80,7 +74,7 @@ export const getPackage = query(vSpecifier, async (specifier) => {
 			const pkg = await registry<Packument>(`/${name}`);
 			const packageJSON = getApproxPackageJSON(pkg, version);
 
-			const moduleReplacements = all.moduleReplacements.filter(
+			const moduleReplacements = allModuleReplacements.filter(
 				(m) => m.type !== 'none' && m.moduleName === name,
 			);
 
@@ -216,36 +210,6 @@ async function packageTypeStatus(
 	};
 }
 
-async function renderMarkdown(markdown: string, linkBase?: string) {
-	const marked = new Marked(
-		markedShiki({
-			async highlight(code, lang) {
-				return await codeToHtml(code, { lang, theme: serendipity });
-			},
-		}),
-	);
-
-	// todo rewrite to use lol-html
-	if (linkBase) {
-		marked.use({
-			walkTokens(token) {
-				if (token.type === 'link' || token.type === 'image') {
-					if (!URL.canParse(token.href)) {
-						token.href = joinPaths(linkBase, token.href);
-					}
-				}
-			},
-		});
-	}
-
-	const md = await marked.parse(markdown, { gfm: true });
-
-	const window = new JSDOM('').window;
-	const dompurify = createDOMPurify(window);
-
-	return dompurify.sanitize(md);
-}
-
 function getLinkBase(repo?: Repository) {
 	if (!repo || !repo.url) return null;
 
@@ -283,6 +247,8 @@ export const renderREADME = query(vSpecifier, async (specifier) => {
 		event.platform!,
 		600,
 		async () => {
+			const { renderMarkdown } = await import('./markdown.server');
+
 			const pkg = await registry<Packument>(`/${name}`);
 			const linkBase = getLinkBase(pkg.repository);
 
@@ -313,7 +279,9 @@ export const renderDocumentedModuleReplacement = query(
 			event.platform!,
 			600,
 			async () => {
-				const replacement = all.moduleReplacements.find(
+				const { renderMarkdown } = await import('./markdown.server');
+
+				const replacement = allModuleReplacements.find(
 					(r) => r.type === 'documented' && r.moduleName == name,
 				) as DocumentedModuleReplacement | undefined;
 

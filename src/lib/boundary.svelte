@@ -8,7 +8,7 @@
 </script>
 
 {#snippet failed(error: unknown, retry: () => void)}
-	<div class="failed">
+	<div class="boundary failed">
 		<button class="icon" onclick={retry}>
 			<IconRefresh />
 		</button>
@@ -18,37 +18,11 @@
 {/snippet}
 
 {#snippet pending()}
-	<div class="pending">
+	<div class="boundary pending">
 		<IconLoader />
 		<p>Loading...</p>
 	</div>
 {/snippet}
 
-<style>
-	.failed,
-	.pending {
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		height: fit-content;
-		gap: 4px;
-	}
-
-	.failed {
-		color: var(--red);
-	}
-
-	.pending {
-		:global(svg) {
-			animation: spin 1s linear infinite forwards;
-			transform: rotate(0deg);
-			will-change: transform;
-		}
-	}
-
-	@keyframes spin {
-		100% {
-			transform: rotate(1turn);
-		}
-	}
-</style>
+<!-- styles in root layout due to
+     https://github.com/sveltejs/svelte/issues/16404 -->

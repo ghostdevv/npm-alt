@@ -7,6 +7,7 @@
 	import IconE18e from 'virtual:icons/custom/e18e';
 	import TypeStatus from './TypeStatus.svelte';
 	import Usage from './Usage.svelte';
+	import DOMPurify from 'dompurify';
 
 	const { params, data } = $props();
 </script>
@@ -56,7 +57,7 @@
 			{/if}
 
 			{#if readme}
-				{@html readme}
+				{@html DOMPurify.sanitize(readme.unsafeHTML)}
 			{:else}
 				<p style="color: var(--text-grey);">No README found</p>
 			{/if}
