@@ -26,6 +26,7 @@
 		"@types/npm-package-arg": "^6.1.4",
 		"@types/semver": "^7.7.1",
 		"date-fns": "^4.1.0",
+		"devalue": "^5.6.1",
 		"dompurify": "^3.3.1",
 		"marked": "^17.0.1",
 		"marked-shiki": "^1.2.1",

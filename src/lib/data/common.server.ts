@@ -1,4 +1,5 @@
 import { version } from '../../../package.json' with { type: 'json' };
+import { parse, stringify } from 'devalue';
 import { ofetch } from 'ofetch';
 
 export const USER_AGENT = `npm-alt/${version}`;
@@ -23,15 +24,15 @@ export async function cached<T>(
 		return await fn();
 	}
 
-	const hit = await platform.env.CACHE.get<T>(key, 'json');
+	const hit = await platform.env.CACHE.get(key, 'text');
 
 	if (hit) {
 		console.log(`[kv-cache=${key}] HIT`);
-		return hit;
+		return parse(hit) as T;
 	}
 
 	const data = await fn();
-	await platform.env.CACHE.put(key, JSON.stringify(data), {
+	await platform.env.CACHE.put(key, stringify(data), {
 		expirationTtl: ttl,
 	});
 
