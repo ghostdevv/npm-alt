@@ -1,6 +1,6 @@
 <script lang="ts">
+	import PackageLinks from '$lib/components/PackageLinks.svelte';
 	import { failed, pending } from '$lib/boundary.svelte';
-	import PackageLinks from '$lib/PackageLinks.svelte';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { Tabs } from 'melt/builders';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Expansion from '$lib/expansions/Expansion.svelte';
+	import Expansion from '$lib/components/expansions/Expansion.svelte';
 	import IconSearch from 'virtual:icons/lucide/search';
 
 	const id = $props.id();

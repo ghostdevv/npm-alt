@@ -1,6 +1,6 @@
 <script lang="ts">
-	import InspectModal from '$lib/InspectModal.svelte';
-	import PackageCard from '$lib/PackageCard.svelte';
+	import InspectModal from '$lib/components/InspectModal.svelte';
+	import PackageCard from '$lib/components/PackageCard.svelte';
 	import { search } from './search.svelte';
 
 	const { total, results, done } = $derived(await search.results());

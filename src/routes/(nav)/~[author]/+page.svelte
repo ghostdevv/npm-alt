@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { listAuthorPackages } from '$lib/data/search.remote';
-	import PackageCard from '$lib/PackageCard.svelte';
+	import PackageCard from '$lib/components/PackageCard.svelte';
 
 	const { params } = $props();
 

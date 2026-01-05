@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconLicense from 'virtual:icons/catppuccin/license';
-	import type { SearchPackage } from './data/search.remote';
+	import type { SearchPackage } from '../data/search.remote';
 	import PackageLinks from './PackageLinks.svelte';
 	import Tag from './Tag.svelte';
 

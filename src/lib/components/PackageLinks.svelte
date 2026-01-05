@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PackageLinks } from './data/package.remote';
+	import type { PackageLinks } from '../data/package.remote';
 	import IconJSON from 'virtual:icons/catppuccin/json';
 	import IconHTTP from 'virtual:icons/catppuccin/http';
 	import IconNPM from 'virtual:icons/catppuccin/npm';

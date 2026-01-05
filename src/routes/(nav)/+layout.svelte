@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NavigationIndicator from '$lib/components/NavigationIndicator.svelte';
-	import Expansion from '$lib/expansions/Expansion.svelte';
+	import Expansion from '$lib/components/expansions/Expansion.svelte';
 	import { search } from './search/search.svelte';
 	import { useThrottle } from 'runed';
 	import { page } from '$app/state';

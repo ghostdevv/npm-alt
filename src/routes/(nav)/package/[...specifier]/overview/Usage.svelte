@@ -1,5 +1,5 @@
 <script lang="ts">
-	import DropdownCodeblock from '$lib/DropdownCodeblock.svelte';
+	import DropdownCodeblock from '$lib/components/DropdownCodeblock.svelte';
 	import type { Package } from '$lib/data/package.remote';
 	import IconPNPM from 'virtual:icons/catppuccin/pnpm';
 	import IconYarn from 'virtual:icons/catppuccin/yarn';

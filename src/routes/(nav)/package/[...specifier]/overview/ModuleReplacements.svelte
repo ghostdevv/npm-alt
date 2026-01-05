@@ -4,10 +4,10 @@
 	import type { ModuleReplacement } from 'module-replacements';
 	import { failed, pending } from '$lib/boundary.svelte';
 	import IconNode from 'virtual:icons/custom/node';
+	import Modal from '$lib/components/Modal.svelte';
 	import IconMDN from 'virtual:icons/custom/mdn';
+	import Tag from '$lib/components/Tag.svelte';
 	import IconX from 'virtual:icons/lucide/x';
-	import Modal from '$lib/Modal.svelte';
-	import Tag from '$lib/Tag.svelte';
 	import DOMPurify from 'dompurify';
 
 	interface Props {
