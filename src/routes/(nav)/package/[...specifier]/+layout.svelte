@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PackageLinks from '$lib/components/PackageLinks.svelte';
 	import { failed, pending } from '$lib/boundary.svelte';
-	import { fade } from 'svelte/transition';
+	import Pending from '$lib/components/Pending.svelte';
 	import { goto } from '$app/navigation';
 	import { Tabs } from 'melt/builders';
 	import { resolve } from '$app/paths';
@@ -9,7 +9,7 @@
 
 	const { children, params, data } = $props();
 
-	const TAB_IDS = ['overview', 'versions'] as const;
+	const TAB_IDS = ['overview', 'files', 'versions'] as const;
 	type TabId = (typeof TAB_IDS)[number];
 
 	function isTab(id: string): id is TabId {
@@ -29,37 +29,41 @@
 	});
 </script>
 
-<section>
-	<div class="name">
-		<h1>
-			{data.pkg.name}<span class="version">@{data.pkg.version}</span>
-		</h1>
+<div class="wrapper">
+	<section>
+		<div class="name">
+			<h1>
+				{data.pkg.name}<span class="version">@{data.pkg.version}</span>
+			</h1>
 
-		<PackageLinks links={data.pkg.links} inspectValue={data.pkg} />
+			<PackageLinks links={data.pkg.links} inspectValue={data.pkg} />
+		</div>
+	</section>
+
+	<div {...tabs.triggerList}>
+		{#each TAB_IDS as id}
+			<button class="outline" {...tabs.getTrigger(id)}>
+				{id}
+			</button>
+		{/each}
 	</div>
-</section>
 
-<div {...tabs.triggerList}>
-	{#each TAB_IDS as id}
-		<button class="outline" {...tabs.getTrigger(id)}>
-			{id}
-		</button>
-	{/each}
-</div>
-
-<div class="slot">
-	<svelte:boundary {failed} {pending}>
-		{#if $effect.pending()}
-			<div class="pending" in:fade>
-				{@render pending()}
-			</div>
-		{/if}
-
-		{@render children()}
-	</svelte:boundary>
+	<div class="slot">
+		<svelte:boundary {failed} {pending}>
+			<Pending />
+			{@render children()}
+		</svelte:boundary>
+	</div>
 </div>
 
 <style>
+	.wrapper {
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-template-rows: max-content max-content 1fr;
+		height: 100%;
+	}
+
 	.name {
 		display: flex;
 		align-items: center;
@@ -76,19 +80,8 @@
 
 	.slot {
 		position: relative;
-
-		.pending {
-			position: absolute;
-			z-index: 100;
-			top: -8px;
-			left: 0;
-
-			width: 100%;
-			height: calc(100% + 8px);
-
-			backdrop-filter: blur(4px);
-			padding: 8px;
-		}
+		height: 100%;
+		overflow-y: auto;
 	}
 
 	section,
