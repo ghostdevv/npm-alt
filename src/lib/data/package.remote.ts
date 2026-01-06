@@ -105,8 +105,42 @@ export interface PackageTypeStatus {
 	definitelyTypedPkg: string;
 }
 
+type PackageExports =
+	| string
+	| Record<
+			string,
+			| string
+			| Record<string, string>
+			| (string | Record<string, string>)[]
+	  >;
+
 interface ExportsPackumentVersion extends PackumentVersion {
-	exports?: string | Record<string, string | Record<string, string>>;
+	exports?: PackageExports;
+}
+
+function exportsHasTypes(exports?: PackageExports): boolean {
+	try {
+		return (
+			// "exports": "./foo.ts"
+			(typeof exports === 'string' && exports.endsWith('ts')) ||
+			// "exports": { ".": "./foo.ts" }
+			(typeof exports !== 'string' &&
+				typeof exports?.['.'] === 'string' &&
+				exports?.['.'].endsWith('ts')) ||
+			// "exports": { ".": { types: "./foo.ts" } }
+			(typeof exports !== 'string' &&
+				typeof exports?.['.'] !== 'string' &&
+				!Array.isArray(exports?.['.']) &&
+				exports?.['.']?.types.endsWith('ts')) ||
+			// "exports": { ".": ["./foo.ts", { "types": "./foo.ts" }] }
+			(typeof exports !== 'string' &&
+				Array.isArray(exports?.['.']) &&
+				exports?.['.']?.some((e) => exportsHasTypes(e)))
+		);
+	} catch (error) {
+		console.error('failed to handle exports', exports);
+		return false;
+	}
 }
 
 async function packageTypeStatus(
@@ -121,19 +155,7 @@ async function packageTypeStatus(
 		return { status: 'built-in', definitelyTypedPkg };
 	}
 
-	const builtIn =
-		// "exports": "./foo.ts"
-		(typeof pkg.exports === 'string' && pkg.exports.endsWith('ts')) ||
-		// "exports": { ".": "./foo.ts" }
-		(typeof pkg.exports !== 'string' &&
-			typeof pkg.exports?.['.'] === 'string' &&
-			pkg.exports?.['.'].endsWith('ts')) ||
-		// "exports": { ".": { types: "./foo.ts" } }
-		(typeof pkg.exports !== 'string' &&
-			typeof pkg.exports?.['.'] !== 'string' &&
-			pkg.exports?.['.']?.types.endsWith('ts'));
-
-	if (builtIn) {
+	if (exportsHasTypes(pkg.exports)) {
 		return { status: 'built-in', definitelyTypedPkg };
 	}
 
