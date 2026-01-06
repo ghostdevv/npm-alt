@@ -8,24 +8,27 @@
 		id: string;
 		children: Snippet;
 		colour: string;
+		permanent?: boolean;
 	}
 
-	const { id, children, colour }: Props = $props();
+	const { id, children, colour, permanent = false }: Props = $props();
 
 	const ignored = new PersistedState<string[]>('ignored-notices', []);
 </script>
 
-{#if !ignored.current.includes(id)}
+{#if permanent || !ignored.current.includes(id)}
 	<div class="notice" style:--colour={colour} out:slide>
 		{@render children()}
 
-		<button
-			class="icon"
-			title="Close and ignore notice"
-			onclick={() => ignored.current.push(id)}
-		>
-			<IconX />
-		</button>
+		{#if !permanent}
+			<button
+				class="icon"
+				title="Close and ignore notice"
+				onclick={() => ignored.current.push(id)}
+			>
+				<IconX />
+			</button>
+		{/if}
 	</div>
 {/if}
 

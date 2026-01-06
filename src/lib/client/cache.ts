@@ -1,16 +1,16 @@
 import { get, set } from 'idb-keyval';
 
-interface Record {
+interface Record<T> {
 	expiresAt: number | null;
-	content: string;
+	content: T;
 }
 
-export function cache<A>(
+export function cache<T, A>(
 	ttlMs: number | null,
-	fn: (...args: A[]) => Promise<string>,
+	fn: (...args: A[]) => Promise<T>,
 ) {
 	return async (key: string, ...args: A[]) => {
-		const hit = await get<Record>(key);
+		const hit = await get<Record<T>>(key);
 
 		if (hit && (hit.expiresAt === null || hit.expiresAt > Date.now())) {
 			return hit.content;

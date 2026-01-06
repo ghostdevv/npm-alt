@@ -1,4 +1,4 @@
-import { cached, resolveSpecifier } from './common.server';
+import { cached, resolveSpecifier, USER_AGENT } from './common.server';
 import { getRequestEvent, query } from '$app/server';
 import { join as joinPaths } from '@std/path';
 import { vSpecifier } from '$lib/valibot';
@@ -61,6 +61,7 @@ export const getPackageFiles = query(vSpecifier, async (specifier) => {
 		async () => {
 			const res = await ofetch<UNPKGMetaResponse>(
 				`https://unpkg.com/${name}@${version}?meta`,
+				{ headers: { 'User-Agent': USER_AGENT } },
 			);
 
 			const tree = new Map<string, RawTreeNode>();
