@@ -7,7 +7,7 @@ import { getInternalPackage } from './package.server';
 import { getRequestEvent, query } from '$app/server';
 import { packageTypeStatus } from './types.server';
 import hostedGitInfo from 'hosted-git-info';
-import { vSpecifier } from '$lib/valibot';
+import * as ve from '../valibot';
 
 const allModuleReplacements = [
 	...microUtils.moduleReplacements,
@@ -16,7 +16,7 @@ const allModuleReplacements = [
 ] as ModuleReplacement[];
 
 export const getPackage = query(
-	vSpecifier,
+	ve.specifier,
 	async (specifier): Promise<Package> => {
 		const event = getRequestEvent();
 		const pkg = await getInternalPackage(specifier, event.platform!);

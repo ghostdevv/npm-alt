@@ -1,7 +1,7 @@
 import type { PackageLinks } from './types';
 import { registry } from './common.server';
-import { username } from '$lib/valibot';
 import { query } from '$app/server';
+import * as ve from '../valibot';
 import * as v from 'valibot';
 
 interface SearchResponse {
@@ -64,7 +64,7 @@ export const searchRegistry = query(
 
 const AUTHOR_BATCH_SIZE = 250;
 
-export const listAuthorPackages = query(username, async (author) => {
+export const listAuthorPackages = query(ve.username, async (author) => {
 	const packages: SearchPackage[] = [];
 
 	do {

@@ -2,7 +2,7 @@ import { getInternalPackage } from './package.server';
 import { cached, USER_AGENT } from './common.server';
 import { getRequestEvent, query } from '$app/server';
 import { join as joinPaths } from '@std/path';
-import { vSpecifier } from '$lib/valibot';
+import * as ve from '../valibot';
 import { ofetch } from 'ofetch';
 import mimes from 'mime-db';
 
@@ -48,7 +48,7 @@ function mimeToLang(mime: string) {
 	}
 }
 
-export const getPackageFiles = query(vSpecifier, async (specifier) => {
+export const getPackageFiles = query(ve.specifier, async (specifier) => {
 	const event = getRequestEvent();
 	const pkg = await getInternalPackage(specifier, event.platform!);
 

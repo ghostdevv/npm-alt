@@ -1,10 +1,10 @@
 import { getInternalPackageVersions } from './package.server';
 import { getRequestEvent, query } from '$app/server';
 import type { PackageVersion } from './types';
-import { vSpecifier } from '$lib/valibot';
+import * as ve from '../valibot';
 import semver from 'semver';
 
-export const getPackageVersions = query(vSpecifier, async (specifier) => {
+export const getPackageVersions = query(ve.specifier, async (specifier) => {
 	const event = getRequestEvent();
 	const pkg = await getInternalPackageVersions(specifier, event.platform!);
 

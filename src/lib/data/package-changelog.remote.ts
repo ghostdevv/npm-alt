@@ -5,7 +5,7 @@ import { GITHUB_TOKEN } from '$env/static/private';
 import type { PackageChangelog } from './types';
 import { join as joinPaths } from '@std/path';
 import hostedGitInfo from 'hosted-git-info';
-import { vSpecifier } from '$lib/valibot';
+import * as ve from '../valibot';
 import { ofetch } from 'ofetch';
 
 interface RawGithubRelease {
@@ -23,7 +23,7 @@ interface Release {
 
 // todo check mime?
 export const getPackageChangelog = query(
-	vSpecifier,
+	ve.specifier,
 	async (specifier): Promise<PackageChangelog | null> => {
 		const event = getRequestEvent();
 		const pkg = await getInternalPackage(specifier, event.platform!);
