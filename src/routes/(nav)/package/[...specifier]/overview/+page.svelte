@@ -29,7 +29,7 @@
 			</Notice>
 		{/if}
 
-		{#if data.pkg.moduleReplacements.length}
+		{#if data.pkg.replacements.length}
 			<Notice
 				id="module-replacements:{data.pkg.name}@{data.pkg.version}"
 				colour="var(--orange)"
@@ -41,14 +41,14 @@
 				<p>
 					e18e is working to improve ecosystem health through cleaning
 					up packages, or recommending alternatives. There is {data
-						.pkg.moduleReplacements.length} recommendation{data.pkg
-						.moduleReplacements.length === 1
+						.pkg.replacements.length} recommendation{data.pkg
+						.replacements.length === 1
 						? ''
 						: 's'} found for this package.
 				</p>
 
 				<ModuleReplacements
-					replacements={data.pkg.moduleReplacements}
+					replacements={data.pkg.replacements}
 					inline={false}
 				/>
 			</Notice>
@@ -74,9 +74,7 @@
 
 			<li>
 				<IconE18e /> e18e suggestions
-				<ModuleReplacements
-					replacements={data.pkg.moduleReplacements}
-				/>
+				<ModuleReplacements replacements={data.pkg.replacements} />
 			</li>
 
 			<li>

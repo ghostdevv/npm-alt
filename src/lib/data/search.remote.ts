@@ -1,4 +1,4 @@
-import type { PackageLinks } from './package.remote';
+import type { PackageLinks } from './types';
 import { registry } from './common.server';
 import { username } from '$lib/valibot';
 import { query } from '$app/server';

@@ -1,4 +1,5 @@
-import { cached, resolveSpecifier, USER_AGENT } from './common.server';
+import { getInternalPackage } from './package.server';
+import { cached, USER_AGENT } from './common.server';
 import { getRequestEvent, query } from '$app/server';
 import { join as joinPaths } from '@std/path';
 import { vSpecifier } from '$lib/valibot';
@@ -49,18 +50,15 @@ function mimeToLang(mime: string) {
 
 export const getPackageFiles = query(vSpecifier, async (specifier) => {
 	const event = getRequestEvent();
-	const { name, version } = await resolveSpecifier(
-		specifier,
-		event.platform!,
-	);
+	const pkg = await getInternalPackage(specifier, event.platform!);
 
-	return await cached(
-		`package-files:${name}-${version}`,
-		event.platform!,
-		600,
-		async () => {
+	return await cached({
+		key: `package-files:${pkg.name}-${pkg.version}`,
+		platform: event.platform!,
+		ttl: 600,
+		async value() {
 			const res = await ofetch<UNPKGMetaResponse>(
-				`https://unpkg.com/${name}@${version}?meta`,
+				`https://unpkg.com/${pkg.name}@${pkg.version}?meta`,
 				{ headers: { 'User-Agent': USER_AGENT } },
 			);
 
@@ -117,5 +115,5 @@ export const getPackageFiles = query(vSpecifier, async (specifier) => {
 
 			return mapToArray(tree);
 		},
-	);
+	});
 });

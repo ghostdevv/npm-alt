@@ -1,8 +1,8 @@
 <script lang="ts">
 	import IconQuestion from 'virtual:icons/lucide/circle-question-mark';
-	import type { Package } from '$lib/data/package.remote';
 	import { failed, pending } from '$lib/boundary.svelte';
 	import { renderMarkdown } from '$lib/client/highlight';
+	import type { ModReplacement } from '$lib/data/types';
 	import IconNode from 'virtual:icons/custom/node';
 	import Modal from '$lib/components/Modal.svelte';
 	import IconMDN from 'virtual:icons/custom/mdn';
@@ -11,14 +11,15 @@
 	import { cache } from '$lib/client/cache';
 
 	interface Props {
-		replacements: Package['moduleReplacements'];
+		replacements: ModReplacement[];
 		inline?: boolean;
 	}
 
 	const { replacements, inline = true }: Props = $props();
 
-	const renderDocumented = cache(86_400_000, async (docLink: string) => {
-		const res = await fetch(docLink);
+	const renderDocumented = cache(86_400_000, async (docPath: string) => {
+		const url = `https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${docPath}.md`;
+		const res = await fetch(url);
 		const md = (await res.text()).replace(/^---\n.*\n---/, '').trim();
 		return await renderMarkdown(md);
 	});
@@ -85,7 +86,7 @@
 						<svelte:boundary {failed} {pending}>
 							{@html await renderDocumented(
 								`module-replacement:${replacement.moduleName}`,
-								replacement.docLink,
+								replacement.docPath,
 							)}
 						</svelte:boundary>
 					{/if}

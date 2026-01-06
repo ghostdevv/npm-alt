@@ -1,15 +1,13 @@
 <script lang="ts">
+	import { getPackageVersions } from '$lib/data/package-versions.remote';
 	import IconCalendar from 'virtual:icons/lucide/calendar';
 	import { format as formatBytes } from '@std/fmt/bytes';
+	import type { PackageVersion } from '$lib/data/types';
 	import IconWeight from 'virtual:icons/lucide/weight';
 	import IconScale from 'virtual:icons/lucide/scale';
 	import IconTrash from 'virtual:icons/lucide/trash';
 	import { formatDistanceToNow } from 'date-fns';
 	import { resolve } from '$app/paths';
-	import {
-		type PackageVersion,
-		getPackageVersions,
-	} from '$lib/data/package-versions.remote';
 
 	const { params, data } = $props();
 	const versions = $derived(await getPackageVersions(params.specifier));
@@ -77,13 +75,9 @@
 
 					<p>
 						<IconCalendar />
-						{#if pkv.publishedAt}
-							{formatDistanceToNow(pkv.publishedAt, {
-								addSuffix: true,
-							})}
-						{:else}
-							???
-						{/if}
+						{formatDistanceToNow(pkv.publishedAt, {
+							addSuffix: true,
+						})}
 					</p>
 
 					<p>

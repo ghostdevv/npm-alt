@@ -1,11 +1,11 @@
 <script lang="ts">
 	import DropdownCodeblock from '$lib/components/DropdownCodeblock.svelte';
-	import type { Package } from '$lib/data/package.remote';
 	import IconPNPM from 'virtual:icons/catppuccin/pnpm';
 	import IconYarn from 'virtual:icons/catppuccin/yarn';
 	import IconDeno from 'virtual:icons/catppuccin/deno';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconBun from 'virtual:icons/catppuccin/bun';
+	import type { Package } from '$lib/data/types';
 
 	interface Props {
 		pkg: Package;
@@ -14,7 +14,7 @@
 	const { pkg }: Props = $props();
 
 	const installPackages = $derived(
-		`${pkg.name}${pkg.types.status === 'definitely-typed' ? ` ${pkg.types.definitelyTypedPkg}` : ''}`,
+		`${pkg.name}${pkg.types.status === 'definitely-typed' ? ` ${pkg.types.pkg}` : ''}`,
 	);
 </script>
 

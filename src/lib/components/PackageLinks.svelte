@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { PackageLinks } from '../data/package.remote';
 	import IconJSON from 'virtual:icons/catppuccin/json';
 	import IconHTTP from 'virtual:icons/catppuccin/http';
+	import type { PackageLinks } from '$lib/data/types';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconGit from 'virtual:icons/catppuccin/git';
 	import InspectModal from './InspectModal.svelte';

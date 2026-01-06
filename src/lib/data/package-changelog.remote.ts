@@ -1,21 +1,12 @@
+import { getInternalPackage } from './package.server';
 import { getRequestEvent, query } from '$app/server';
+import { USER_AGENT, cached } from './common.server';
 import { GITHUB_TOKEN } from '$env/static/private';
+import type { PackageChangelog } from './types';
 import { join as joinPaths } from '@std/path';
 import hostedGitInfo from 'hosted-git-info';
-import type { Packument } from '@npm/types';
 import { vSpecifier } from '$lib/valibot';
 import { ofetch } from 'ofetch';
-import {
-	resolveSpecifier,
-	USER_AGENT,
-	registry,
-	cached,
-} from './common.server';
-
-interface PackageChangelog {
-	source: 'npm' | 'git' | 'gh-releases';
-	content: string;
-}
 
 interface RawGithubRelease {
 	name: string;
@@ -25,7 +16,7 @@ interface RawGithubRelease {
 	published_at: string;
 }
 
-interface GithubRelease {
+interface Release {
 	md: string;
 	publishedAt: number;
 }
@@ -35,18 +26,15 @@ export const getPackageChangelog = query(
 	vSpecifier,
 	async (specifier): Promise<PackageChangelog | null> => {
 		const event = getRequestEvent();
-		const { name, version } = await resolveSpecifier(
-			specifier,
-			event.platform!,
-		);
+		const pkg = await getInternalPackage(specifier, event.platform!);
 
-		return await cached(
-			`package-changelog:${name}-${version}`,
-			event.platform!,
-			600,
-			async () => {
+		return await cached({
+			key: `package-changelog:${pkg.name}-${pkg.version}`,
+			platform: event.platform!,
+			ttl: 600,
+			async value() {
 				const npmChangelog = await ofetch(
-					`https://unpkg.com/${name}@${version}/CHANGELOG.md`,
+					`https://unpkg.com/${pkg.name}@${pkg.version}/CHANGELOG.md`,
 					{
 						headers: { 'User-Agent': USER_AGENT },
 						responseType: 'text',
@@ -57,10 +45,8 @@ export const getPackageChangelog = query(
 					return { source: 'npm', content: npmChangelog };
 				}
 
-				const pkg = await registry<Packument>(`/${name}`);
-
-				const repo = pkg.repository?.url
-					? hostedGitInfo.fromUrl(pkg.repository.url)
+				const repo = pkg.repoURL
+					? hostedGitInfo.fromUrl(pkg.repoURL)
 					: undefined;
 
 				if (!repo) {
@@ -68,11 +54,7 @@ export const getPackageChangelog = query(
 				}
 
 				const gitChangelogFilePath = repo.file(
-					joinPaths(
-						'/',
-						pkg.repository?.directory || '',
-						'CHANGELOG.md',
-					),
+					joinPaths('/', pkg.repoDir || '', 'CHANGELOG.md'),
 				);
 
 				const gitChangelog = await ofetch(gitChangelogFilePath, {
@@ -88,7 +70,7 @@ export const getPackageChangelog = query(
 					return null;
 				}
 
-				const results: GithubRelease[] = [];
+				const results: Release[] = [];
 
 				do {
 					const res = await ofetch<RawGithubRelease[]>(
@@ -129,6 +111,6 @@ export const getPackageChangelog = query(
 						.join('\n\n'),
 				};
 			},
-		);
+		});
 	},
 );

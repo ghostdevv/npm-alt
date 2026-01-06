@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Package } from '$lib/data/package.remote';
 	import { failed, pending } from '$lib/boundary.svelte';
 	import { renderMarkdown } from '$lib/client/highlight';
+	import type { Package } from '$lib/data/types';
 	import { join as joinPaths } from '@std/path';
 	import { cache } from '$lib/client/cache';
 

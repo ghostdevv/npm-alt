@@ -1,9 +1,6 @@
 import { version } from '../../../package.json' with { type: 'json' };
-import type { Specifier } from '$lib/valibot';
-import type { Packument } from '@npm/types';
 import { parse, stringify } from 'devalue';
 import { ofetch } from 'ofetch';
-import semver from 'semver';
 
 export const USER_AGENT = `npm-alt/${version}`;
 
@@ -16,73 +13,61 @@ export const registry = ofetch.create({
 	retryDelay: 500,
 });
 
-export async function cached<T>(
-	key: string,
-	platform: App.Platform,
-	ttl: number,
-	fn: () => Promise<T>,
-) {
-	if (!platform.env.CACHE) {
-		console.warn(`[kv-cache=${key}] CACHE not available`);
-		return await fn();
-	}
+interface CacheOptions<T> {
+	/**
+	 * The key that identifies the cached value.
+	 * The first part is the prefix, that should be constant.
+	 * The second part should be unique for each cache entry.
+	 */
+	key: `${string}:${string}`;
 
-	const hit = await platform.env.CACHE.get(key, 'text');
+	/**
+	 * Access to Cloudflare
+	 */
+	platform: App.Platform;
 
-	if (hit) {
-		console.log(`[kv-cache=${key}] HIT`);
-		return parse(hit) as T;
-	}
+	/**
+	 * Time in seconds that the cached value should live
+	 */
+	ttl: number;
 
-	const data = await fn();
-	await platform.env.CACHE.put(key, stringify(data), {
-		expirationTtl: ttl,
-	});
+	/**
+	 * When enabled the value in the cache is ignored and
+	 * overwritten by the new `value` call.
+	 */
+	force?: boolean;
 
-	console.log(`[kv-cache=${key}] MISS`);
-
-	return data;
+	/**
+	 * Fn that returns the value to be cached. Should\
+	 * be serialisable with devalue.
+	 */
+	value: () => Promise<T>;
 }
 
-export async function resolveSpecifier(
-	specifier: Specifier,
-	platform: App.Platform,
-) {
-	if (specifier.type === 'version') {
-		return { name: specifier.name, version: specifier.fetchSpec };
+/**
+ * Cache the value in Cloudflare KV, with a given ttl.
+ */
+export async function cached<T>(o: CacheOptions<T>): Promise<T> {
+	if (!o.platform.env.CACHE) {
+		console.warn(`[kv-cache=${o.key}] CACHE not available`);
+		return await o.value();
 	}
 
-	return await cached(
-		`parsed-specifier:${specifier}`,
-		platform,
-		60,
-		async () => {
-			const pkg = await registry<Packument>(`/${specifier.name}`);
-			let version: string | null = null;
+	if (!o.force) {
+		const hit = await o.platform.env.CACHE.get(o.key, 'text');
 
-			// Based on MIT Licensed code from Anthony Fu
-			// https://github.com/antfu/fast-npm-meta/blob/334e913beaaf8c03595b42feaee5aed7b8d24b75/server/routes/%5B...pkg%5D.ts#L15-L35
-			if (specifier.type === 'tag') {
-				version = pkg['dist-tags'][specifier.fetchSpec] || null;
-			} else if (
-				specifier.type === 'range' &&
-				['*', 'latest'].includes(specifier.fetchSpec)
-			) {
-				version = pkg['dist-tags'].latest || null;
-			} else if (specifier.type === 'range') {
-				let maxVersion = pkg['dist-tags'].latest || null;
-				if (!semver.satisfies(maxVersion!, specifier.fetchSpec))
-					maxVersion = null;
+		if (hit) {
+			console.log(`[kv-cache=${o.key}] HIT`);
+			return parse(hit) as T;
+		}
+	}
 
-				for (const ver of Object.keys(pkg.versions)) {
-					if (semver.satisfies(ver, specifier.fetchSpec)) {
-						if (!maxVersion || semver.lte(ver, maxVersion))
-							version = ver;
-					}
-				}
-			}
+	const value = await o.value();
+	await o.platform.env.CACHE.put(o.key, stringify(value), {
+		expirationTtl: o.ttl,
+	});
 
-			return { name: specifier.name, version: version! };
-		},
-	);
+	console.log(`[kv-cache=${o.key}] ${o.force ? 'FORCE' : 'MISS'}`);
+
+	return value;
 }

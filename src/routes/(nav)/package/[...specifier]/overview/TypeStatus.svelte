@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconQuestion from 'virtual:icons/lucide/circle-question-mark';
-	import type { PackageTypeStatus } from '$lib/data/package.remote';
+	import type { PackageTypeStatus } from '$lib/data/types';
 	import IconCheck from 'virtual:icons/lucide/check';
 	import IconMinus from 'virtual:icons/lucide/minus';
 
