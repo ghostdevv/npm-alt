@@ -149,7 +149,7 @@ async function packageTypeStatus(
 ): Promise<PackageTypeStatus> {
 	const definitelyTypedPkg = pkg.name.startsWith('@')
 		? pkg.name.replace('/', '__').replace('@', '@types/')
-		: pkg.name;
+		: `@types/${pkg.name}`;
 
 	if (pkg.types) {
 		return { status: 'built-in', definitelyTypedPkg };
