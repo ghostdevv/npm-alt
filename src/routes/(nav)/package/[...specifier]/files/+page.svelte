@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getPackageFiles, type FileNode } from '$lib/data/package.remote';
 	import IconFolderOpen from 'virtual:icons/catppuccin/folder-open';
 	import InspectModal from '$lib/components/InspectModal.svelte';
 	import { highlight, sanitise } from '$lib/client/highlight';
@@ -12,6 +11,10 @@
 	import { slide } from 'svelte/transition';
 	import { cache } from '$lib/client/cache';
 	import { Tree } from 'melt/builders';
+	import {
+		getPackageFiles,
+		type FileNode,
+	} from '$lib/data/package-files.remote';
 
 	const { params, data } = $props();
 	const files = $derived(await getPackageFiles(params.specifier));

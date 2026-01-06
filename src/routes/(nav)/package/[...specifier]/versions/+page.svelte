@@ -1,8 +1,4 @@
 <script lang="ts">
-	import {
-		getPackageVersions,
-		type PackageVersion,
-	} from '$lib/data/package.remote';
 	import IconCalendar from 'virtual:icons/lucide/calendar';
 	import { format as formatBytes } from '@std/fmt/bytes';
 	import IconWeight from 'virtual:icons/lucide/weight';
@@ -10,6 +6,10 @@
 	import IconTrash from 'virtual:icons/lucide/trash';
 	import { formatDistanceToNow } from 'date-fns';
 	import { resolve } from '$app/paths';
+	import {
+		type PackageVersion,
+		getPackageVersions,
+	} from '$lib/data/package-versions.remote';
 
 	const { params, data } = $props();
 	const versions = $derived(await getPackageVersions(params.specifier));
