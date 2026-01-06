@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { getPackageVersions } from '$lib/data/package.remote';
+	import {
+		getPackageVersions,
+		type PackageVersion,
+	} from '$lib/data/package.remote';
 	import IconCalendar from 'virtual:icons/lucide/calendar';
 	import { format as formatBytes } from '@std/fmt/bytes';
 	import IconWeight from 'virtual:icons/lucide/weight';
@@ -10,10 +13,41 @@
 
 	const { params, data } = $props();
 	const versions = $derived(await getPackageVersions(params.specifier));
+
+	function getTitle(pkv: PackageVersion) {
+		if (pkv.version === data.pkg.version) {
+			return 'Currently selected version.';
+		}
+
+		if (pkv.groupState === 'deprecated') {
+			return 'This version is deprecated.';
+		}
+
+		if (pkv.groupState === 'lead') {
+			return 'Latest version in range.';
+		}
+	}
 </script>
 
 <section>
-	<p class="count">Found {versions.length} versions</p>
+	<h4 class="count">{versions.length} Versions</h4>
+
+	<div class="legend">
+		<div class="key lead">
+			<div class="vis lead"></div>
+			<p>Latest version in major/minor</p>
+		</div>
+
+		<div class="key">
+			<div class="vis deprecated"></div>
+			<p>Version is deprecated</p>
+		</div>
+
+		<div class="key">
+			<div class="vis current"></div>
+			<p>Currently selected version</p>
+		</div>
+	</div>
 
 	<ol>
 		{#each versions as pkv}
@@ -23,19 +57,18 @@
 					href={resolve('/(nav)/package/[...specifier]/overview', {
 						specifier: `${data.pkg.name}@${pkv.version}`,
 					})}
-					class={[pkv.groupState]}
+					class={[
+						pkv.groupState,
+						pkv.version === data.pkg.version && 'current',
+					]}
+					title={getTitle(pkv)}
 				>
 					{#if pkv.groupState === 'deprecated'}
-						<div class="group" title="This version is deprecated">
+						<div class="group">
 							<IconTrash />
 						</div>
 					{:else}
-						<p
-							class="group"
-							title={pkv.groupState === 'lead'
-								? 'Latest version in range'
-								: undefined}
-						>
+						<p class="group">
 							{pkv.group}
 						</p>
 					{/if}
@@ -74,7 +107,45 @@
 
 <style>
 	.count {
-		margin-block-end: 16px;
+		margin-block-end: 8px;
+	}
+
+	.deprecated {
+		--border: var(--red);
+		--background: color(from var(--red) srgb r g b / 0.2);
+	}
+
+	.lead {
+		--border: var(--green);
+		--background: color(from var(--green) srgb r g b / 0.2);
+	}
+
+	.current {
+		--border: var(--primary);
+		--background: color(from var(--primary) srgb r g b / 0.2);
+	}
+
+	.legend {
+		display: flex;
+		align-items: center;
+		gap: 22px;
+
+		margin-block: 8px;
+
+		.key {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+
+			font-size: 0.9em;
+
+			.vis {
+				width: 10px;
+				height: 10px;
+				border-radius: 100%;
+				background-color: var(--border);
+			}
+		}
 	}
 
 	ol {
@@ -96,16 +167,6 @@
 			border: 2px solid var(--border, var(--background-tertiary));
 			border-radius: 12px;
 			color: var(--text);
-
-			&.deprecated {
-				--border: var(--red);
-				--background: color(from var(--red) srgb r g b / 0.2);
-			}
-
-			&.lead {
-				--border: var(--green);
-				--background: color(from var(--green) srgb r g b / 0.2);
-			}
 
 			&:active,
 			&:hover {
