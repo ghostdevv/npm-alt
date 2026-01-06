@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { getPackageFiles, type FileNode } from '$lib/data/package.remote';
 	import IconFolderOpen from 'virtual:icons/catppuccin/folder-open';
+	import InspectModal from '$lib/components/InspectModal.svelte';
 	import IconFolder from 'virtual:icons/catppuccin/folder';
 	import { format as formatBytes } from '@std/fmt/bytes';
 	import { failed, pending } from '$lib/boundary.svelte';
 	import IconText from 'virtual:icons/catppuccin/text';
+	import IconJSON from 'virtual:icons/catppuccin/json';
 	import Pending from '$lib/components/Pending.svelte';
+	import { highlight } from '$lib/client/highlight';
 	import { slide } from 'svelte/transition';
+	import { cache } from '$lib/client/cache';
 	import { Tree } from 'melt/builders';
 
 	const { params, data } = $props();
@@ -38,12 +42,12 @@
 		return path.split('/').pop()!;
 	}
 
-	async function fetchContent(file: FileNode) {
+	const renderAndFetchContent = cache(null, async (file: FileNode) => {
 		const url = `https://unpkg.com/${data.pkg.name}@${data.pkg.version}${file.id}`;
 		const res = await fetch(url);
-		const text = await res.text();
-		return text;
-	}
+		const code = await res.text();
+		return await highlight(code, file.lang);
+	});
 </script>
 
 {#snippet treeItems(items: (typeof tree)['children'], depth: number = 0)}
@@ -74,6 +78,14 @@
 <div class="explorer">
 	<ul {...tree.root}>
 		{@render treeItems(tree.children, 0)}
+
+		<li>
+			<InspectModal value={files}>
+				<button class="icon" title="View raw file data">
+					<IconJSON />
+				</button>
+			</InspectModal>
+		</li>
 	</ul>
 
 	<div class="spacer"></div>
@@ -82,7 +94,10 @@
 		{#if selected}
 			<svelte:boundary {failed} {pending}>
 				<Pending />
-				<pre><code>{await fetchContent(selected)}</code></pre>
+				{@html await renderAndFetchContent(
+					`file:${data.pkg.name}-${data.pkg.version}-${selected.id}`,
+					selected,
+				)}
 			</svelte:boundary>
 		{:else}
 			<p class="default">select something :D</p>
@@ -109,9 +124,9 @@
 			overflow: auto;
 			position: relative;
 
-			pre {
+			> :global(pre) {
 				margin: 0px;
-				height: 100%;
+				max-height: 100%;
 			}
 
 			&:has(.default) {

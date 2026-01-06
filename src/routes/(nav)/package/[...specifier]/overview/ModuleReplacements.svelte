@@ -1,21 +1,27 @@
 <script lang="ts">
-	import { renderDocumentedModuleReplacement } from '$lib/data/package.remote';
 	import IconQuestion from 'virtual:icons/lucide/circle-question-mark';
-	import type { ModuleReplacement } from 'module-replacements';
+	import type { Package } from '$lib/data/package.remote';
 	import { failed, pending } from '$lib/boundary.svelte';
+	import { renderMarkdown } from '$lib/client/highlight';
 	import IconNode from 'virtual:icons/custom/node';
 	import Modal from '$lib/components/Modal.svelte';
 	import IconMDN from 'virtual:icons/custom/mdn';
 	import Tag from '$lib/components/Tag.svelte';
 	import IconX from 'virtual:icons/lucide/x';
-	import DOMPurify from 'dompurify';
+	import { cache } from '$lib/client/cache';
 
 	interface Props {
-		replacements: ModuleReplacement[];
+		replacements: Package['moduleReplacements'];
 		inline?: boolean;
 	}
 
 	const { replacements, inline = true }: Props = $props();
+
+	const renderDocumented = cache(86_400_000, async (docLink: string) => {
+		const res = await fetch(docLink);
+		const md = (await res.text()).replace(/^---\n.*\n---/, '').trim();
+		return await renderMarkdown(md);
+	});
 </script>
 
 {#if replacements.length === 0}
@@ -77,9 +83,10 @@
 						<h3>Documented Steps</h3>
 
 						<svelte:boundary {failed} {pending}>
-							<!-- prettier-ignore -->
-							{@const doc = await renderDocumentedModuleReplacement(replacement.moduleName)}
-							{@html DOMPurify.sanitize(doc.unsafeHTML)}
+							{@html await renderDocumented(
+								`module-replacement:${replacement.moduleName}`,
+								replacement.docLink,
+							)}
 						</svelte:boundary>
 					{/if}
 				</section>

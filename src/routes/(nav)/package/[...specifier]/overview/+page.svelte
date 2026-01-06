@@ -5,18 +5,16 @@
 	import ModuleReplacements from './ModuleReplacements.svelte';
 	import IconLicense from 'virtual:icons/catppuccin/license';
 	import IconTS from 'virtual:icons/catppuccin/typescript';
-	import { renderREADME } from '$lib/data/package.remote';
 	import { format as formatBytes } from '@std/fmt/bytes';
-	import { failed, pending } from '$lib/boundary.svelte';
 	import IconWeight from 'virtual:icons/lucide/weight';
 	import Notice from '$lib/components/Notice.svelte';
 	import IconE18e from 'virtual:icons/custom/e18e';
 	import { formatDistanceToNow } from 'date-fns';
 	import TypeStatus from './TypeStatus.svelte';
+	import README from './README.svelte';
 	import Usage from './Usage.svelte';
-	import DOMPurify from 'dompurify';
 
-	const { params, data } = $props();
+	const { data } = $props();
 </script>
 
 <section class="main">
@@ -56,19 +54,7 @@
 			</Notice>
 		{/if}
 
-		<svelte:boundary {failed} {pending}>
-			{@const readme = await renderREADME(params.specifier)}
-
-			{#if $effect.pending()}
-				{@render pending()}
-			{/if}
-
-			{#if readme}
-				{@html DOMPurify.sanitize(readme.unsafeHTML)}
-			{:else}
-				<p style="color: var(--text-grey);">No README found</p>
-			{/if}
-		</svelte:boundary>
+		<README pkg={data.pkg} />
 	</div>
 
 	<div class="sidebar">

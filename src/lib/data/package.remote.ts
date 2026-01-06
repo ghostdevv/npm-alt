@@ -1,18 +1,30 @@
-import { packageName, vSpecifier, type Specifier } from '$lib/valibot';
 import { allModuleReplacements } from './module-replacements.server';
-import { cached, registry, USER_AGENT } from './common.server';
 import type { Packument, PackumentVersion } from '@npm/types';
+import { vSpecifier, type Specifier } from '$lib/valibot';
 import { getRequestEvent, query } from '$app/server';
+import { cached, registry } from './common.server';
 import { join as joinPaths } from '@std/path';
 import hostedGitInfo from 'hosted-git-info';
-import { error } from '@sveltejs/kit';
 import { ofetch } from 'ofetch';
 import semver from 'semver';
-import type {
-	DocumentedModuleReplacement,
-	ModuleReplacement,
-} from 'module-replacements';
+import mimes from 'mime-db';
 
+function getModuleReplacements(moduleName: string) {
+	return allModuleReplacements
+		.filter((m) => m.type !== 'none' && m.moduleName === moduleName)
+		.map((m) => {
+			if (m.type === 'documented') {
+				return {
+					...m,
+					docLink: `https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${m.docPath}.md`,
+				};
+			}
+
+			return m;
+		});
+}
+
+// todo yeet
 export interface PackageLinks {
 	repository?: string;
 	homepage?: string;
@@ -22,8 +34,14 @@ export interface PackageLinks {
 export interface Package {
 	name: string;
 	version: string;
-	links: PackageLinks;
-	moduleReplacements: ModuleReplacement[];
+	repo?: {
+		link: string;
+		dir?: string;
+		assets: string;
+	};
+	homepage?: string;
+	npm: string;
+	moduleReplacements: ReturnType<typeof getModuleReplacements>;
 	types: PackageTypeStatus;
 	deprecated?: string;
 	license?: string;
@@ -48,26 +66,24 @@ export const getPackage = query(vSpecifier, async (specifier) => {
 			const pkg = await registry<Packument>(`/${name}`);
 			const packageJSON = pkg['versions'][version];
 
-			const moduleReplacements = allModuleReplacements.filter(
-				(m) => m.type !== 'none' && m.moduleName === name,
-			);
-
-			const types = await packageTypeStatus(packageJSON, event.platform!);
+			const repo = pkg.repository?.url
+				? hostedGitInfo.fromUrl(pkg.repository.url)
+				: undefined;
 
 			return {
 				name: pkg.name,
 				version,
-				links: {
-					repository: pkg.repository?.url
-						? hostedGitInfo
-								.fromUrl(pkg.repository.url)
-								?.https({ noGitPlus: true })
-						: undefined,
-					homepage: pkg.homepage,
-					npm: `https://www.npmjs.com/package/${pkg.name}`,
-				},
-				moduleReplacements,
-				types,
+				repo: repo
+					? {
+							link: repo.https({ noGitPlus: true }),
+							dir: pkg.repository?.directory,
+							assets: repo.file('/'),
+						}
+					: undefined,
+				homepage: pkg.homepage,
+				npm: `https://www.npmjs.com/package/${pkg.name}`,
+				moduleReplacements: getModuleReplacements(name),
+				types: await packageTypeStatus(packageJSON, event.platform!),
 				deprecated: packageJSON.deprecated,
 				license: packageJSON.license,
 				unpackedSize: packageJSON.dist.unpackedSize,
@@ -197,84 +213,6 @@ async function packageTypeStatus(
 	};
 }
 
-export const renderREADME = query(vSpecifier, async (specifier) => {
-	const event = getRequestEvent();
-	const { name, version } = await resolveSpecifier(
-		specifier,
-		event.platform!,
-	);
-
-	return await cached(
-		`readme:${name}-${version}`,
-		event.platform!,
-		600,
-		async () => {
-			const { renderMarkdown } = await import('./markdown.server');
-
-			const pkg = await registry<Packument>(`/${name}`);
-			const linkBase = pkg.repository?.url
-				? hostedGitInfo
-						.fromUrl(pkg.repository.url)
-						?.file(joinPaths(pkg.repository.directory || ''))
-				: undefined;
-
-			const readme = await ofetch(
-				`https://unpkg.com/${name}@${version}/README.md`,
-				{
-					responseType: 'text',
-					headers: { 'User-Agent': USER_AGENT },
-				},
-			).catch(() => null);
-
-			if (!readme) {
-				return null;
-			}
-
-			return await renderMarkdown(readme, linkBase || undefined);
-		},
-	);
-});
-
-export const renderDocumentedModuleReplacement = query(
-	packageName,
-	async (name) => {
-		const event = getRequestEvent();
-
-		return await cached(
-			`module-replacement-render:${name}`,
-			event.platform!,
-			600,
-			async () => {
-				const { renderMarkdown } = await import('./markdown.server');
-
-				const replacement = allModuleReplacements.find(
-					(r) => r.type === 'documented' && r.moduleName == name,
-				) as DocumentedModuleReplacement | undefined;
-
-				if (!replacement) {
-					error(404, 'failed to find requested replacement');
-				}
-
-				const doc = await ofetch(
-					`https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${replacement.docPath}.md`,
-					{
-						responseType: 'text',
-						headers: { 'User-Agent': USER_AGENT },
-					},
-				).catch(() => null);
-
-				if (!doc) {
-					error(404, 'failed to find requested documentation');
-				}
-
-				return await renderMarkdown(
-					doc.replace(/^---\n.*\n---/, '').trim(),
-				);
-			},
-		);
-	},
-);
-
 async function resolveSpecifier(specifier: Specifier, platform: App.Platform) {
 	if (specifier.type === 'version') {
 		return { name: specifier.name, version: specifier.fetchSpec };
@@ -330,7 +268,7 @@ interface UNPKGMetaResponse {
 export interface FileNode {
 	id: string;
 	size: number;
-	mime: string;
+	lang: string;
 }
 
 interface RawDirectoryNode {
@@ -346,6 +284,16 @@ interface DirectoryNode {
 
 type RawTreeNode = FileNode | RawDirectoryNode;
 type TreeNode = FileNode | DirectoryNode;
+
+function mimeToLang(mime: string) {
+	switch (mime) {
+		case 'text/typescript':
+			return 'typescript';
+
+		default:
+			return mimes[mime]?.extensions?.[0] || 'txt';
+	}
+}
 
 export const getPackageFiles = query(vSpecifier, async (specifier) => {
 	const event = getRequestEvent();
@@ -377,7 +325,7 @@ export const getPackageFiles = query(vSpecifier, async (specifier) => {
 						current.set(segment, {
 							id: fullPath,
 							size: file.size,
-							mime: file.type,
+							lang: mimeToLang(file.type),
 						});
 					} else {
 						if (!current.has(segment)) {
@@ -397,11 +345,7 @@ export const getPackageFiles = query(vSpecifier, async (specifier) => {
 					.values()
 					.map((node): TreeNode => {
 						if (!('children' in node)) {
-							return {
-								id: node.id,
-								size: node.size,
-								mime: node.mime,
-							};
+							return node;
 						}
 
 						const children = mapToArray(node.children);

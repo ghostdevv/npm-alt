@@ -36,7 +36,14 @@
 				{data.pkg.name}<span class="version">@{data.pkg.version}</span>
 			</h1>
 
-			<PackageLinks links={data.pkg.links} inspectValue={data.pkg} />
+			<PackageLinks
+				links={{
+					npm: data.pkg.npm,
+					homepage: data.pkg.homepage,
+					repository: data.pkg.repo?.link,
+				}}
+				inspectValue={data.pkg}
+			/>
 		</div>
 	</section>
 
