@@ -46,7 +46,9 @@
 		const url = `https://unpkg.com/${data.pkg.name}@${data.pkg.version}${file.id}`;
 		const res = await fetch(url);
 		const code = await res.text();
-		return await highlight(code, file.lang);
+		return file.size > 1_000_000
+			? `<pre><code>${code}</code></pre>`
+			: await highlight(code, file.lang);
 	});
 </script>
 
