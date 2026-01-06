@@ -48,7 +48,7 @@ function mimeToLang(mime: string) {
 	}
 }
 
-export const getPackageFiles = query(ve.specifier, async (specifier) => {
+export const getPackageFiles = query(ve.specifierExact, async (specifier) => {
 	const event = getRequestEvent();
 	const pkg = await getInternalPackage(specifier, event.platform!);
 

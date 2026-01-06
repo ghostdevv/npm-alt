@@ -16,8 +16,14 @@
 		type FileNode,
 	} from '$lib/data/package-files.remote';
 
-	const { params, data } = $props();
-	const files = $derived(await getPackageFiles(params.specifier));
+	const { data } = $props();
+
+	const files = $derived(
+		await getPackageFiles({
+			name: data.pkg.name,
+			version: data.pkg.version,
+		}),
+	);
 
 	let selected = $state<FileNode | null>(null);
 

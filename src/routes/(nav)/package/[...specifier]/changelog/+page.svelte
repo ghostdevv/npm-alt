@@ -7,11 +7,17 @@
 	import Notice from '$lib/components/Notice.svelte';
 	import { cache } from '$lib/client/cache';
 
-	const { params, data } = $props();
+	const { data } = $props();
 
 	const renderChangelog = cache(null, async () => {
-		const md = await getPackageChangelog(params.specifier);
-		if (!md) return null;
+		const md = await getPackageChangelog({
+			name: data.pkg.name,
+			version: data.pkg.version,
+		});
+
+		if (!md) {
+			return null;
+		}
 
 		return { source: md.source, html: await renderMarkdown(md.content) };
 	});

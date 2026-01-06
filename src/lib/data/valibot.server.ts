@@ -27,6 +27,11 @@ export const semver = v.pipe(
 	v.string('semver failed to be parsed'),
 );
 
+export const specifierExact = v.object({
+	name: packageName,
+	version: semver,
+});
+
 export const specifier = v.pipe(
 	v.string('specifier must be a string'),
 	v.minLength(1, 'specifier should be at least one character long'),

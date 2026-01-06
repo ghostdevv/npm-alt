@@ -23,7 +23,7 @@ interface Release {
 
 // todo check mime?
 export const getPackageChangelog = query(
-	ve.specifier,
+	ve.specifierExact,
 	async (specifier): Promise<PackageChangelog | null> => {
 		const event = getRequestEvent();
 		const pkg = await getInternalPackage(specifier, event.platform!);
