@@ -127,6 +127,23 @@
 			> :global(pre) {
 				margin: 0px;
 				max-height: 100%;
+
+				/* thanks alexpeattie */
+				/* https://github.com/shikijs/shiki/issues/3#issuecomment-830564854 */
+				> :global(code) {
+					counter-reset: step;
+					counter-increment: step 0;
+
+					:global(.line::before) {
+						content: counter(step);
+						counter-increment: step;
+						width: 1rem;
+						margin-right: 1.5rem;
+						display: inline-block;
+						text-align: right;
+						color: var(--text-grey);
+					}
+				}
 			}
 
 			&:has(.default) {
