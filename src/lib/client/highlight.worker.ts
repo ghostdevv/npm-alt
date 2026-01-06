@@ -21,15 +21,15 @@ async function highlight(code: string, lang: string) {
 	highlighter ??= await init();
 
 	try {
-		return highlighter.codeToHtml(code, {
-			theme: 'serendipity-sunset-v1',
-			lang,
-		});
+		highlighter.getLanguage(lang);
 	} catch (error) {
-		console.error('failed to highlight code', error);
-		// todo properly
-		return `<pre data-failed><code>${code}</code></pre>`;
+		lang = 'text';
 	}
+
+	return highlighter.codeToHtml(code, {
+		theme: 'serendipity-sunset-v1',
+		lang,
+	});
 }
 
 async function renderMarkdown(markdown: string) {

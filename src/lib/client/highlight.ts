@@ -16,9 +16,13 @@ export async function highlight(code: string, ext: string) {
 
 let domPurify: DOMPurify | null = null;
 
+export async function sanitise(html: string) {
+	domPurify ??= (await import('dompurify')).default;
+	return domPurify.sanitize(html);
+}
+
 export async function renderMarkdown(markdown: string) {
 	worker ??= await init();
-	domPurify ??= (await import('dompurify')).default;
 	const html = await worker.renderMarkdown(markdown);
-	return domPurify.sanitize(html);
+	return await sanitise(html);
 }

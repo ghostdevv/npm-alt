@@ -2,13 +2,13 @@
 	import { getPackageFiles, type FileNode } from '$lib/data/package.remote';
 	import IconFolderOpen from 'virtual:icons/catppuccin/folder-open';
 	import InspectModal from '$lib/components/InspectModal.svelte';
+	import { highlight, sanitise } from '$lib/client/highlight';
 	import IconFolder from 'virtual:icons/catppuccin/folder';
 	import { format as formatBytes } from '@std/fmt/bytes';
 	import { failed, pending } from '$lib/boundary.svelte';
 	import IconText from 'virtual:icons/catppuccin/text';
 	import IconJSON from 'virtual:icons/catppuccin/json';
 	import Pending from '$lib/components/Pending.svelte';
-	import { highlight } from '$lib/client/highlight';
 	import { slide } from 'svelte/transition';
 	import { cache } from '$lib/client/cache';
 	import { Tree } from 'melt/builders';
@@ -47,7 +47,7 @@
 		const res = await fetch(url);
 		const code = await res.text();
 		return file.size > 1_000_000
-			? `<pre><code>${code}</code></pre>`
+			? `<pre><code>${await sanitise(code)}</code></pre>`
 			: await highlight(code, file.lang);
 	});
 </script>
