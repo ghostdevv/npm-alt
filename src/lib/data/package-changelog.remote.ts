@@ -29,7 +29,7 @@ export const getPackageChangelog = query(
 		const pkg = await getInternalPackage(specifier, event.platform!);
 
 		return await cached({
-			key: `package-changelog:${pkg.name}-${pkg.version}`,
+			key: `changelog:${pkg.name}@${pkg.version}`,
 			platform: event.platform!,
 			ttl: 600,
 			async value() {

@@ -53,7 +53,7 @@ export const getPackageFiles = query(ve.specifierExact, async (specifier) => {
 	const pkg = await getInternalPackage(specifier, event.platform!);
 
 	return await cached({
-		key: `package-files:${pkg.name}-${pkg.version}`,
+		key: `files:${pkg.name}@${pkg.version}`,
 		platform: event.platform!,
 		ttl: 600,
 		async value() {

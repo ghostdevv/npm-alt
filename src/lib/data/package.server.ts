@@ -16,7 +16,7 @@ export async function getInternalPackage(
 	const spec = await resolveSpecifier(specifier, platform);
 
 	const core = await cached({
-		key: `pkg:${spec.name}-${spec.version}`,
+		key: `pkg:${spec.name}@${spec.version}`,
 		platform,
 		ttl: 600,
 		async value() {
@@ -101,7 +101,7 @@ async function resolveSpecifier(
 	let pkg: Packument | undefined = undefined;
 
 	const result = await cached({
-		key: `specifier:${specifier}`,
+		key: `specifier:${specifier.name}@${specifier.fetchSpec}`,
 		platform,
 		ttl: 60,
 		async value() {
@@ -160,7 +160,7 @@ export async function getInternalPackageVersions(
 	const spec = await resolveSpecifier(specifier, platform);
 
 	const versions = await cached({
-		key: `pkg-versions:${spec.name}`,
+		key: `versions:${spec.name}`,
 		platform,
 		ttl: 60,
 		force,
