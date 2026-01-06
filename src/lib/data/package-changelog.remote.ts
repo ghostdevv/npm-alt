@@ -101,7 +101,11 @@ export const getPackageChangelog = query(
 								publishedAt: Date.parse(r.published_at),
 							})),
 					);
-				} while (results.length % 100 === 0);
+				} while (results.length !== 0 && results.length % 100 === 0);
+
+				if (results.length === 0) {
+					return null;
+				}
 
 				return {
 					source: 'gh-releases',
