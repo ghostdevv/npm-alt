@@ -12,7 +12,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check .",
-		"types": "wrangler types"
+		"types": "wrangler types",
+		"knip": "knip"
 	},
 	"devDependencies": {
 		"@iconify-json/catppuccin": "^1.2.17",
@@ -25,14 +26,17 @@
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@types/hosted-git-info": "^3.0.5",
 		"@types/mime-db": "^1.43.6",
+		"@types/node": "^25.0.3",
 		"@types/npm-package-arg": "^6.1.4",
 		"@types/semver": "^7.7.1",
 		"comlink": "^4.4.2",
 		"date-fns": "^4.1.0",
 		"devalue": "^5.6.1",
 		"dompurify": "^3.3.1",
+		"ghostsui": "2.0.0-beta.6",
 		"hosted-git-info": "^9.0.2",
 		"idb-keyval": "^6.2.2",
+		"knip": "^5.80.0",
 		"marked": "^17.0.1",
 		"marked-shiki": "^1.2.1",
 		"melt": "^0.43.0",

@@ -2,7 +2,7 @@ import { version } from '../../../package.json' with { type: 'json' };
 import { parse, stringify } from 'devalue';
 import { ofetch } from 'ofetch';
 
-export const USER_AGENT = `npm-alt/${version}`;
+const USER_AGENT = `npm-alt/${version}`;
 
 export const registry = ofetch.create({
 	baseURL: 'https://registry.npmjs.org',
