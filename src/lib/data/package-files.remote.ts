@@ -2,7 +2,7 @@ import { getInternalPackage } from './package.server';
 import { cached, USER_AGENT } from './common.server';
 import { getRequestEvent, query } from '$app/server';
 import { join as joinPaths } from '@std/path';
-import * as ve from '../valibot';
+import * as ve from './valibot.server';
 import { ofetch } from 'ofetch';
 import mimes from 'mime-db';
 

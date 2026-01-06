@@ -1,7 +1,7 @@
 import type { PackageLinks } from './types';
 import { registry } from './common.server';
+import * as ve from './valibot.server';
 import { query } from '$app/server';
-import * as ve from '../valibot';
 import * as v from 'valibot';
 
 interface SearchResponse {

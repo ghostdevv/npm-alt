@@ -5,7 +5,7 @@ import { GITHUB_TOKEN } from '$env/static/private';
 import type { PackageChangelog } from './types';
 import { join as joinPaths } from '@std/path';
 import hostedGitInfo from 'hosted-git-info';
-import * as ve from '../valibot';
+import * as ve from './valibot.server';
 import { ofetch } from 'ofetch';
 
 interface RawGithubRelease {

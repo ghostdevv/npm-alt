@@ -7,7 +7,7 @@ import { getInternalPackage } from './package.server';
 import { getRequestEvent, query } from '$app/server';
 import { packageTypeStatus } from './types.server';
 import hostedGitInfo from 'hosted-git-info';
-import * as ve from '../valibot';
+import * as ve from './valibot.server';
 
 const allModuleReplacements = [
 	...microUtils.moduleReplacements,
