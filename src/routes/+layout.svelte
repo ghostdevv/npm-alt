@@ -38,14 +38,13 @@
 		&.failed {
 			color: var(--red);
 		}
+	}
 
-		&.pending {
-			:global(svg) {
-				animation: spin 1s linear infinite forwards;
-				transform: rotate(0deg);
-				will-change: transform;
-			}
-		}
+	:global(.boundary.pending svg),
+	:global(.spin) {
+		animation: spin 1s linear infinite forwards;
+		transform: rotate(0deg);
+		will-change: transform;
 	}
 
 	@keyframes spin {
