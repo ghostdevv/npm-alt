@@ -3,6 +3,7 @@ import { createOnigurumaEngine } from 'shiki/engine/oniguruma';
 import { bundledLanguages } from 'shiki/bundle/web';
 import { serendipity } from './serendipity-shiki';
 import markedShiki from 'marked-shiki';
+import markedAlert from 'marked-alert';
 import { expose } from 'comlink';
 import { marked } from 'marked';
 
@@ -10,6 +11,7 @@ let highlighter: HighlighterCore | null = null;
 
 async function init() {
 	marked.use(markedShiki({ highlight }));
+	marked.use(markedAlert());
 	return await createHighlighterCore({
 		engine: createOnigurumaEngine(import('shiki/wasm')),
 		themes: [serendipity],

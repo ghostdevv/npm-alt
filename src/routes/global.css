@@ -1,5 +1,55 @@
 @import 'ghostsui';
 
+/* Based on GPL v3+ code from ghostdevv, permission given to relicense under MIT */
+/* https://github.com/ghostdevv/website/blob/f7c02eb7a8701b259d639220241c196d42492eb7/src/lib/layouts/post.scss */
+.markdown {
+	max-width: 100%;
+
+	& > :first-child {
+		margin-top: 0px;
+		padding-top: 0px;
+	}
+
+	p {
+		margin: 12px 0px;
+	}
+
+	h1 {
+		padding: 8px 0px;
+		border-bottom: 4px solid var(--background-secondary);
+
+		&:not(&:first-child) {
+			margin-top: 32px;
+		}
+	}
+
+	h1,
+	h2 {
+		font-weight: 600;
+		margin-top: 24px;
+		color: #fff;
+	}
+
+	h3,
+	h4 {
+		font-weight: 600;
+		margin-top: 28px;
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	:is(ul, ol) li p {
+		display: inline;
+	}
+
+	.markdown-alert {
+		padding: 4px 16px;
+	}
+}
+
 /* styles moved here from $lib/boundary.svelte due to */
 /* https://github.com/sveltejs/svelte/issues/16404 */
 /* when fixed should move back to component */

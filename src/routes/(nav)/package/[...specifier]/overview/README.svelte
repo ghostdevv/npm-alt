@@ -87,7 +87,9 @@
 	{/if}
 
 	{#if readme}
-		{@html readme}
+		<div class="markdown">
+			{@html readme}
+		</div>
 	{:else}
 		<p style="color: var(--text-grey);">No README found</p>
 	{/if}

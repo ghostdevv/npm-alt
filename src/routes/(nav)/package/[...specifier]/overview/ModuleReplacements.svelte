@@ -81,13 +81,13 @@
 							</code>.
 						</p>
 					{:else if replacement.type === 'documented'}
-						<h3>Documented Steps</h3>
-
 						<svelte:boundary {failed} {pending}>
-							{@html await renderDocumented(
-								`module-replacement:${replacement.moduleName}`,
-								replacement.docPath,
-							)}
+							<div class="markdown">
+								{@html await renderDocumented(
+									`module-replacement:${replacement.moduleName}`,
+									replacement.docPath,
+								)}
+							</div>
 						</svelte:boundary>
 					{/if}
 				</section>

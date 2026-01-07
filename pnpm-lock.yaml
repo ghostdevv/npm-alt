@@ -80,6 +80,9 @@ importers:
       marked:
         specifier: ^17.0.1
         version: 17.0.1
+      marked-alert:
+        specifier: ^2.1.2
+        version: 2.1.2(marked@17.0.1)
       marked-shiki:
         specifier: ^1.2.1
         version: 1.2.1(marked@17.0.1)(shiki@3.20.0)
@@ -1346,6 +1349,11 @@ packages:
 
   many-keys-map@2.0.1:
     resolution: {integrity: sha512-DHnZAD4phTbZ+qnJdjoNEVU1NecYoSdbOOoVmTDH46AuxDkEVh3MxTVpXq10GtcTC6mndN9dkv1rNfpjRcLnOw==}
+
+  marked-alert@2.1.2:
+    resolution: {integrity: sha512-EFNRZ08d8L/iEIPLTlQMDjvwIsj03gxWCczYTht6DCiHJIZhMk4NK5gtPY9UqAYb09eV5VGT+jD4lp396E0I+w==}
+    peerDependencies:
+      marked: '>=7.0.0'
 
   marked-shiki@1.2.1:
     resolution: {integrity: sha512-yHxYQhPY5oYaIRnROn98foKhuClark7M373/VpLxiy5TrDu9Jd/LsMwo8w+U91Up4oDb9IXFrP0N1MFRz8W/DQ==}
@@ -2807,6 +2815,10 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   many-keys-map@2.0.1: {}
+
+  marked-alert@2.1.2(marked@17.0.1):
+    dependencies:
+      marked: 17.0.1
 
   marked-shiki@1.2.1(marked@17.0.1)(shiki@3.20.0):
     dependencies:

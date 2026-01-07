@@ -60,7 +60,9 @@
 			</Notice>
 		{/if}
 
-		{@html changelog.html}
+		<div class="markdown">
+			{@html changelog.html}
+		</div>
 	{:else}
 		<Notice id="" colour="var(--primary)" permanent>
 			<h4 class="row">

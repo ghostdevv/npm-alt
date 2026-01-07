@@ -40,6 +40,7 @@
 		"idb-keyval": "^6.2.2",
 		"knip": "^5.80.0",
 		"marked": "^17.0.1",
+		"marked-alert": "^2.1.2",
 		"marked-shiki": "^1.2.1",
 		"melt": "^0.43.0",
 		"mime-db": "^1.54.0",
