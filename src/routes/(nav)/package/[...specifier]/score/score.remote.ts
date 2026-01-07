@@ -37,7 +37,7 @@ export const getPackageScore = query(ve.specifierExact, async (spec) => {
 				changelog: changelog ? (changelog.source === 'npm' ? 2 : 1) : 0,
 				types: pkg.typesIncluded ? 1 : 0,
 				license: pkg.license ? 1 : 0,
-				provenance: null,
+				// provenance: null,
 			};
 		},
 	});

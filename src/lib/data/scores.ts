@@ -35,10 +35,10 @@ export const SCORE_CRITERIA = Object.freeze([
 		description: 'The package provides a license',
 		max: 1,
 	},
-	{
-		id: 'provenance',
-		name: 'Has provenance',
-		description: 'The package has a provenance.',
-		max: 1,
-	},
+	// {
+	// 	id: 'provenance',
+	// 	name: 'Has provenance',
+	// 	description: 'The package has a provenance.',
+	// 	max: 1,
+	// },
 ] as const) satisfies readonly Criterion[];
