@@ -44,11 +44,10 @@
 			</h1>
 
 			<PackageLinks
-				links={{
-					npm: data.pkg.npm,
-					homepage: data.pkg.homepage,
-					repository: data.pkg.repo?.link,
-				}}
+				name={data.pkg.name}
+				version={data.pkg.version}
+				homepage={data.pkg.homepage}
+				repo={data.pkg.repo?.link}
 				inspectValue={data.pkg}
 			/>
 		</div>

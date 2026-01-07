@@ -1,21 +1,23 @@
 <script lang="ts">
 	import IconJSON from 'virtual:icons/catppuccin/json';
 	import IconHTTP from 'virtual:icons/catppuccin/http';
-	import type { PackageLinks } from '$lib/data/types';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconGit from 'virtual:icons/catppuccin/git';
 	import InspectModal from './InspectModal.svelte';
 
 	interface Props {
-		links: PackageLinks;
+		name: string;
+		version: string;
+		repo?: string;
+		homepage?: string;
 		inspectValue: unknown;
 	}
 
-	const { links, inspectValue }: Props = $props();
+	const { name, version, repo, homepage, inspectValue }: Props = $props();
 </script>
 
 <a
-	href={links.npm}
+	href="https://www.npmjs.com/package/{name}/v/{version}"
 	rel="noreferrer noopener"
 	title="Open on NPM"
 	class="button icon"
@@ -23,9 +25,9 @@
 	<IconNPM />
 </a>
 
-{#if links.repository}
+{#if repo}
 	<a
-		href={links.repository}
+		href={repo}
 		rel="noreferrer noopener"
 		title="Open Git Repository"
 		class="button icon"
@@ -34,9 +36,9 @@
 	</a>
 {/if}
 
-{#if links.homepage}
+{#if homepage}
 	<a
-		href={links.homepage}
+		href={homepage}
 		rel="noreferrer noopener"
 		title="Open Homepage"
 		class="button icon"

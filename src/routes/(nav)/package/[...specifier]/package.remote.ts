@@ -36,7 +36,6 @@ export const getPackage = query(
 					}
 				: undefined,
 			homepage: pkg.homepage,
-			npm: `https://www.npmjs.com/package/${pkg.name}`,
 			replacements: allModuleReplacements.filter(
 				(m): m is ModReplacement =>
 					m.type !== 'none' && m.moduleName === pkg.name,

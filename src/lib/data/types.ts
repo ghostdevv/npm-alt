@@ -35,15 +35,6 @@ export interface InternalPackage {
 }
 
 /**
- * @todo remove this with search updates
- */
-export interface PackageLinks {
-	repository?: string;
-	homepage?: string;
-	npm: string;
-}
-
-/**
  * Filtered {@link ModuleReplacement} to remove the `type: 'none'`
  * replacements.
  */
@@ -61,7 +52,6 @@ export interface Package {
 		assets: string;
 	};
 	homepage?: string;
-	npm: string;
 	replacements: ModReplacement[];
 	types: PackageTypeStatus;
 	deprecated?: string;

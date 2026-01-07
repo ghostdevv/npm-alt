@@ -1,19 +1,9 @@
 <script lang="ts">
 	import NavigationIndicator from '$lib/components/NavigationIndicator.svelte';
 	import Expansion from '$lib/components/expansions/Expansion.svelte';
-	import { search } from './search/search.svelte';
-	import { useThrottle } from 'runed';
-	import { page } from '$app/state';
+	import SearchInput from './SearchInput.svelte';
 
-	let { children } = $props();
-
-	let query = $state(page.url.searchParams.get('q') || '');
-	// svelte-ignore state_referenced_locally
-	search.query = query;
-
-	const updateSearch = useThrottle(() => {
-		search.query = query;
-	});
+	const { children } = $props();
 </script>
 
 <NavigationIndicator />
@@ -21,22 +11,7 @@
 <div class="wrapper">
 	<header>
 		<a href="/"><Expansion /></a>
-
-		<label>
-			<span class="sr-only">Search NPM</span>
-			<input
-				type="search"
-				name="q"
-				placeholder="Search for...?"
-				bind:value={
-					() => query,
-					(v) => {
-						query = v;
-						updateSearch();
-					}
-				}
-			/>
-		</label>
+		<SearchInput />
 	</header>
 
 	<div class="children">

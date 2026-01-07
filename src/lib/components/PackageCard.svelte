@@ -1,6 +1,6 @@
 <script lang="ts">
+	import type { SearchPackage } from '$lib/client/npm-search';
 	import IconLicense from 'virtual:icons/catppuccin/license';
-	import type { SearchPackage } from '../data/search.remote';
 	import PackageLinks from './PackageLinks.svelte';
 	import Tag from './Tag.svelte';
 
@@ -36,7 +36,13 @@
 			title="Package License"
 		/>
 
-		<PackageLinks links={pkg.links} inspectValue={pkg} />
+		<PackageLinks
+			name={pkg.name}
+			version={pkg.version}
+			homepage={pkg.links.homepage}
+			repo={pkg.links.repository}
+			inspectValue={pkg}
+		/>
 	</div>
 </details>
 
