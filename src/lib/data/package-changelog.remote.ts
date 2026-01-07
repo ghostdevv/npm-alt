@@ -24,17 +24,16 @@ interface Release {
 // todo check mime?
 export const getPackageChangelog = query(
 	ve.specifierExact,
-	async (specifier): Promise<PackageChangelog | null> => {
+	async (spec): Promise<PackageChangelog | null> => {
 		const event = getRequestEvent();
-		const pkg = await getInternalPackage(specifier, event.platform!);
 
 		return await cached({
-			key: `changelog:${pkg.name}@${pkg.version}`,
+			key: `changelog:${spec.name}@${spec.version}`,
 			platform: event.platform!,
 			ttl: 600,
 			async value() {
 				const npmChangelog = await ofetch(
-					`https://unpkg.com/${pkg.name}@${pkg.version}/CHANGELOG.md`,
+					`https://unpkg.com/${spec.name}@${spec.version}/CHANGELOG.md`,
 					{
 						headers: { 'User-Agent': USER_AGENT },
 						responseType: 'text',
@@ -44,6 +43,8 @@ export const getPackageChangelog = query(
 				if (npmChangelog) {
 					return { source: 'npm', content: npmChangelog };
 				}
+
+				const pkg = await getInternalPackage(spec, event.platform!);
 
 				const repo = pkg.repoURL
 					? hostedGitInfo.fromUrl(pkg.repoURL)
