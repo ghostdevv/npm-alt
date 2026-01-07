@@ -82,5 +82,6 @@
 		padding: 12px;
 		background-color: var(--background-primary);
 		border: 2px solid var(--background-secondary);
+		width: min(80%, 1200px);
 	}
 </style>
