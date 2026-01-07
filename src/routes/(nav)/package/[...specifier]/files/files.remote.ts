@@ -55,7 +55,7 @@ export const getPackageFiles = query(ve.specifierExact, async (specifier) => {
 	return await cached({
 		key: `files:${pkg.name}@${pkg.version}`,
 		platform: event.platform!,
-		ttl: 600,
+		ttl: 86400,
 		async value() {
 			const res = await ofetch<UNPKGMetaResponse>(
 				`https://unpkg.com/${pkg.name}@${pkg.version}?meta`,

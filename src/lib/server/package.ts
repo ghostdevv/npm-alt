@@ -18,7 +18,7 @@ export async function getInternalPackage(
 	const core = await cached({
 		key: `pkg:${spec.name}@${spec.version}`,
 		platform,
-		ttl: 600,
+		ttl: 86400,
 		async value() {
 			spec.pkg ||= await registry<Packument>(`/${spec.name}`);
 			const manifest = spec.pkg['versions'][spec.version];
@@ -103,7 +103,7 @@ async function resolveSpecifier(
 	const result = await cached({
 		key: `specifier:${specifier.name}@${specifier.fetchSpec}`,
 		platform,
-		ttl: 60,
+		ttl: 300,
 		async value() {
 			pkg = await registry<Packument>(`/${specifier.name}`);
 			let version: string | null = null;
@@ -162,7 +162,7 @@ export async function getInternalPackageVersions(
 	const versions = await cached({
 		key: `versions:${spec.name}`,
 		platform,
-		ttl: 60,
+		ttl: 300,
 		force,
 		async value() {
 			const pkg =

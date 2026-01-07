@@ -27,7 +27,7 @@ export async function getChangelog(
 	return await cached({
 		key: `changelog:${name}@${version}`,
 		platform,
-		ttl: 600,
+		ttl: 86400,
 		async value() {
 			const npmChangelog = await ofetch(
 				`https://unpkg.com/${name}@${version}/CHANGELOG.md`,

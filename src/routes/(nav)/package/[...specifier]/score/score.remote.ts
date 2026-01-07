@@ -23,7 +23,7 @@ export const getPackageScore = query(ve.specifierExact, async (spec) => {
 	return await cached({
 		key: `score:${spec.name}@${spec.version}`,
 		platform: event.platform!,
-		ttl: 600,
+		ttl: 86400,
 		async value(): Promise<ScoreResults> {
 			const pkg = await getInternalPackage(spec, event.platform!);
 
