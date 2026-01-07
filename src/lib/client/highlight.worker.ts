@@ -13,7 +13,10 @@ async function init() {
 	return await createHighlighterCore({
 		engine: createOnigurumaEngine(import('shiki/wasm')),
 		themes: [serendipity],
-		langs: Object.values(bundledLanguages),
+		langs: [
+			...Object.values(bundledLanguages),
+			() => import('@shikijs/langs/toml'),
+		],
 	});
 }
 

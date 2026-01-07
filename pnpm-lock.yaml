@@ -17,6 +17,9 @@ importers:
       '@npm/types':
         specifier: ^2.1.0
         version: 2.1.0
+      '@shikijs/langs':
+        specifier: ^3.20.0
+        version: 3.20.0
       '@std/fmt':
         specifier: jsr:^1.0.8
         version: '@jsr/std__fmt@1.0.8'
