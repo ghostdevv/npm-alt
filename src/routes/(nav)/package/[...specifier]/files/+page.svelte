@@ -1,5 +1,6 @@
 <script lang="ts">
 	import IconFolderOpen from 'virtual:icons/catppuccin/folder-open';
+	import { getPackageFiles, type FileNode } from './files.remote';
 	import InspectModal from '$lib/components/InspectModal.svelte';
 	import { highlight, sanitise } from '$lib/client/highlight';
 	import IconFolder from 'virtual:icons/catppuccin/folder';
@@ -11,10 +12,6 @@
 	import { slide } from 'svelte/transition';
 	import { cache } from '$lib/client/cache';
 	import { Tree } from 'melt/builders';
-	import {
-		getPackageFiles,
-		type FileNode,
-	} from '$lib/data/package-files.remote';
 
 	const { data } = $props();
 

@@ -1,7 +1,7 @@
-import { getInternalPackageVersions } from './package.server';
+import { getInternalPackageVersions } from '$lib/server/package';
+import type { PackageVersion } from '$lib/data/types';
 import { getRequestEvent, query } from '$app/server';
-import type { PackageVersion } from './types';
-import * as ve from './valibot.server';
+import * as ve from '$lib/server/valibot';
 import semver from 'semver';
 
 export const getPackageVersions = query(ve.specifier, async (specifier) => {

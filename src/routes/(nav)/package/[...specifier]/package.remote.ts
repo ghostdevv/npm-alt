@@ -1,13 +1,13 @@
 import microUtils from 'module-replacements/manifests/micro-utilities.json' with { type: 'json' };
 import preferred from 'module-replacements/manifests/preferred.json' with { type: 'json' };
 import native from 'module-replacements/manifests/native.json' with { type: 'json' };
+import type { ModReplacement, Package } from '$lib/data/types';
+import { packageTypeStatus } from '$lib/server/package-types';
 import type { ModuleReplacement } from 'module-replacements';
-import type { ModReplacement, Package } from './types';
-import { getInternalPackage } from './package.server';
+import { getInternalPackage } from '$lib/server/package';
 import { getRequestEvent, query } from '$app/server';
-import { packageTypeStatus } from './types.server';
 import hostedGitInfo from 'hosted-git-info';
-import * as ve from './valibot.server';
+import * as ve from '$lib/server/valibot';
 
 const allModuleReplacements = [
 	...microUtils.moduleReplacements,

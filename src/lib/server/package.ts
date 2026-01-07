@@ -1,7 +1,7 @@
-import type { InternalPackage, InternalPackageVersions } from './types';
-import { cached, registry } from './common.server';
-import type { Specifier } from './valibot.server';
-import { typesIncluded } from './types.server';
+import type { InternalPackage, InternalPackageVersions } from '../data/types';
+import type { Specifier } from '$lib/server/valibot';
+import { typesIncluded } from './package-types';
+import { cached, registry } from './common';
 import type { Packument } from '@npm/types';
 import semver from 'semver';
 

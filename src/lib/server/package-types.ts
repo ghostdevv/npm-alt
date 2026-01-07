@@ -1,7 +1,7 @@
-import type { InternalPackage, PackageTypeStatus } from './types';
-import { getInternalPackage } from './package.server';
+import type { InternalPackage, PackageTypeStatus } from '../data/types';
+import type { Specifier } from '$lib/server/valibot';
 import type { PackumentVersion } from '@npm/types';
-import type { Specifier } from './valibot.server';
+import { getInternalPackage } from './package';
 import parsePackage from 'npm-package-arg';
 
 type PackageExports =

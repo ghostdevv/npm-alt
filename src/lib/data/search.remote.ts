@@ -1,6 +1,6 @@
+import { registry } from '$lib/server/common';
 import type { PackageLinks } from './types';
-import { registry } from './common.server';
-import * as ve from './valibot.server';
+import * as ve from '$lib/server/valibot';
 import { query } from '$app/server';
 import * as v from 'valibot';
 

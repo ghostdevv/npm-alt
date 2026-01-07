@@ -1,11 +1,11 @@
 <script lang="ts">
 	import IconQuestion from 'virtual:icons/lucide/circle-question-mark';
-	import { getPackageScore } from '$lib/data/package-score.remote';
-	import { SCORE_CRITERIA } from '$lib/data/package-scores';
 	import IconLoader from 'virtual:icons/lucide/loader';
 	import IconMinus from 'virtual:icons/lucide/minus';
 	import IconCheck from 'virtual:icons/lucide/check';
 	import Notice from '$lib/components/Notice.svelte';
+	import { SCORE_CRITERIA } from '$lib/data/scores';
+	import { getPackageScore } from './score.remote';
 	import { failed } from '$lib/boundary.svelte';
 	import IconX from 'virtual:icons/lucide/x';
 

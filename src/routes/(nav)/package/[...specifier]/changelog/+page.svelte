@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getPackageChangelog } from '$lib/data/package-changelog.remote';
 	import IconChangelog from 'virtual:icons/catppuccin/changelog';
+	import { getPackageChangelog } from './changelog.remote';
 	import { renderMarkdown } from '$lib/client/highlight';
 	import IconGithub from 'virtual:icons/lucide/github';
 	import IconGit from 'virtual:icons/catppuccin/git';

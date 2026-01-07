@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { getPackageVersions } from '$lib/data/package-versions.remote';
 	import IconCalendar from 'virtual:icons/lucide/calendar';
 	import { format as formatBytes } from '@std/fmt/bytes';
+	import { getPackageVersions } from './versions.remote';
 	import type { PackageVersion } from '$lib/data/types';
 	import IconWeight from 'virtual:icons/lucide/weight';
 	import IconScale from 'virtual:icons/lucide/scale';

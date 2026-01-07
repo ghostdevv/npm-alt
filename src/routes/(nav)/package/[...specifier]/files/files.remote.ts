@@ -1,8 +1,8 @@
-import { getInternalPackage } from './package.server';
-import { cached, USER_AGENT } from './common.server';
+import { getInternalPackage } from '$lib/server/package';
+import { cached, USER_AGENT } from '$lib/server/common';
 import { getRequestEvent, query } from '$app/server';
 import { join as joinPaths } from '@std/path';
-import * as ve from './valibot.server';
+import * as ve from '$lib/server/valibot';
 import { ofetch } from 'ofetch';
 import mimes from 'mime-db';
 

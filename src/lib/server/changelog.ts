@@ -1,7 +1,7 @@
-import { getInternalPackage } from './package.server';
-import { USER_AGENT, cached } from './common.server';
+import type { PackageChangelog } from '$lib/data/types';
 import { GITHUB_TOKEN } from '$env/static/private';
-import type { PackageChangelog } from './types';
+import { getInternalPackage } from './package';
+import { USER_AGENT, cached } from './common';
 import { join as joinPaths } from '@std/path';
 import hostedGitInfo from 'hosted-git-info';
 import { ofetch } from 'ofetch';

@@ -1,10 +1,10 @@
-import { getChangelog } from './package-changelog.server';
-import { getInternalPackage } from './package.server';
+import { getInternalPackage } from '$lib/server/package';
+import { USER_AGENT, cached } from '$lib/server/common';
+import type { InternalPackage } from '$lib/data/types';
+import { getChangelog } from '$lib/server/changelog';
 import { getRequestEvent, query } from '$app/server';
-import { USER_AGENT, cached } from './common.server';
-import type { CriteriaId } from './package-scores';
-import type { InternalPackage } from './types';
-import * as ve from './valibot.server';
+import type { CriteriaId } from '$lib/data/scores';
+import * as ve from '$lib/server/valibot';
 
 type ScoreResults = Record<CriteriaId, number | null>;
 
