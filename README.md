@@ -1,38 +1,53 @@
-# sv
+# npm-alt (name tbd)
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+An alternative frontend for npm that aims to provide a better experience, with more useful supplemental information.
 
-## Creating a project
+> [!NOTE]
+> There is an instance up at https://npm.willow.sh until I find it a permenant home.
+> Mobile users beware...
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Extra Features
 
-```sh
-# create a new project in the current directory
-npx sv create
+### npm acronyms
 
-# create a new project in my-app
-npx sv create my-app
-```
+The most important feature, the old npm acronyms.
 
-## Developing
+![](./.github/images/npm-acronyms.png)
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### e18e suggestions
 
-```sh
-npm run dev
+Shows e18e suggestions on packages.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+![](./.github/images/e18e.png)
 
-## Building
+### install options
 
-To create a production version of your app:
+- Selectable package manager install options
+- Adds the @types package if required
+- Shows browser import for script[type=module]
 
-```sh
-npm run build
-```
+![](./.github/images/install-options.png)
 
-You can preview the production build with `npm run preview`.
+### changelog viewer
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Tries to fetch the changelog from the npm package files, the repo, or GitHub releases.
+
+![](./.github/images/changelog.png)
+
+### better version viewer
+
+Inspired by jsr/crates.io
+
+![](./.github/images/versions.png)
+
+### package score
+
+Inspired by jsr, very much a work in progress
+
+![](./.github/images/package-score.png)
+
+### non-beta file viewer
+
+:p
+
+![](./.github/images/file-viewer.png)
