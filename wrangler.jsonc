@@ -16,6 +16,12 @@
 			"id": "0a5cfb16c9094aaaa8240be3b92e39f3",
 		},
 	],
+	"routes": [
+		{
+			"pattern": "npm.willow.sh",
+			"custom_domain": true,
+		},
+	],
 	"observability": {
 		"enabled": true,
 	},
