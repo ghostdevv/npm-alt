@@ -105,18 +105,18 @@
 	}
 
 	.deprecated {
-		--border: var(--red);
-		--background: color(from var(--red) srgb r g b / 0.2);
+		--border: color(from var(--red) srgb r g b / 0.75);
+		--background: color(from var(--red) srgb r g b / 0.15);
 	}
 
 	.lead {
-		--border: var(--green);
-		--background: color(from var(--green) srgb r g b / 0.2);
+		--border: color(from var(--green) srgb r g b / 0.75);
+		--background: color(from var(--green) srgb r g b / 0.15);
 	}
 
 	.current {
-		--border: var(--primary);
-		--background: color(from var(--primary) srgb r g b / 0.2);
+		--border: color(from var(--primary) srgb r g b / 0.75);
+		--background: color(from var(--primary) srgb r g b / 0.15);
 	}
 
 	.legend {
