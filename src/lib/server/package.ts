@@ -37,7 +37,7 @@ export async function getInternalPackage(
 				homepage: manifest.homepage,
 				deprecated: manifest.deprecated,
 				license: manifest.license,
-				unpackedSize: manifest.dist.unpackedSize,
+				size: manifest.dist.unpackedSize,
 				publishedAt: new Date(spec.pkg.time[spec.version]),
 				createdAt: new Date(spec.pkg.time.created),
 				updatedAt: new Date(spec.pkg.time.modified),
