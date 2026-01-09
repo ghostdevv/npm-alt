@@ -19,7 +19,7 @@ export async function getInternalPackage(
 		key: `pkg:${spec.name}@${spec.version}`,
 		platform,
 		ttl: 86400,
-		async value() {
+		async value(): Promise<Omit<InternalPackage, 'name' | 'version'>> {
 			spec.pkg ||= await registry<Packument>(`/${spec.name}`);
 			const manifest = spec.pkg['versions'][spec.version];
 
@@ -159,7 +159,7 @@ export async function getInternalPackageVersions(
 ): Promise<InternalPackageVersions> {
 	const spec = await resolveSpecifier(specifier, platform);
 
-	const versions = await cached({
+	return await cached({
 		key: `versions:${spec.name}`,
 		platform,
 		ttl: 300,
@@ -168,18 +168,15 @@ export async function getInternalPackageVersions(
 			const pkg =
 				spec.pkg || (await registry<Packument>(`/${spec.name}`));
 
-			return Object.values(pkg.versions).map((pkv) => ({
-				version: pkv.version,
-				deprecated: !!pkv.deprecated,
-				license: pkv.license,
-				size: pkv.dist.unpackedSize,
-				publishedAt: new Date(pkg.time[pkv.version]),
-			}));
+			return {
+				versions: Object.values(pkg.versions).map((pkv) => ({
+					version: pkv.version,
+					deprecated: !!pkv.deprecated,
+					license: pkv.license,
+					size: pkv.dist.unpackedSize,
+					publishedAt: new Date(pkg.time[pkv.version]),
+				})),
+			};
 		},
 	});
-
-	return {
-		name: spec.name,
-		versions,
-	};
 }

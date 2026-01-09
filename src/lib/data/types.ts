@@ -67,7 +67,6 @@ export interface Package {
  * See {@link InternalPackage} for more information.
  */
 export interface InternalPackageVersions {
-	name: string;
 	versions: {
 		version: string;
 		deprecated?: boolean;
