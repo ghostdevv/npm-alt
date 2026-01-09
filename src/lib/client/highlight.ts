@@ -9,9 +9,13 @@ async function init() {
 	return wrap<HighlightWorker>(new Worker());
 }
 
-export async function highlight(code: string, ext: string) {
+export async function highlight(
+	code: string,
+	ext: string,
+	lineNumbers?: boolean,
+) {
 	worker ??= await init();
-	return await worker.highlight(code, ext);
+	return await worker.highlight(code, ext, lineNumbers);
 }
 
 let domPurify: DOMPurify | null = null;

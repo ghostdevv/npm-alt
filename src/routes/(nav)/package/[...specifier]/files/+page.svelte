@@ -11,7 +11,7 @@
 	import Pending from '$lib/components/Pending.svelte';
 	import { slide } from 'svelte/transition';
 	import { cache } from '$lib/client/cache';
-	import { goto } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { Tree } from 'melt/builders';
 	import { page } from '$app/state';
 
@@ -40,6 +40,7 @@
 
 			if (!('children' in item) && file !== item.id) {
 				page.url.searchParams.set('file', item.id);
+				page.url.hash = '';
 				goto(page.url);
 				return;
 			}
@@ -54,10 +55,72 @@
 		const url = `https://unpkg.com/${data.pkg.name}@${data.pkg.version}${file.id}`;
 		const res = await fetch(url);
 		const code = await res.text();
-		return file.size > 1_000_000
-			? `<pre><code>${await sanitise(code)}</code></pre>`
-			: await highlight(code, file.lang);
+
+		if (file.size > 1_000_000) {
+			return `<pre><code>${await sanitise(code)}</code></pre>`;
+		}
+
+		return await highlight(code, file.lang, true);
 	});
+
+	function lineNumberClick(event: MouseEvent) {
+		const target = (event.target as HTMLSpanElement | null)?.parentElement;
+
+		if (!target || !target.dataset.line) {
+			return;
+		}
+
+		event.preventDefault();
+
+		const oldLine = page.url.hash.match(/^#(?<line>L\d+)/)?.groups?.line;
+		const newLine = `L${Number.parseInt(target.dataset.line)}`;
+
+		const hash =
+			event.shiftKey && oldLine && oldLine !== newLine
+				? `#${oldLine}-${newLine}`
+				: `#${newLine}`;
+
+		if (page.url.hash !== hash) {
+			page.url.hash = hash;
+			goto(page.url);
+		}
+	}
+
+	function renderSelection(root: HTMLDivElement) {
+		const m = page.url.hash.match(/^#L(\d+)(?:-L(\d+))?$/);
+
+		for (const line of root.querySelectorAll('.line.selected')) {
+			line.classList.remove('selected');
+		}
+
+		if (!m) return;
+
+		const start = Number.parseInt(m[1]);
+		const end = Number.parseInt(m[2] ?? m[1]);
+
+		for (const line of root.querySelectorAll<HTMLSpanElement>('.line')) {
+			const lineNum = Number.parseInt(line.dataset.line!);
+			if (!isNaN(lineNum) && lineNum >= start && lineNum <= end) {
+				line.classList.add('selected');
+			}
+		}
+	}
+
+	function handleLineNumbers(root: HTMLDivElement) {
+		root.addEventListener('click', lineNumberClick);
+
+		$effect(() => {
+			renderSelection(root);
+		});
+
+		const observer = new MutationObserver(() => renderSelection(root));
+		observer.observe(root, { childList: true, subtree: true });
+
+		return () => {
+			root.removeEventListener('click', lineNumberClick);
+			observer.disconnect();
+		};
+	}
 </script>
 
 {#snippet treeItems(items: (typeof tree)['children'], depth: number = 0)}
@@ -109,13 +172,16 @@
 					somehow you selected a directory, please select a file :p
 				</p>
 			{:else if item}
-				<svelte:boundary {failed} {pending}>
-					<Pending />
-					{@html await renderAndFetchContent(
-						`file:${data.pkg.name}-${data.pkg.version}-${item.id}`,
-						item,
-					)}
-				</svelte:boundary>
+				<div class="code" {@attach handleLineNumbers}>
+					<svelte:boundary {failed} {pending}>
+						<Pending />
+
+						{@html await renderAndFetchContent(
+							`file:${data.pkg.name}-${data.pkg.version}-${item.id}`,
+							item,
+						)}
+					</svelte:boundary>
+				</div>
 			{:else}
 				<p class="default error">that file doesn't exist :((</p>
 			{/if}
@@ -144,24 +210,32 @@
 			overflow: auto;
 			position: relative;
 
-			> :global(pre) {
-				margin: 0px;
-				max-height: 100%;
+			.code {
+				display: contents;
 
-				/* thanks alexpeattie */
-				/* https://github.com/shikijs/shiki/issues/3#issuecomment-830564854 */
-				> :global(code) {
-					counter-reset: step;
-					counter-increment: step 0;
+				> :global(pre) {
+					margin: 0px;
+					max-height: 100%;
 
-					:global(.line::before) {
-						content: counter(step);
-						counter-increment: step;
-						width: 1rem;
-						margin-right: 1.5rem;
-						display: inline-block;
-						text-align: right;
+					:global(.line) {
+						&.selected {
+							--colour: color(
+								from var(--primary) srgb r g b / 0.2
+							);
+
+							background-color: var(--colour);
+
+							/* https://www.youtube.com/watch?v=81pnuZFarRw */
+							box-shadow: 0 0 0 100vmax
+								var(--bg-color, var(--colour));
+							clip-path: inset(0 -100vmax);
+						}
+					}
+
+					:global(.line-number) {
 						color: var(--text-grey);
+						margin-right: 8px;
+						padding: 0px;
 					}
 				}
 			}
