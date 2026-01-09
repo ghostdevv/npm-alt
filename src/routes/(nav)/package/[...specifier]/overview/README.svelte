@@ -4,6 +4,7 @@
 	import type { Package } from '$lib/data/types';
 	import { join as joinPaths } from '@std/path';
 	import { cache } from '$lib/client/cache';
+	import Pending from '$lib/components/Pending.svelte';
 
 	interface Props {
 		pkg: Package;
@@ -85,9 +86,7 @@
 		pkg,
 	)}
 
-	{#if $effect.pending()}
-		{@render pending()}
-	{/if}
+	<Pending />
 
 	{#if readme}
 		<div class="markdown">

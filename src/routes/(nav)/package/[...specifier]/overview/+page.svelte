@@ -136,6 +136,7 @@
 
 		.readme {
 			overflow-x: auto;
+			position: relative;
 		}
 
 		.sidebar {
