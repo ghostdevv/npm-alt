@@ -11,7 +11,9 @@
 	import Pending from '$lib/components/Pending.svelte';
 	import { slide } from 'svelte/transition';
 	import { cache } from '$lib/client/cache';
+	import { goto } from '$app/navigation';
 	import { Tree } from 'melt/builders';
+	import { page } from '$app/state';
 
 	const { data } = $props();
 
@@ -22,27 +24,27 @@
 		}),
 	);
 
-	let selected = $state<FileNode | null>(null);
+	let file = $derived(page.url.searchParams.get('file') || undefined);
 
-	const tree = $derived(
-		new Tree({
-			items: files,
-			expanded: [],
-			onSelectedChange(selection) {
-				const item = selection ? tree.getItem(selection) : null;
+	const tree = new Tree({
+		selected: () => file,
+		items: () => files,
+		onSelectedChange(selection) {
+			if (!selection) return;
+			const item = tree.getItem(selection);
 
-				if (!item) {
-					selected = null;
-					return;
-				}
+			if (!item) {
+				page.url.searchParams.delete('file');
+				return;
+			}
 
-				if (!('children' in item)) {
-					selected = item;
-					return;
-				}
-			},
-		}),
-	);
+			if (!('children' in item) && file !== item.id) {
+				page.url.searchParams.set('file', item.id);
+				goto(page.url);
+				return;
+			}
+		},
+	});
 
 	function baseName(path: string) {
 		return path.split('/').pop()!;
@@ -99,14 +101,24 @@
 	<div class="spacer"></div>
 
 	<div class="content">
-		{#if selected}
-			<svelte:boundary {failed} {pending}>
-				<Pending />
-				{@html await renderAndFetchContent(
-					`file:${data.pkg.name}-${data.pkg.version}-${selected.id}`,
-					selected,
-				)}
-			</svelte:boundary>
+		{#if file}
+			{@const item = tree.getItem(file)}
+
+			{#if item && 'children' in item}
+				<p class="default error">
+					somehow you selected a directory, please select a file :p
+				</p>
+			{:else if item}
+				<svelte:boundary {failed} {pending}>
+					<Pending />
+					{@html await renderAndFetchContent(
+						`file:${data.pkg.name}-${data.pkg.version}-${item.id}`,
+						item,
+					)}
+				</svelte:boundary>
+			{:else}
+				<p class="default error">that file doesn't exist :((</p>
+			{/if}
 		{:else}
 			<p class="default">select something :D</p>
 		{/if}
@@ -160,6 +172,10 @@
 
 				.default {
 					color: var(--text-grey);
+
+					&.error {
+						color: var(--red);
+					}
 				}
 			}
 		}

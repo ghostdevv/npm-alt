@@ -62,7 +62,7 @@
 	</div>
 
 	<div class="slot">
-		<svelte:boundary {failed} {pending}>
+		<svelte:boundary {failed} {pending} onerror={console.error}>
 			<Pending />
 			{@render children()}
 		</svelte:boundary>
