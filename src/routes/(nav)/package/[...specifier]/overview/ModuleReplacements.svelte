@@ -17,11 +17,14 @@
 
 	const { replacements, inline = true }: Props = $props();
 
-	const renderDocumented = cache(86_400_000, async (docPath: string) => {
-		const url = `https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${docPath}.md`;
-		const res = await fetch(url);
-		const md = (await res.text()).replace(/^---\n.*\n---/, '').trim();
-		return await renderMarkdown(md);
+	const renderDocumented = cache({
+		ttl: 86_400,
+		async value(docPath: string) {
+			const url = `https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${docPath}.md`;
+			const res = await fetch(url);
+			const md = (await res.text()).replace(/^---\n.*\n---/, '').trim();
+			return await renderMarkdown(md);
+		},
 	});
 </script>
 

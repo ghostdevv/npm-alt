@@ -11,15 +11,18 @@
 
 	const { pkg }: Props = $props();
 
-	const renderREADME = cache(null, async (pkg: Package): Promise<string> => {
-		const res = await fetch(
-			`https://unpkg.com/${pkg.name}@${pkg.version}/README.md`,
-		);
+	const renderREADME = cache({
+		version: 1,
+		async value(pkg: Package): Promise<string> {
+			const res = await fetch(
+				`https://unpkg.com/${pkg.name}@${pkg.version}/README.md`,
+			);
 
-		const md = await res.text();
-		const html = await renderMarkdown(md);
+			const md = await res.text();
+			const html = await renderMarkdown(md);
 
-		return fixRelativeLinks(html, pkg.repo);
+			return fixRelativeLinks(html, pkg.repo);
+		},
 	});
 
 	// send help

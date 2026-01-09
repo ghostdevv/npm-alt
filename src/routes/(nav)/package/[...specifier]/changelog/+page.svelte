@@ -9,17 +9,23 @@
 
 	const { data } = $props();
 
-	const renderChangelog = cache(null, async () => {
-		const md = await getPackageChangelog({
-			name: data.pkg.name,
-			version: data.pkg.version,
-		});
+	const renderChangelog = cache({
+		version: 1,
+		async value() {
+			const md = await getPackageChangelog({
+				name: data.pkg.name,
+				version: data.pkg.version,
+			});
 
-		if (!md) {
-			return null;
-		}
+			if (!md) {
+				return null;
+			}
 
-		return { source: md.source, html: await renderMarkdown(md.content) };
+			return {
+				source: md.source,
+				html: await renderMarkdown(md.content),
+			};
+		},
 	});
 
 	const changelog = $derived(

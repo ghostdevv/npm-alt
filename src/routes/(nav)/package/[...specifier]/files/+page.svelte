@@ -51,16 +51,19 @@
 		return path.split('/').pop()!;
 	}
 
-	const renderAndFetchContent = cache(null, async (file: FileNode) => {
-		const url = `https://unpkg.com/${data.pkg.name}@${data.pkg.version}${file.id}`;
-		const res = await fetch(url);
-		const code = await res.text();
+	const renderAndFetchContent = cache({
+		version: 2,
+		async value(file: FileNode) {
+			const url = `https://unpkg.com/${data.pkg.name}@${data.pkg.version}${file.id}`;
+			const res = await fetch(url);
+			const code = await res.text();
 
-		if (file.size > 1_000_000) {
-			return `<pre><code>${await sanitise(code)}</code></pre>`;
-		}
+			if (file.size > 1_000_000) {
+				return `<pre><code>${await sanitise(code)}</code></pre>`;
+			}
 
-		return await highlight(code, file.lang, true);
+			return await highlight(code, file.lang, true);
+		},
 	});
 
 	function lineNumberClick(event: MouseEvent) {
