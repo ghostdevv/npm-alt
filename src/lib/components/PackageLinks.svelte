@@ -3,17 +3,21 @@
 	import IconHTTP from 'virtual:icons/catppuccin/http';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconGit from 'virtual:icons/catppuccin/git';
+	import IconHeart from 'virtual:icons/lucide/heart';
 	import InspectModal from './InspectModal.svelte';
+	import type { Funding } from '$lib/data/types';
 
 	interface Props {
 		name: string;
 		version: string;
 		repo?: string;
 		homepage?: string;
+		funding?: Funding[];
 		inspectValue: unknown;
 	}
 
-	const { name, version, repo, homepage, inspectValue }: Props = $props();
+	const { name, version, repo, homepage, funding, inspectValue }: Props =
+		$props();
 </script>
 
 <a
@@ -24,6 +28,20 @@
 >
 	<IconNPM />
 </a>
+
+{#if funding?.length}
+	{#each funding as { url }}
+		<a
+			href={url}
+			rel="noreferrer noopener"
+			target="_blank"
+			title="Open Funding"
+			class="button icon"
+		>
+			<IconHeart color="#D8369F" />
+		</a>
+	{/each}
+{/if}
 
 {#if repo}
 	<a

@@ -61,3 +61,20 @@ export async function cached<T>(o: CacheOptions<T>): Promise<T> {
 
 	return value;
 }
+
+/**
+ * Check whether a URL is definitely a URL, and for
+ * another website.
+ */
+export function checkURL(raw: string): string | null {
+	const url = URL.parse(raw);
+	if (!url) return null;
+
+	if (!['http:', 'https:'].includes(url.protocol)) {
+		return null;
+	}
+
+	url.protocol = 'https:';
+
+	return url.toString();
+}

@@ -42,6 +42,7 @@ export const getPackage = query(
 			),
 			types: await packageTypeStatus(pkg, event.platform!),
 			deprecated: pkg.deprecated,
+			funding: pkg.funding,
 			license: pkg.license,
 			unpackedSize: pkg.size,
 			publishedAt: pkg.publishedAt,

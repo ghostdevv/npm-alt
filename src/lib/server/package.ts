@@ -1,11 +1,16 @@
-import type { InternalPackage, InternalPackageVersions } from '../data/types';
+import type { Packument, PackumentVersion } from '@npm/types';
+import { cached, checkURL, USER_AGENT } from './common';
 import type { Specifier } from '$lib/server/valibot';
 import { typesIncluded } from './package-types';
-import { cached, USER_AGENT } from './common';
-import type { Packument } from '@npm/types';
 import { ofetch, FetchError } from 'ofetch';
 import { error } from '@sveltejs/kit';
 import semver from 'semver';
+import {
+	type InternalPackageVersions,
+	type InternalPackage,
+	isFundingType,
+	type Funding,
+} from '../data/types';
 
 /**
  * Fetch a {@link Packument} for a given package name from npm.
@@ -30,6 +35,30 @@ async function getPackument(name: string): Promise<Packument> {
 			error(500, 'Failed to fetch package, try again?');
 		}
 	}
+}
+
+/**
+ * Parse the funding information from a {@link PackumentVersion} to
+ * the internal {@link Funding} format.
+ */
+function parseFunding(funding?: PackumentVersion['funding']): Funding[] {
+	if (!funding) return [];
+
+	if (typeof funding == 'string') {
+		const url = checkURL(funding);
+		return url ? [{ url }] : [];
+	}
+
+	if (Array.isArray(funding)) {
+		return parseFunding(funding);
+	}
+
+	const url = checkURL(funding.url);
+	if (!url) return [];
+
+	return isFundingType(funding.type)
+		? [{ type: funding.type, url }]
+		: [{ url }];
 }
 
 /**
@@ -69,6 +98,7 @@ export async function getInternalPackage(
 				createdAt: new Date(spec.pkg.time.created),
 				updatedAt: new Date(spec.pkg.time.modified),
 				typesIncluded: typesIncluded(manifest),
+				funding: parseFunding(manifest.funding),
 			};
 		},
 	});

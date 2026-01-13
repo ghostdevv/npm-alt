@@ -48,6 +48,7 @@
 				version={data.pkg.version}
 				homepage={data.pkg.homepage}
 				repo={data.pkg.repo?.link}
+				funding={data.pkg.funding}
 				inspectValue={data.pkg}
 			/>
 		</div>

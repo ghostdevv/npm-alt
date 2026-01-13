@@ -32,6 +32,33 @@ export interface InternalPackage {
 	createdAt: Date;
 	updatedAt: Date;
 	typesIncluded: boolean;
+	funding?: Funding[];
+}
+
+/**
+ * @see {@link FundingType}
+ */
+export const FUNDING_TYPES = ['patreon', 'individual'] as const;
+
+/**
+ * Supported funding types. More need adding as they're discovered,
+ * as there doesn't seem to be an official list.
+ */
+export type FundingType = (typeof FUNDING_TYPES)[number];
+
+/**
+ * Check whether a string is a {@link FundingType}
+ */
+export function isFundingType(type: string): type is FundingType {
+	return FUNDING_TYPES.includes(type as any);
+}
+
+/**
+ * Location for package funding, with an optional type.
+ */
+export interface Funding {
+	type?: (typeof FUNDING_TYPES)[number];
+	url: string;
 }
 
 /**
@@ -55,6 +82,7 @@ export interface Package {
 	replacements: ModReplacement[];
 	types: PackageTypeStatus;
 	deprecated?: string;
+	funding?: Funding[];
 	license?: string;
 	unpackedSize?: number;
 	publishedAt: Date;
