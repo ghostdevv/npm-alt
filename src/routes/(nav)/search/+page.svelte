@@ -6,43 +6,53 @@
 	import { search } from './search.svelte';
 </script>
 
-<svelte:boundary {failed} {pending}>
-	{@const result = await search.results()}
+{#if search.query.length >= 2}
+	<svelte:boundary {failed} {pending}>
+		{@const result = await search.results()}
 
-	<section class:stale={$effect.pending() > 0}>
-		<Pending />
+		<section class:stale={$effect.pending() > 0}>
+			<Pending />
 
-		<div>
-			<p style="display: inline-block;">
-				Found {result.total} packages.
-			</p>
+			<div>
+				<p style="display: inline-block;">
+					Found {result.total} packages.
+				</p>
 
-			<InspectModal value={result}>
-				<button class="icon" style="display: inline-block;">
-					View raw.
+				<InspectModal value={result}>
+					<button class="icon" style="display: inline-block;">
+						View raw.
+					</button>
+				</InspectModal>
+			</div>
+
+			<div class="results">
+				{#each result.results as res}
+					<PackageCard pkg={res.package} />
+				{/each}
+			</div>
+
+			{#if !result.done}
+				<button
+					class="icon"
+					onclick={() => search.loadMore()}
+					disabled={$effect.pending() > 0}
+				>
+					Load More
 				</button>
-			</InspectModal>
-		</div>
-
-		<div class="results">
-			{#each result.results as res}
-				<PackageCard pkg={res.package} />
-			{/each}
-		</div>
-
-		{#if !result.done}
-			<button
-				class="icon"
-				onclick={() => search.loadMore()}
-				disabled={$effect.pending() > 0}
-			>
-				Load More
-			</button>
-		{/if}
-	</section>
-</svelte:boundary>
+			{/if}
+		</section>
+	</svelte:boundary>
+{:else}
+	<p class="hint">
+		(psst, try putting at least two characters in the search bar)
+	</p>
+{/if}
 
 <style>
+	.hint {
+		color: var(--text-grey);
+	}
+
 	section {
 		position: relative;
 
