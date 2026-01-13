@@ -15,7 +15,7 @@
 		search.query = query;
 		page.url.searchParams.set('q', query);
 		goto(page.url, { keepFocus: true, noScroll: true });
-	});
+	}, 1000);
 
 	const openable = $derived(!page.url.pathname.endsWith('/search'));
 	let open = $state(false);
