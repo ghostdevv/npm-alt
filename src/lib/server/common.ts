@@ -1,7 +1,7 @@
 import { version } from '../../../package.json' with { type: 'json' };
 import { parse, stringify } from 'devalue';
 
-export const USER_AGENT = `npm-alt/${version}`;
+export const USER_AGENT = `npm-alt/${version} (+https://github.com/ghostdevv/npm-alt)`;
 
 interface CacheOptions<T> {
 	/**
