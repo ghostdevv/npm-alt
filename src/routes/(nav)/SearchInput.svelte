@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { failed, pending } from '$lib/boundary.svelte';
 	import Pending from '$lib/components/Pending.svelte';
+	import { goto, onNavigate } from '$app/navigation';
 	import { search } from './search/search.svelte';
-	import { onNavigate } from '$app/navigation';
 	import { onClickOutside } from 'runed';
 	import { useThrottle } from 'runed';
 	import { page } from '$app/state';
@@ -13,6 +13,8 @@
 
 	const updateSearch = useThrottle(() => {
 		search.query = query;
+		page.url.searchParams.set('q', query);
+		goto(page.url, { keepFocus: true, noScroll: true });
 	});
 
 	const openable = $derived(!page.url.pathname.endsWith('/search'));
