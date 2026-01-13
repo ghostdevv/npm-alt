@@ -1,6 +1,8 @@
 <script lang="ts">
 	import NavigationIndicator from '$lib/components/NavigationIndicator.svelte';
 	import Expansion from '$lib/components/expansions/Expansion.svelte';
+	import { failed, pending } from '$lib/boundary.svelte';
+	import Pending from '$lib/components/Pending.svelte';
 	import SearchInput from './SearchInput.svelte';
 
 	const { children } = $props();
@@ -15,7 +17,10 @@
 	</header>
 
 	<div class="children">
-		{@render children()}
+		<svelte:boundary {failed} {pending}>
+			<Pending />
+			{@render children()}
+		</svelte:boundary>
 	</div>
 </div>
 
@@ -45,6 +50,7 @@
 		.children {
 			overflow-y: auto;
 			padding-block-start: 8px;
+			position: relative;
 		}
 	}
 </style>

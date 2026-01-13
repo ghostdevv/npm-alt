@@ -1,7 +1,14 @@
-interface SearchResponse {
+type SearchResponse = SearchSuccess | SearchError;
+
+interface SearchSuccess {
 	objects: SearchObject[];
 	total: number;
 	time: string;
+}
+
+interface SearchError {
+	error: string;
+	code: string;
 }
 
 export interface SearchObject {
@@ -37,13 +44,14 @@ interface PackageLinks {
 export interface SearchResult {
 	total: number;
 	done: boolean;
-	objects: SearchResponse['objects'];
+	objects: SearchSuccess['objects'];
 }
 
 export async function searchNPM(
 	query: string,
 	from: number,
 	size: number,
+	signal?: AbortSignal,
 ): Promise<SearchResult> {
 	if (!query) {
 		return {
@@ -58,12 +66,20 @@ export async function searchNPM(
 	url.searchParams.set('size', `${size}`);
 	url.searchParams.set('from', `${from}`);
 
-	const res = await fetch(url);
-	const data = await res.json<SearchResponse>();
+	try {
+		const res = await fetch(url, { signal });
+		const data = await res.json<SearchResponse>();
 
-	return {
-		done: data.objects.length % size !== 0,
-		objects: data.objects,
-		total: data.total,
-	};
+		if ('error' in data) {
+			throw new Error(`search failed: ${data.error} (${data.code})`);
+		}
+
+		return {
+			done: data.objects.length % size !== 0,
+			objects: data.objects,
+			total: data.total,
+		};
+	} catch (error) {
+		throw new Error('failed to search npm', { cause: error });
+	}
 }

@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { failed, pending } from '$lib/boundary.svelte';
+	import Pending from '$lib/components/Pending.svelte';
 	import { search } from './search/search.svelte';
+	import { onNavigate } from '$app/navigation';
 	import { onClickOutside } from 'runed';
 	import { useThrottle } from 'runed';
 	import { page } from '$app/state';
-	import { onNavigate } from '$app/navigation';
 
 	let query = $state(page.url.searchParams.get('q') || '');
 	// svelte-ignore state_referenced_locally
@@ -12,8 +14,6 @@
 	const updateSearch = useThrottle(() => {
 		search.query = query;
 	});
-
-	const { total, results, done } = $derived(await search.results());
 
 	const openable = $derived(!page.url.pathname.endsWith('/search'));
 	let open = $state(false);
@@ -48,21 +48,25 @@
 		/>
 	</label>
 
-	{#if openable && open && search.query.length}
+	{#if openable && open && search.query.length >= 2}
 		<ul class="results">
-			{#each results as result}
-				<li class="result">
-					<a href="/package/{result.package.name}/overview">
-						<div class="stretch">
-							{result.package.name}<span class="version">
-								@{result.package.version}
-							</span>
-						</div>
-					</a>
-				</li>
-			{:else}
-				<li><p>No results :((</p></li>
-			{/each}
+			<svelte:boundary {failed} {pending}>
+				<Pending />
+
+				{#each (await search.results()).results as result}
+					<li class="result">
+						<a href="/package/{result.package.name}/overview">
+							<div class="stretch">
+								{result.package.name}<span class="version">
+									@{result.package.version}
+								</span>
+							</div>
+						</a>
+					</li>
+				{:else}
+					<li><p>No results :((</p></li>
+				{/each}
+			</svelte:boundary>
 		</ul>
 	{/if}
 </div>

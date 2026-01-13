@@ -1,4 +1,5 @@
 import { searchNPM, type SearchResult } from '$lib/client/npm-search';
+import { getAbortSignal } from 'svelte';
 
 const BATCH_SIZE = 20;
 
@@ -19,35 +20,53 @@ class Search {
 	private cache = new Map<number, SearchResult>();
 
 	async results() {
-		const results = await Promise.all(
-			Array.from(
-				{ length: Math.ceil(this._from / BATCH_SIZE + 1) },
-				async (_, i) => {
-					const from = i * BATCH_SIZE;
-					const query = this.query;
+		const query = this.query;
 
-					const hit = this.cache.get(from);
-					if (hit) return hit;
+		if (query.length <= 1) {
+			throw new Error('npm search must be at least 2 characters long');
+		}
 
-					const res = await searchNPM(query, from, BATCH_SIZE);
-					this.cache.set(from, res);
+		const signal = getAbortSignal();
 
-					return {
-						done: res.objects.length % BATCH_SIZE !== 0,
-						objects: res.objects,
-						total: res.total,
-					};
-				},
-			),
-		);
+		try {
+			const results = await Promise.all(
+				Array.from(
+					{ length: Math.ceil(this._from / BATCH_SIZE + 1) },
+					async (_, i) => {
+						const from = i * BATCH_SIZE;
+						const query = this.query;
 
-		const last = results.at(-1);
+						const hit = this.cache.get(from);
+						if (hit) return hit;
 
-		return {
-			done: last?.done ?? true,
-			total: last?.total ?? 0,
-			results: results.flatMap((result) => result.objects),
-		};
+						const res = await searchNPM(
+							query,
+							from,
+							BATCH_SIZE,
+							signal,
+						);
+
+						this.cache.set(from, res);
+
+						return {
+							done: res.objects.length !== BATCH_SIZE,
+							objects: res.objects,
+							total: res.total,
+						};
+					},
+				),
+			);
+
+			const last = results.at(-1);
+
+			return {
+				done: last?.done ?? true,
+				total: last?.total ?? 0,
+				results: results.flatMap((result) => result.objects),
+			};
+		} catch (error) {
+			throw error;
+		}
 	}
 
 	loadMore() {
