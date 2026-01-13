@@ -1,9 +1,36 @@
 import type { InternalPackage, InternalPackageVersions } from '../data/types';
 import type { Specifier } from '$lib/server/valibot';
 import { typesIncluded } from './package-types';
-import { cached, registry } from './common';
+import { cached, USER_AGENT } from './common';
 import type { Packument } from '@npm/types';
+import { ofetch, FetchError } from 'ofetch';
+import { error } from '@sveltejs/kit';
 import semver from 'semver';
+
+/**
+ * Fetch a {@link Packument} for a given package name from npm.
+ */
+async function getPackument(name: string): Promise<Packument> {
+	try {
+		return await ofetch<Packument>(`/${name}`, {
+			baseURL: 'https://registry.npmjs.org',
+			headers: {
+				'User-Agent': USER_AGENT,
+			},
+			retry: 3,
+			retryDelay: 500,
+		});
+	} catch (_err) {
+		const err = _err as FetchError<Packument>;
+
+		if (err.status === 404) {
+			error(404, 'Package not found');
+		} else {
+			console.error('failed to fetch packument', error);
+			error(500, 'Failed to fetch package, try again?');
+		}
+	}
+}
 
 /**
  * Fetch the {@link InternalPackage} for a given specifier
@@ -20,7 +47,7 @@ export async function getInternalPackage(
 		platform,
 		ttl: 86400,
 		async value(): Promise<Omit<InternalPackage, 'name' | 'version'>> {
-			spec.pkg ||= await registry<Packument>(`/${spec.name}`);
+			spec.pkg ||= await getPackument(spec.name);
 			const manifest = spec.pkg['versions'][spec.version];
 
 			platform.ctx.waitUntil(
@@ -105,7 +132,7 @@ async function resolveSpecifier(
 		platform,
 		ttl: 300,
 		async value() {
-			pkg = await registry<Packument>(`/${specifier.name}`);
+			pkg = await getPackument(specifier.name);
 			let version: string | null = null;
 
 			// Based on MIT Licensed code from Anthony Fu
@@ -165,8 +192,7 @@ export async function getInternalPackageVersions(
 		ttl: 300,
 		force,
 		async value() {
-			const pkg =
-				spec.pkg || (await registry<Packument>(`/${spec.name}`));
+			const pkg = spec.pkg || (await getPackument(spec.name));
 
 			return {
 				versions: Object.values(pkg.versions).map((pkv) => ({
