@@ -1,11 +1,11 @@
 <script lang="ts">
 	import IconNPM from 'virtual:icons/catppuccin/npm';
-	import { expansions } from './expansions';
+	import { page } from '$app/state';
 </script>
 
 <h3>
 	<IconNPM />
-	{expansions[Math.floor(Math.random() * expansions.length)]}
+	{page.data.expansion}
 </h3>
 
 <style>
