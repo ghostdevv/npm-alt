@@ -29,7 +29,7 @@ class Search {
 	async results() {
 		const query = this.query;
 
-		if (query.length <= 1) {
+		if (query.trim().length <= 1) {
 			throw new Error('npm search must be at least 2 characters long');
 		}
 
