@@ -50,7 +50,7 @@
 		{#each options as option}
 			{@const Icon = option.icon}
 			<div {...select.getOption(option, option.title)}>
-				<button class="icon">
+				<button class="icon" title={option.title}>
 					<Icon />
 				</button>
 			</div>
