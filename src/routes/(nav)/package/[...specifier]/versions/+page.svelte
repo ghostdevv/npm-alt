@@ -1,12 +1,16 @@
 <script lang="ts">
 	import IconCalendar from 'virtual:icons/lucide/calendar';
+	import VersionDownloads from './VersionDownloads.svelte';
 	import { format as formatBytes } from '@std/fmt/bytes';
+	import { failed, pending } from '$lib/boundary.svelte';
 	import { getPackageVersions } from './versions.remote';
+	import Pending from '$lib/components/Pending.svelte';
 	import type { PackageVersion } from '$lib/data/types';
 	import IconWeight from 'virtual:icons/lucide/weight';
 	import IconScale from 'virtual:icons/lucide/scale';
 	import IconTrash from 'virtual:icons/lucide/trash';
 	import { formatDistanceToNow } from 'date-fns';
+	import Downloads from './Downloads.svelte';
 	import { resolve } from '$app/paths';
 
 	const { params, data } = $props();
@@ -28,8 +32,26 @@
 </script>
 
 <section>
-	<h4 class="count">{versions.length} Versions</h4>
+	<h3 class="count">{versions.length} Versions</h3>
+</section>
 
+<section class="graphs">
+	<div class="graph">
+		<svelte:boundary {failed} {pending}>
+			<Pending />
+			<Downloads name={data.pkg.name} />
+		</svelte:boundary>
+	</div>
+
+	<div class="graph">
+		<svelte:boundary {failed} {pending}>
+			<Pending />
+			<VersionDownloads name={data.pkg.name} />
+		</svelte:boundary>
+	</div>
+</section>
+
+<section>
 	<div class="legend">
 		<div class="key lead">
 			<div class="vis lead"></div>
@@ -100,6 +122,21 @@
 </section>
 
 <style>
+	.graphs {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-template-rows: 1fr;
+		gap: 12px;
+
+		width: 100%;
+		max-width: 100%;
+
+		.graph {
+			position: relative;
+			width: 100%;
+		}
+	}
+
 	.count {
 		margin-block-end: 8px;
 	}
