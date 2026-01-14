@@ -5,7 +5,9 @@
 	import IconDeno from 'virtual:icons/catppuccin/deno';
 	import IconNPM from 'virtual:icons/catppuccin/npm';
 	import IconBun from 'virtual:icons/catppuccin/bun';
+	import IconNYPM from 'virtual:icons/custom/nypm';
 	import type { Package } from '$lib/data/types';
+	import IconNI from 'virtual:icons/custom/ni';
 
 	interface Props {
 		pkg: Package;
@@ -47,6 +49,16 @@
 			title: 'bun',
 			icon: IconBun,
 			content: `bun add ${installPackages}`,
+		},
+		{
+			title: '@antfu/ni',
+			icon: IconNI,
+			content: `ni ${installPackages}`,
+		},
+		{
+			title: 'nypm',
+			icon: IconNYPM,
+			content: `nypm add ${installPackages}`,
 		},
 	]}
 />
