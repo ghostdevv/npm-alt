@@ -20,8 +20,10 @@
 	const openable = $derived(!page.url.pathname.endsWith('/search'));
 	let open = $state(false);
 
-	onNavigate(() => {
-		open = false;
+	onNavigate((event) => {
+		if (event.from?.url.pathname != event.to?.url.pathname) {
+			open = false;
+		}
 	});
 </script>
 
