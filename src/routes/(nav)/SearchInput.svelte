@@ -64,7 +64,7 @@
 						</a>
 					</li>
 				{:else}
-					<li><p>No results :((</p></li>
+					<li class="empty"><p>No results :((</p></li>
 				{/each}
 			</svelte:boundary>
 		</ul>
@@ -96,11 +96,19 @@
 			display: flex;
 			flex-direction: column;
 
+			&:not(:has(li)) > *,
+			.empty,
 			.result {
 				width: 100%;
 				margin: 0px;
 				padding: 8px 12px;
 
+				p {
+					margin: 0px;
+				}
+			}
+
+			.result {
 				a {
 					color: var(--text);
 				}
