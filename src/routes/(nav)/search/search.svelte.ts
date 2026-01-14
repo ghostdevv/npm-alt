@@ -6,15 +6,22 @@ const BATCH_SIZE = 20;
 class Search {
 	private _from = $state(0);
 	private _query = $state('');
+	private debounce: ReturnType<typeof setTimeout> | null = null;
 
 	get query() {
 		return this._query;
 	}
 
 	set query(value: string) {
-		this._query = value;
-		this._from = 0;
-		this.cache.clear();
+		if (this.debounce) {
+			clearTimeout(this.debounce);
+		}
+
+		this.debounce = setTimeout(() => {
+			this._query = value;
+			this._from = 0;
+			this.cache.clear();
+		}, 250);
 	}
 
 	private cache = new Map<number, SearchResult>();

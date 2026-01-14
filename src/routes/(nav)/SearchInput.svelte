@@ -1,24 +1,20 @@
 <script lang="ts">
 	import { failed, pending } from '$lib/boundary.svelte';
 	import Pending from '$lib/components/Pending.svelte';
-	import { goto, onNavigate } from '$app/navigation';
 	import { search } from './search/search.svelte';
+	import { onNavigate } from '$app/navigation';
+	import { useSearchParams } from 'runed/kit';
 	import { onClickOutside } from 'runed';
-	import { useThrottle } from 'runed';
 	import { page } from '$app/state';
+	import * as v from 'valibot';
 
-	let query = $state(page.url.searchParams.get('q') || '');
-	// svelte-ignore state_referenced_locally
-	search.query = query;
-
-	const updateSearch = useThrottle(() => {
-		search.query = query;
-		page.url.searchParams.set('q', query);
-		goto(page.url, { keepFocus: true, noScroll: true });
-	}, 1000);
-
+	const params = useSearchParams(v.object({ q: v.optional(v.string(), '') }));
 	const openable = $derived(!page.url.pathname.endsWith('/search'));
 	let open = $state(false);
+
+	$effect(() => {
+		search.query = params.q;
+	});
 
 	onNavigate((event) => {
 		if (event.from?.url.pathname != event.to?.url.pathname) {
@@ -42,13 +38,7 @@
 			placeholder="Search for...?"
 			onfocus={() => (open = openable)}
 			onkeydown={() => {}}
-			bind:value={
-				() => query,
-				(v) => {
-					query = v;
-					updateSearch();
-				}
-			}
+			bind:value={() => params.q, (value) => (params.q = value)}
 		/>
 	</label>
 
