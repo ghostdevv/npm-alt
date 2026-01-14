@@ -1,12 +1,30 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
+	import { page } from '$app/state';
 	import './global.css';
 
-	let { children } = $props();
+	const { children } = $props();
+
+	const title = $derived.by(() => {
+		const { id } = page.route;
+
+		if (id === '/') {
+			return 'home';
+		} else if (id?.startsWith('/(nav)/package/[...specifier]')) {
+			return page.params.specifier;
+		} else if (id == '/(nav)/search') {
+			return 'search';
+		} else if (id == '/(nav)/~[author]') {
+			return page.params.author;
+		}
+
+		return '???';
+	});
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>{title} ~ npm-alt</title>
 </svelte:head>
 
 <main>
