@@ -36,14 +36,14 @@ function exportsHasTypes(exports?: PackageExports): boolean {
 			(typeof exports !== 'string' &&
 				typeof exports?.['.'] !== 'string' &&
 				!Array.isArray(exports?.['.']) &&
-				exports?.['.']?.types.endsWith('ts')) ||
+				exports?.['.']?.types?.endsWith('ts')) ||
 			// "exports": { ".": ["./foo.ts", { "types": "./foo.ts" }] }
 			(typeof exports !== 'string' &&
 				Array.isArray(exports?.['.']) &&
 				exports?.['.']?.some((e) => exportsHasTypes(e)))
 		);
 	} catch (error) {
-		console.error('failed to handle exports', exports);
+		console.error('failed to handle exports', exports, error);
 		return false;
 	}
 }
