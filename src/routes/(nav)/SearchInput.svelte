@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { failed, pending } from '$lib/boundary.svelte';
 	import Pending from '$lib/components/Pending.svelte';
+	import { goto, onNavigate } from '$app/navigation';
 	import { search } from './search/search.svelte';
-	import { onNavigate } from '$app/navigation';
 	import { useSearchParams } from 'runed/kit';
 	import { onClickOutside } from 'runed';
 	import { page } from '$app/state';
@@ -37,8 +37,14 @@
 			name="q"
 			placeholder="Search for...?"
 			onfocus={() => (open = openable)}
-			onkeydown={() => {}}
 			bind:value={() => params.q, (value) => (params.q = value)}
+			onkeydown={(event) => {
+				if (event.key === 'Enter' && page.url.pathname != '/search') {
+					const url = new URL('/search', location.origin);
+					url.searchParams.set('q', params.q);
+					goto(url);
+				}
+			}}
 		/>
 	</label>
 
