@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, onNavigate } from '$app/navigation';
 	import { fade } from 'svelte/transition';
-	import { navigating } from '$app/state';
-	import { untrack } from 'svelte';
+	import { onDestroy } from 'svelte';
 
 	// Constants
 	const PROGRESS_INCREMENT = 0.1;
@@ -87,10 +86,9 @@
 		animationFrame = requestAnimationFrame(animate);
 	}
 
-	// Watch for navigation changes
-	$effect(() => {
-		if (navigating?.to) {
-			untrack(startProgressAnimation);
+	onNavigate((event) => {
+		if (event.from?.url.pathname != event.to?.url.pathname) {
+			startProgressAnimation();
 		}
 	});
 
@@ -101,9 +99,8 @@
 		completeAnimation();
 	});
 
-	// Cleanup on unmount
-	$effect(() => {
-		return cleanup;
+	onDestroy(() => {
+		cleanup();
 	});
 </script>
 
