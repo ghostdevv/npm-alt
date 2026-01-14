@@ -5,5 +5,10 @@
 		"type": true
 	},
 	"tags": ["-lintignore"],
-	"ignoreDependencies": ["@iconify-json/catppuccin", "@iconify-json/lucide"]
+	"ignoreDependencies": [
+		"@iconify-json/catppuccin",
+		"@iconify-json/lucide",
+		"ghostsui"
+	],
+	"ignoreUnresolved": ["\\$env/static/private"]
 }
