@@ -1,21 +1,21 @@
+import type { Props as NodeData } from '$lib/components/PackageCardHeader.svelte';
+import type { Edge, Node as NodeType, NodeProps } from '@xyflow/svelte';
+import { packageTypeStatus } from '$lib/server/package-types';
 import { getInternalPackage } from '$lib/server/package';
 import { getRequestEvent, query } from '$app/server';
 import type { Dependency } from '$lib/data/types';
-import type { Edge, Node } from '@xyflow/svelte';
 import * as ve from '$lib/server/valibot';
 import * as v from 'valibot';
 
-export interface NodeData {
-	[key: string]: unknown;
-	label: string;
-}
+type Node = NodeType<NodeData & Record<string, unknown>, 'DependencyNode'>;
+export type DependencyNodeProps = NodeProps<Node>;
 
 export const getDependencyGraph = query(
 	ve.specifierExact,
 	async (specifier) => {
 		const event = getRequestEvent();
 
-		const nodes = new Map<string, Node<NodeData>>();
+		const nodes = new Map<string, Node>();
 		const edges: Edge[] = [];
 
 		async function createNode(dep: Dependency) {
@@ -25,33 +25,42 @@ export const getDependencyGraph = query(
 			);
 
 			if (!spec.success || !dep.registry) {
-				const node = {
+				const node: Node = {
 					id: `${dep.name}@${dep.version}`,
+					type: 'DependencyNode',
 					position: { x: 0, y: 0 },
 					data: {
-						label: `${dep.name}@${dep.version}`,
+						name: dep.name,
+						version: dep.version,
 					},
 				};
+
+				if (dep.optional) {
+					node.data.state = 'optional';
+				}
 
 				nodes.set(node.id, node);
 				return node;
 			}
 
 			const pkg = await getInternalPackage(spec.output, event.platform!);
+			const types = await packageTypeStatus(pkg, event.platform!);
 			const id = `${pkg.name}@${pkg.version}`;
 
 			if (nodes.has(id)) {
 				return nodes.get(id)!;
 			}
 
-			const node: Node<NodeData> = {
+			const node: Node = {
 				id: id,
+				type: 'DependencyNode',
 				position: { x: 0, y: 0 },
 				data: {
-					// name: dep.name,
-					// version: dep.version,
-					// optional: dep.optional,
-					label: id,
+					name: pkg.name,
+					version: pkg.version,
+					types: types.status,
+					optional: dep.optional,
+					deprecated: !!pkg.deprecated,
 				},
 			};
 

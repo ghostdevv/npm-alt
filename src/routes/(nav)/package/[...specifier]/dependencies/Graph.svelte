@@ -2,6 +2,7 @@
 	import '@xyflow/svelte/dist/style.css';
 	import IconRefresh from 'virtual:icons/lucide/refresh-cw';
 	import IconLink from 'virtual:icons/lucide/external-link';
+	import DependencyNode from './DependencyNode.svelte';
 	import { getDependencyGraph } from './graph.remote';
 	import type { PageData } from './$types';
 	import Dagre from '@dagrejs/dagre';
@@ -39,8 +40,8 @@
 		for (const node of newNodes) {
 			graph.setNode(node.id, {
 				...node,
-				width: node.measured?.width ?? 150,
-				height: node.measured?.height ?? 40,
+				width: node.measured?.width ?? 0,
+				height: node.measured?.height ?? 0,
 			});
 		}
 
@@ -73,7 +74,13 @@
 </script>
 
 <div class="graph">
-	<SvelteFlow bind:nodes bind:edges fitView colorMode="dark">
+	<SvelteFlow
+		bind:nodes
+		bind:edges
+		fitView
+		colorMode="dark"
+		nodeTypes={{ DependencyNode }}
+	>
 		<Background
 			bgColor="var(--background-primary)"
 			patternColor="var(--background-tertiary)"
