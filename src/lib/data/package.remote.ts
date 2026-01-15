@@ -8,6 +8,7 @@ import { getInternalPackage } from '$lib/server/package';
 import { getRequestEvent, query } from '$app/server';
 import hostedGitInfo from 'hosted-git-info';
 import * as ve from '$lib/server/valibot';
+import { isHttpError } from '@sveltejs/kit';
 
 const allModuleReplacements = [
 	...microUtils.moduleReplacements,
@@ -58,23 +59,32 @@ export const getPackageCore = query.batch(ve.specifier, async (specifiers) => {
 
 	const pkgs = await Promise.all(
 		specifiers.map(async (specifier) => {
-			const pkg = await getInternalPackage(specifier, event.platform!);
+			try {
+				const pkg = await getInternalPackage(
+					specifier,
+					event.platform!,
+				);
 
-			const repo = pkg.repoURL
-				? hostedGitInfo.fromUrl(pkg.repoURL)
-				: undefined;
+				const repo = pkg.repoURL
+					? hostedGitInfo.fromUrl(pkg.repoURL)
+					: undefined;
 
-			return {
-				name: pkg.name,
-				version: pkg.version,
-				description: pkg.description,
-				repo: repo?.https({ noGitPlus: true }),
-				homepage: pkg.homepage,
-				funding: pkg.funding,
-				types: await packageTypeStatus(pkg, event.platform!),
-				deprecated: !!pkg.deprecated,
-				license: pkg.license,
-			};
+				return {
+					name: pkg.name,
+					version: pkg.version,
+					description: pkg.description,
+					repo: repo?.https({ noGitPlus: true }),
+					homepage: pkg.homepage,
+					funding: pkg.funding,
+					types: await packageTypeStatus(pkg, event.platform!),
+					deprecated: !!pkg.deprecated,
+					license: pkg.license,
+				};
+			} catch (error) {
+				return {
+					errorCode: isHttpError(error) ? error.status : 500,
+				};
+			}
 		}),
 	);
 

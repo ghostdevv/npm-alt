@@ -27,10 +27,13 @@
 		description,
 		links,
 		optional = false,
-		registry = true,
 	} = $derived(props);
 
 	const pkg = $derived(getPackageCore(`${name}@${version}`));
+
+	const registry = $derived(
+		pkg.current?.errorCode === 404 ? false : props.registry || true,
+	);
 
 	const license = $derived.by(() => {
 		if (props.license) {
@@ -63,11 +66,11 @@
 			<span class="icon spin" title="Loading...">
 				<IconLoader />
 			</span>
-		{:else if pkg.current?.types.status == 'built-in'}
+		{:else if pkg.current?.types?.status == 'built-in'}
 			<span class="icon" title="Types built-in">
 				<IconTS />
 			</span>
-		{:else if pkg.current?.types.status == 'definitely-typed'}
+		{:else if pkg.current?.types?.status == 'definitely-typed'}
 			<span
 				class="icon"
 				title="@types package available (by definitely typed)"
@@ -85,17 +88,26 @@
 		{/if}
 	</div>
 
-	{#if pkg.error}
-		{@render failed(pkg.error, pkg.refresh)}
-	{:else if description || pkg.current?.description}
-		<p class="description">{description || pkg.current?.description}</p>
-	{:else if pkg.loading}
-		{@render pending()}
-	{:else}
-		<p class="description" style="color: var(--text-grey)">
-			No description provided.
-		</p>
-	{/if}
+	<div class="description">
+		{#if pkg.error || pkg.current?.errorCode}
+			{#if pkg.current?.errorCode === 404}
+				<p class="none">
+					Package doesn't seem to exist, perhaps it's internal.
+				</p>
+			{:else}
+				{@render failed(
+					pkg.error || 'Failed to get package',
+					pkg.refresh,
+				)}
+			{/if}
+		{:else if description || pkg.current?.description}
+			<p>{description || pkg.current?.description}</p>
+		{:else if pkg.loading}
+			{@render pending()}
+		{:else}
+			<p class="none">No description provided.</p>
+		{/if}
+	</div>
 
 	<div class="tags">
 		<Tag
@@ -172,6 +184,10 @@
 
 		.description {
 			margin-top: 0px;
+
+			.none {
+				color: var(--text-grey);
+			}
 		}
 
 		.tags {
