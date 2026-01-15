@@ -42,9 +42,13 @@
 <div class="package" class:deprecated={!!pkg.current?.deprecated}>
 	<div class="title">
 		<PackageCardHeader
-			{...props}
-			{registry}
+			name={props.name}
+			version={pkg.current?.version || props.version}
+			optional={props.optional}
+			deprecated={!!pkg.current?.deprecated}
+			loading={pkg.loading}
 			types={pkg.current?.types?.status}
+			{registry}
 		/>
 	</div>
 
@@ -79,7 +83,7 @@
 
 		<PackageLinks
 			name={props.name}
-			version={props.version}
+			version={pkg.current?.version || props.version}
 			homepage={props.links?.homepage || pkg.current?.homepage}
 			repo={props.links?.repository || pkg.current?.repo}
 			inspectValue={{ props, pkg: pkg.current, license, registry }}
