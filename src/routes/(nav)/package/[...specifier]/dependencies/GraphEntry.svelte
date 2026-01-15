@@ -32,6 +32,7 @@
 	.entry {
 		width: 100%;
 		position: relative;
+		margin-block-end: 8px;
 
 		border: 2px solid var(--background-tertiary);
 		border-radius: 12px;

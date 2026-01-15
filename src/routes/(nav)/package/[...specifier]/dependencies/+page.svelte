@@ -18,8 +18,10 @@
 
 {#each Object.entries(groups) as [group, deps]}
 	{#if deps.length}
-		<section>
-			<h3>{NAME_MAP[group as Dependency['type']]}</h3>
+		<details open>
+			<summary>
+				<h3>{NAME_MAP[group as Dependency['type']]}</h3>
+			</summary>
 
 			{#if group === 'prod'}
 				<GraphEntry />
@@ -30,7 +32,7 @@
 					<PackageCard {...pkg} />
 				{/each}
 			</div>
-		</section>
+		</details>
 	{/if}
 {/each}
 
@@ -39,20 +41,25 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
-		margin-block-start: 8px;
 
 		:global(> *) {
 			flex-basis: 35%;
 		}
 	}
 
-	section {
-		&:not(:first-child) {
-			margin-block: 32px !important;
+	details {
+		margin-block: 22px;
+
+		&:first-child {
+			margin-block-start: 0px !important;
 		}
 
-		h3 {
-			margin-block-end: 12px;
+		&:last-child {
+			margin-block-end: 0px !important;
+		}
+
+		&[open] > summary {
+			padding-bottom: 12px;
 		}
 	}
 </style>
