@@ -155,7 +155,8 @@ export async function getInternalPackage(
 					manifest.peerDependencies,
 					'peer',
 					(name) =>
-						manifest.peerDependenciesMeta?.[name].optional ?? false,
+						manifest.peerDependenciesMeta?.[name]?.optional ??
+						false,
 				),
 			];
 
