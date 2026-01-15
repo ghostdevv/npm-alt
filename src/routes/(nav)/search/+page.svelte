@@ -27,7 +27,7 @@
 
 			<div class="results">
 				{#each result.results as res}
-					<PackageCard pkg={res.package} />
+					<PackageCard {...res.package} />
 				{/each}
 			</div>
 

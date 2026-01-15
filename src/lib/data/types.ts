@@ -14,6 +14,19 @@ export type PackageTypeStatus =
 	| { status: 'none' };
 
 /**
+ * Unified dependency structure, joins together the `dependencies`,
+ * `devDependencies`, `optionalDependencies`, `peerDependencies`,
+ * and `peerDependenciesMeta` fields from a package.json file.
+ */
+export interface Dependency {
+	type: 'prod' | 'dev' | 'peer';
+	name: string;
+	version: string;
+	optional: boolean;
+	registry: boolean;
+}
+
+/**
  * Internal representation of an exact npm package version.
  * Fields are added and removed based on what is actually used,
  * with the goal of keeping the cache small and reducing repeat
@@ -28,6 +41,7 @@ export interface InternalPackage {
 	deprecated?: string;
 	license?: string;
 	size?: number;
+	dependencies: Dependency[];
 	publishedAt: Date;
 	createdAt: Date;
 	updatedAt: Date;
@@ -84,6 +98,7 @@ export interface Package {
 	deprecated?: string;
 	funding?: Funding[];
 	license?: string;
+	dependencies: Dependency[];
 	unpackedSize?: number;
 	publishedAt: Date;
 	createdAt: Date;

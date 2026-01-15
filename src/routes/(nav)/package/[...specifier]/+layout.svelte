@@ -11,6 +11,7 @@
 
 	const TAB_IDS = [
 		'overview',
+		'dependencies',
 		'files',
 		'changelog',
 		'versions',

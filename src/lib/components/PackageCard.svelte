@@ -5,22 +5,52 @@
 	import Tag from './Tag.svelte';
 
 	interface Props {
-		pkg: SearchPackage;
+		name: string;
+		version: string;
+		description?: string;
+		license?: string;
+		optional?: boolean;
+		registry?: boolean;
+		links?: SearchPackage['links'];
 	}
 
-	const { pkg }: Props = $props();
+	const props: Props = $props();
+
+	let {
+		name,
+		version,
+		description,
+		license,
+		links,
+		optional = false,
+		registry = true,
+	} = $derived(props);
 </script>
 
 <details class="package" open>
 	<summary>
-		<a href="/package/{pkg.name}">
-			{pkg.name}<span class="version">@{pkg.version}</span>
-		</a>
+		{#snippet summary()}
+			{name}<span class="version">@{version}</span>
+
+			{#if optional}
+				<span class="optional">(optional)</span>
+			{/if}
+		{/snippet}
+
+		{#if registry}
+			<a href="/package/{name}">
+				{@render summary()}
+			</a>
+		{:else}
+			<p>
+				{@render summary()}
+			</p>
+		{/if}
 	</summary>
 
 	<p class="description">
-		{#if pkg.description}
-			{pkg.description}
+		{#if description}
+			{description}
 		{:else}
 			<span style="color: var(--text-grey)">
 				No description provided.
@@ -31,17 +61,17 @@
 	<div class="tags">
 		<Tag
 			icon={IconLicense}
-			label={pkg.license || 'None provided'}
-			colour="var(--{pkg.license ? 'green' : 'red'})"
+			label={license || 'None provided'}
+			colour="var(--{license ? 'green' : 'red'})"
 			title="Package License"
 		/>
 
 		<PackageLinks
-			name={pkg.name}
-			version={pkg.version}
-			homepage={pkg.links.homepage}
-			repo={pkg.links.repository}
-			inspectValue={pkg}
+			{name}
+			{version}
+			homepage={links?.homepage}
+			repo={links?.repository}
+			inspectValue={props}
 		/>
 	</div>
 </details>
@@ -68,6 +98,12 @@
 
 			.version {
 				color: var(--text-grey);
+			}
+
+			.optional {
+				color: var(--orange);
+				font-style: italic;
+				font-size: 0.85rem;
 			}
 		}
 

@@ -34,7 +34,7 @@
 <section>
 	<div class="packages">
 		{#each packages as pkg}
-			<PackageCard {pkg} />
+			<PackageCard {...pkg} />
 		{/each}
 	</div>
 </section>

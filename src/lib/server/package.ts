@@ -3,6 +3,7 @@ import { cached, checkURL, USER_AGENT } from './common';
 import type { Specifier } from '$lib/server/valibot';
 import { typesIncluded } from './package-types';
 import { ofetch, FetchError } from 'ofetch';
+import parsePackage from 'npm-package-arg';
 import { error } from '@sveltejs/kit';
 import semver from 'semver';
 import {
@@ -10,6 +11,7 @@ import {
 	type InternalPackage,
 	isFundingType,
 	type Funding,
+	type Dependency,
 } from '../data/types';
 
 /**
@@ -62,6 +64,21 @@ function parseFunding(funding?: PackumentVersion['funding']): Funding[] {
 }
 
 /**
+ * Checks whether the given name and version are a npm registry package.
+ * This doesn't guarantee that the package exists, but it does guarantee that
+ * it's a valid package name and version.
+ */
+function isRegistryPackage(name: string, version: string): boolean {
+	try {
+		parsePackage(`${name}@${version}`);
+		return true;
+	} catch (error) {
+		console.error('failed to parse a package', error);
+		return false;
+	}
+}
+
+/**
  * Fetch the {@link InternalPackage} for a given specifier
  * (e.g. `svelte@latest`), or for an exact name and version.
  */
@@ -87,6 +104,61 @@ export async function getInternalPackage(
 				getInternalPackageVersions(spec, platform, true),
 			);
 
+			/**
+			 * Helper to collect dependencies from the manifest.
+			 */
+			function collect(
+				deps: Record<string, string> | undefined,
+				type: Dependency['type'],
+				optional: boolean | ((name: string) => boolean),
+				skip?: (name: string) => boolean,
+			): Dependency[] {
+				if (!deps) return [];
+
+				return Object.entries(deps)
+					.map(([name, version]) => {
+						if (skip?.(name)) {
+							return null;
+						}
+
+						return {
+							type,
+							name,
+							version,
+							registry: isRegistryPackage(name, version),
+							optional:
+								typeof optional === 'function'
+									? optional(name)
+									: optional,
+						} as Dependency;
+					})
+					.filter((d): d is Dependency => d !== null);
+			}
+
+			const dependencies: Dependency[] = [
+				// Production dependencies (excluding those also declared as optional)
+				...collect(
+					manifest.dependencies,
+					'prod',
+					false,
+					(name) => !!manifest.optionalDependencies?.[name],
+				),
+
+				// Development dependencies
+				...collect(manifest.devDependencies, 'dev', false),
+
+				// Optional dependencies (always marked optional)
+				...collect(manifest.optionalDependencies, 'prod', true),
+
+				// Peer dependencies (optional may come from peerDependenciesMeta)
+				...collect(
+					manifest.peerDependencies,
+					'peer',
+					(name) =>
+						manifest.peerDependenciesMeta?.[name].optional ?? false,
+				),
+			];
+
 			return {
 				repoURL: manifest.repository?.url,
 				repoDir: manifest.repository?.directory,
@@ -99,6 +171,7 @@ export async function getInternalPackage(
 				updatedAt: new Date(spec.pkg.time.modified),
 				typesIncluded: typesIncluded(manifest),
 				funding: parseFunding(manifest.funding),
+				dependencies,
 			};
 		},
 	});

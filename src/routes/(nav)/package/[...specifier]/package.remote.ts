@@ -41,6 +41,7 @@ export const getPackage = query(
 					m.type !== 'none' && m.moduleName === pkg.name,
 			),
 			types: await packageTypeStatus(pkg, event.platform!),
+			dependencies: pkg.dependencies,
 			deprecated: pkg.deprecated,
 			funding: pkg.funding,
 			license: pkg.license,
