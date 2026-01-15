@@ -39,14 +39,20 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
-		margin-block-start: 12px;
+		margin-block-start: 8px;
 
 		:global(> *) {
 			flex-basis: 35%;
 		}
 	}
 
-	section:not(:first-child) {
-		margin-block: 32px !important;
+	section {
+		&:not(:first-child) {
+			margin-block: 32px !important;
+		}
+
+		h3 {
+			margin-block-end: 12px;
+		}
 	}
 </style>
