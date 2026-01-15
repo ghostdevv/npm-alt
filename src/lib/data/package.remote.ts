@@ -52,3 +52,32 @@ export const getPackage = query(
 		};
 	},
 );
+
+export const getPackageCore = query.batch(ve.specifier, async (specifiers) => {
+	const event = getRequestEvent();
+
+	const pkgs = await Promise.all(
+		specifiers.map(async (specifier) => {
+			const pkg = await getInternalPackage(specifier, event.platform!);
+
+			const repo = pkg.repoURL
+				? hostedGitInfo.fromUrl(pkg.repoURL)
+				: undefined;
+
+			return {
+				name: pkg.name,
+				version: pkg.version,
+				description: pkg.description,
+				repo: repo?.https({ noGitPlus: true }),
+				homepage: pkg.homepage,
+				funding: pkg.funding,
+				types: await packageTypeStatus(pkg, event.platform!),
+				deprecated: !!pkg.deprecated,
+				license: pkg.license,
+			};
+		}),
+	);
+
+	// @todo the type is wrong, should be schema input
+	return (_, index) => pkgs[index];
+});

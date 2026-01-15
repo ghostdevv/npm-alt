@@ -35,6 +35,7 @@ export interface Dependency {
 export interface InternalPackage {
 	name: string;
 	version: string;
+	description?: string;
 	repoURL?: string;
 	repoDir?: string;
 	homepage?: string;

@@ -22,7 +22,7 @@
 
 			<div class="deps">
 				{#each deps as pkg}
-					<PackageCard {...pkg} description="???" />
+					<PackageCard {...pkg} />
 				{/each}
 			</div>
 		</section>

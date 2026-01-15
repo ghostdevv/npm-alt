@@ -162,6 +162,7 @@ export async function getInternalPackage(
 			];
 
 			return {
+				description: manifest.description,
 				repoURL: manifest.repository?.url,
 				repoDir: manifest.repository?.directory,
 				homepage: manifest.homepage,
