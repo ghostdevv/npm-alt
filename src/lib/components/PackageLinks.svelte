@@ -10,25 +10,35 @@
 
 	interface Props {
 		name: string;
-		version: string;
+		version?: string;
 		repo?: string;
 		homepage?: string;
 		funding?: Funding[];
+		registry?: boolean;
 		inspectValue: unknown;
 	}
 
-	const { name, version, repo, homepage, funding, inspectValue }: Props =
-		$props();
+	const {
+		name,
+		version,
+		repo,
+		homepage,
+		funding,
+		registry = true,
+		inspectValue,
+	}: Props = $props();
 </script>
 
-<a
-	href="https://www.npmjs.com/package/{name}/v/{version}"
-	rel="noreferrer noopener"
-	title="Open on NPM"
-	class="button icon"
->
-	<IconNPM />
-</a>
+{#if registry && version}
+	<a
+		href="https://www.npmjs.com/package/{name}/v/{version}"
+		rel="noreferrer noopener"
+		title="Open on NPM"
+		class="button icon"
+	>
+		<IconNPM />
+	</a>
+{/if}
 
 {#if funding?.length}
 	{#each funding as { url }}
@@ -66,14 +76,16 @@
 	</a>
 {/if}
 
-<a
-	href="https://node-modules.dev/#install={name}"
-	target="_blank"
-	title="Open node-modules.dev"
-	class="button icon"
->
-	<IconNMD />
-</a>
+{#if registry && version}
+	<a
+		href="https://node-modules.dev/#install={name}"
+		target="_blank"
+		title="Open node-modules.dev"
+		class="button icon"
+	>
+		<IconNMD />
+	</a>
+{/if}
 
 <InspectModal value={inspectValue}>
 	<button class="icon">

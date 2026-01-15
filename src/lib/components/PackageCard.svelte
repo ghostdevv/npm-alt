@@ -78,16 +78,18 @@
 	</div>
 
 	<div class="tags">
-		<Tag
-			icon={IconLicense}
-			label={license.text}
-			colour={license.colour}
-			title="Package License"
-		/>
+		{#if registry}
+			<Tag
+				icon={IconLicense}
+				label={license.text}
+				colour={license.colour}
+				title="Package License"
+			/>
+		{/if}
 
 		<PackageLinks
 			name={props.name}
-			version={pkg.current?.version || props.version}
+			version={pkg.current ? pkg.current.version : props.version}
 			homepage={props.links?.homepage || pkg.current?.homepage}
 			repo={props.links?.repository || pkg.current?.repo}
 			inspectValue={{ props, pkg: pkg.current, license, registry }}
