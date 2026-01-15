@@ -5,6 +5,7 @@
 	import ModuleReplacements from './ModuleReplacements.svelte';
 	import IconLicense from 'virtual:icons/catppuccin/license';
 	import IconTS from 'virtual:icons/catppuccin/typescript';
+	import IconDT from 'virtual:icons/custom/dt';
 	import { format as formatBytes } from '@std/fmt/bytes';
 	import IconWeight from 'virtual:icons/lucide/weight';
 	import Notice from '$lib/components/Notice.svelte';
@@ -68,7 +69,11 @@
 
 		<ul>
 			<li>
-				<IconTS /> Type Definitions
+				{#if data.pkg.types.status == 'definitely-typed'}
+					<IconDT />
+				{:else}
+					<IconTS />
+				{/if} Type Definitions
 				<TypeStatus types={data.pkg.types} />
 			</li>
 

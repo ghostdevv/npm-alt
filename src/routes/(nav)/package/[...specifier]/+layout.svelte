@@ -1,7 +1,9 @@
 <script lang="ts">
 	import PackageLinks from '$lib/components/PackageLinks.svelte';
+	import IconTS from 'virtual:icons/catppuccin/typescript';
 	import { failed, pending } from '$lib/boundary.svelte';
 	import Pending from '$lib/components/Pending.svelte';
+	import IconDT from 'virtual:icons/custom/dt';
 	import { goto } from '$app/navigation';
 	import { Tabs } from 'melt/builders';
 	import { resolve } from '$app/paths';
@@ -44,6 +46,19 @@
 				{data.pkg.name}<span class="version">@{data.pkg.version}</span>
 			</h1>
 
+			{#if data.pkg.types.status == 'built-in'}
+				<div class="types" title="Types built-in">
+					<IconTS />
+				</div>
+			{:else if data.pkg.types.status == 'definitely-typed'}
+				<div
+					class="types"
+					title="@types package available (by definitely typed)"
+				>
+					<IconDT />
+				</div>
+			{/if}
+
 			<PackageLinks
 				name={data.pkg.name}
 				version={data.pkg.version}
@@ -85,11 +100,20 @@
 		gap: 8px;
 
 		h1 {
-			margin-right: auto;
-
 			.version {
 				color: var(--text-grey);
 			}
+		}
+
+		.types {
+			display: grid;
+			place-items: center;
+			margin-right: auto;
+			font-size: 1.2rem;
+		}
+
+		&:not(:has(.types)) h1 {
+			margin-right: auto;
 		}
 	}
 

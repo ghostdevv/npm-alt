@@ -2,8 +2,11 @@
 	import type { SearchPackage } from '$lib/client/npm-search';
 	import IconLicense from 'virtual:icons/catppuccin/license';
 	import { getPackageCore } from '$lib/data/package.remote';
+	import IconTS from 'virtual:icons/catppuccin/typescript';
 	import { failed, pending } from '$lib/boundary.svelte';
+	import IconLoader from 'virtual:icons/lucide/loader';
 	import PackageLinks from './PackageLinks.svelte';
+	import IconDT from 'virtual:icons/custom/dt';
 	import Tag from './Tag.svelte';
 
 	interface Props {
@@ -43,18 +46,6 @@
 		}
 	});
 </script>
-
-{#snippet title()}
-	{name}<span class="version">@{version}</span>
-
-	{#if optional}
-		<span class="optional">(optional)</span>
-	{/if}
-
-	{#if pkg.current?.deprecated}
-		<span class="deprecated">(deprecated)</span>
-	{/if}
-{/snippet}
 
 <div class="package" class:deprecated={!!pkg.current?.deprecated}>
 	<div class="title">
@@ -142,9 +133,17 @@
 		gap: 6px;
 
 		.title {
-			margin: 0px;
-			font-family: monospace;
-			color: var(--text);
+			display: flex;
+			align-items: center;
+			gap: 8px;
+
+			a,
+			p,
+			span {
+				color: var(--text);
+				margin: 0px;
+				font-family: monospace;
+			}
 
 			.icon {
 				display: grid;

@@ -1,0 +1,23 @@
+<!-- Based on the MIT Licensed Catppuccin ts icon -->
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	width="1.2em"
+	height="1.2em"
+	fill="none"
+	viewBox="0 0 16 16"
+>
+	<g>
+		<path
+			stroke="#7FC3F4"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			d="M4 1.5h8A2.5 2.5 0 0 1 14.5 4v8a2.5 2.5 0 0 1-2.5 2.5H4A2.5 2.5 0 0 1 1.5 12V4A2.5 2.5 0 0 1 4 1.5Z"
+		/>
+		<path
+			stroke="#7FC3F4"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			d="M11 7.5v5m1.5-5h-3M8 8.75c0-.69-.54-1.25-1.2-1.25h-.6C5 7.5 5 7.5 5 8.75v2.5c0 1.25 0 1.25 1.2 1.25h.6c.66 0 1.2-.56 1.2-1.25v-2.5Z"
+		/>
+	</g>
+</svg>
