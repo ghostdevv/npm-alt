@@ -1,10 +1,12 @@
 <script lang="ts">
 	import '@xyflow/svelte/dist/style.css';
+	import IconFullscreen from 'virtual:icons/lucide/fullscreen';
 	import IconRefresh from 'virtual:icons/lucide/refresh-cw';
 	import IconLink from 'virtual:icons/lucide/external-link';
 	import { fitNodeInViewport, isVisible } from './utils';
 	import DependencyNode from './DependencyNode.svelte';
 	import { getDependencyGraph } from './graph.remote';
+	import IconX from 'virtual:icons/lucide/x';
 	import type { PageData } from './$types';
 	import Dagre from '@dagrejs/dagre';
 	import { page } from '$app/state';
@@ -19,9 +21,7 @@
 
 	const pkg = $derived((page.data as PageData).pkg);
 	const { fitView, getViewport, setViewport } = useSvelteFlow();
-
-	let height = $state(0);
-	let width = $state(0);
+	let container = $state<HTMLDivElement>();
 
 	let { nodes, edges } = $derived(
 		await getDependencyGraph({
@@ -67,10 +67,11 @@
 
 		await fitView();
 		const root = nodes.find((n) => n.id === `${pkg.name}@${pkg.version}`);
+		const containerRect = container!.getBoundingClientRect();
 		const vp = getViewport();
 
-		if (root && !isVisible(root, vp, width, height)) {
-			const newVp = fitNodeInViewport(root, vp, width, height);
+		if (root && !isVisible(root, vp, containerRect)) {
+			const newVp = fitNodeInViewport(root, vp, containerRect);
 			await setViewport(newVp);
 		}
 	}
@@ -83,9 +84,15 @@
 			position();
 		}
 	});
+
+	let fullscreen = $state(false);
 </script>
 
-<div class="graph" bind:clientWidth={width} bind:clientHeight={height}>
+<div
+	class="graph"
+	bind:this={container}
+	onfullscreenchange={() => (fullscreen = !!document.fullscreenElement)}
+>
 	<SvelteFlow
 		bind:nodes
 		bind:edges
@@ -106,9 +113,27 @@
 		/>
 
 		<Controls position="bottom-right" showFitView={false} showLock={false}>
+			<ControlButton
+				title={fullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+				onclick={() => {
+					if (fullscreen) {
+						document.exitFullscreen();
+					} else {
+						container?.requestFullscreen();
+					}
+				}}
+			>
+				{#if fullscreen}
+					<IconX />
+				{:else}
+					<IconFullscreen />
+				{/if}
+			</ControlButton>
+
 			<ControlButton title="Reposition" onclick={() => position()}>
 				<IconRefresh />
 			</ControlButton>
+
 			<ControlButton
 				title="Open in npmgraph"
 				onclick={() => {

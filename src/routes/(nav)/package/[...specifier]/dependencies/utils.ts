@@ -7,14 +7,13 @@ import type { Node } from './graph.remote';
 export function isVisible(
 	node: Node,
 	viewport: Viewport,
-	width: number,
-	height: number,
+	containerRect: DOMRect,
 ) {
 	// viewport rect in flow coordinates
 	const viewX = -viewport.x / viewport.zoom;
 	const viewY = -viewport.y / viewport.zoom;
-	const viewW = width / viewport.zoom;
-	const viewH = height / viewport.zoom;
+	const viewW = containerRect.width / viewport.zoom;
+	const viewH = containerRect.height / viewport.zoom;
 
 	// node rect
 	const nodeX = node.position.x;
@@ -37,14 +36,13 @@ export function isVisible(
 export function fitNodeInViewport(
 	node: Node,
 	viewport: Viewport,
-	width: number,
-	height: number,
+	containerRect: DOMRect,
 ) {
 	// viewport bounds in flow coords
 	const viewX = -viewport.x / viewport.zoom;
 	const viewY = -viewport.y / viewport.zoom;
-	const viewW = width / viewport.zoom;
-	const viewH = height / viewport.zoom;
+	const viewW = containerRect.width / viewport.zoom;
+	const viewH = containerRect.height / viewport.zoom;
 
 	// root bounds
 	const rootX = node.position.x;
