@@ -1,6 +1,7 @@
 <script lang="ts">
 	import PackageCard from '$lib/components/PackageCard.svelte';
 	import type { Dependency } from '$lib/data/types';
+	import GraphEntry from './GraphEntry.svelte';
 
 	const NAME_MAP = {
 		prod: 'Dependencies',
@@ -19,6 +20,10 @@
 	{#if deps.length}
 		<section>
 			<h3>{NAME_MAP[group as Dependency['type']]}</h3>
+
+			{#if group === 'prod'}
+				<GraphEntry />
+			{/if}
 
 			<div class="deps">
 				{#each deps as pkg}

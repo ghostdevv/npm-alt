@@ -1,12 +1,10 @@
 <script lang="ts">
 	import type { SearchPackage } from '$lib/client/npm-search';
+	import PackageCardHeader from './PackageCardHeader.svelte';
 	import IconLicense from 'virtual:icons/catppuccin/license';
 	import { getPackageCore } from '$lib/data/package.remote';
-	import IconTS from 'virtual:icons/catppuccin/typescript';
 	import { failed, pending } from '$lib/boundary.svelte';
-	import IconLoader from 'virtual:icons/lucide/loader';
 	import PackageLinks from './PackageLinks.svelte';
-	import IconDT from 'virtual:icons/custom/dt';
 	import Tag from './Tag.svelte';
 
 	interface Props {
@@ -20,16 +18,7 @@
 	}
 
 	const props: Props = $props();
-
-	let {
-		name,
-		version,
-		description,
-		links,
-		optional = false,
-	} = $derived(props);
-
-	const pkg = $derived(getPackageCore(`${name}@${version}`));
+	const pkg = $derived(getPackageCore(`${props.name}@${props.version}`));
 
 	const registry = $derived(
 		pkg.current?.errorCode === 404 ? false : props.registry || true,
@@ -52,40 +41,11 @@
 
 <div class="package" class:deprecated={!!pkg.current?.deprecated}>
 	<div class="title">
-		{#if registry}
-			<a href="/package/{name}@{version}">
-				{name}<span class="version">@{version}</span>
-			</a>
-		{:else}
-			<p>
-				{name}<span class="version">@{version}</span>
-			</p>
-		{/if}
-
-		{#if pkg.loading}
-			<span class="icon spin" title="Loading...">
-				<IconLoader />
-			</span>
-		{:else if pkg.current?.types?.status == 'built-in'}
-			<span class="icon" title="Types built-in">
-				<IconTS />
-			</span>
-		{:else if pkg.current?.types?.status == 'definitely-typed'}
-			<span
-				class="icon"
-				title="@types package available (by definitely typed)"
-			>
-				<IconDT />
-			</span>
-		{/if}
-
-		{#if optional}
-			<span class="optional">(optional)</span>
-		{/if}
-
-		{#if pkg.current?.deprecated}
-			<span class="deprecated">(deprecated)</span>
-		{/if}
+		<PackageCardHeader
+			{...props}
+			{registry}
+			types={pkg.current?.types?.status}
+		/>
 	</div>
 
 	<div class="description">
@@ -100,8 +60,8 @@
 					pkg.refresh,
 				)}
 			{/if}
-		{:else if description || pkg.current?.description}
-			<p>{description || pkg.current?.description}</p>
+		{:else if props.description || pkg.current?.description}
+			<p>{props.description || pkg.current?.description}</p>
 		{:else if pkg.loading}
 			{@render pending()}
 		{:else}
@@ -118,11 +78,11 @@
 		/>
 
 		<PackageLinks
-			{name}
-			{version}
-			homepage={links?.homepage || pkg.current?.homepage}
-			repo={links?.repository || pkg.current?.repo}
-			inspectValue={{ props, pkg: pkg.current }}
+			name={props.name}
+			version={props.version}
+			homepage={props.links?.homepage || pkg.current?.homepage}
+			repo={props.links?.repository || pkg.current?.repo}
+			inspectValue={{ props, pkg: pkg.current, license, registry }}
 		/>
 	</div>
 </div>
@@ -136,7 +96,7 @@
 		padding-block: 8px;
 		margin: 0px;
 
-		border: 2px solid var(--background-secondary);
+		border: 2px solid var(--background-tertiary);
 		border-radius: 12px;
 
 		display: grid;
@@ -148,38 +108,6 @@
 			display: flex;
 			align-items: center;
 			gap: 8px;
-
-			a,
-			p,
-			span {
-				color: var(--text);
-				margin: 0px;
-				font-family: monospace;
-			}
-
-			.icon {
-				display: grid;
-				place-items: center;
-
-				&.spin {
-					font-size: 0.85rem;
-				}
-			}
-
-			.version {
-				color: var(--text-grey);
-			}
-
-			.optional {
-				color: var(--orange);
-				font-style: italic;
-				font-size: 0.85rem;
-			}
-
-			.deprecated {
-				color: var(--red);
-				font-size: 0.85rem;
-			}
 		}
 
 		.description {
