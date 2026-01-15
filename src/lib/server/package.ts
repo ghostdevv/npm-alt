@@ -52,7 +52,7 @@ function parseFunding(funding?: PackumentVersion['funding']): Funding[] {
 	}
 
 	if (Array.isArray(funding)) {
-		return parseFunding(funding);
+		return funding.flatMap((f) => parseFunding(f));
 	}
 
 	const url = checkURL(funding.url);
