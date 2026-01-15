@@ -2,22 +2,26 @@
 	import '@xyflow/svelte/dist/style.css';
 	import IconRefresh from 'virtual:icons/lucide/refresh-cw';
 	import IconLink from 'virtual:icons/lucide/external-link';
+	import { fitNodeInViewport, isVisible } from './utils';
 	import DependencyNode from './DependencyNode.svelte';
 	import { getDependencyGraph } from './graph.remote';
 	import type { PageData } from './$types';
 	import Dagre from '@dagrejs/dagre';
 	import { page } from '$app/state';
 	import {
+		ControlButton,
+		useSvelteFlow,
 		SvelteFlow,
 		Background,
 		Position,
 		Controls,
-		ControlButton,
-		useSvelteFlow,
 	} from '@xyflow/svelte';
 
 	const pkg = $derived((page.data as PageData).pkg);
-	const { fitView } = useSvelteFlow();
+	const { fitView, getViewport, setViewport } = useSvelteFlow();
+
+	let height = $state(0);
+	let width = $state(0);
 
 	let { nodes, edges } = $derived(
 		await getDependencyGraph({
@@ -26,7 +30,7 @@
 		}),
 	);
 
-	function position() {
+	async function position() {
 		const graph = new Dagre.graphlib.Graph()
 			.setDefaultEdgeLabel(() => ({}))
 			.setGraph({ rankdir: 'LR', nodesep: 15, ranksep: 25 });
@@ -60,7 +64,15 @@
 		}
 
 		nodes = newNodes;
-		fitView({ minZoom: 0.75 });
+
+		await fitView();
+		const root = nodes.find((n) => n.id === `${pkg.name}@${pkg.version}`);
+		const vp = getViewport();
+
+		if (root && !isVisible(root, vp, width, height)) {
+			const newVp = fitNodeInViewport(root, vp, width, height);
+			await setViewport(newVp);
+		}
 	}
 
 	let initiallyPositioned = $state(false);
@@ -73,7 +85,7 @@
 	});
 </script>
 
-<div class="graph">
+<div class="graph" bind:clientWidth={width} bind:clientHeight={height}>
 	<SvelteFlow
 		bind:nodes
 		bind:edges

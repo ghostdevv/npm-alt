@@ -7,7 +7,11 @@ import type { Dependency } from '$lib/data/types';
 import * as ve from '$lib/server/valibot';
 import * as v from 'valibot';
 
-type Node = NodeType<NodeData & Record<string, unknown>, 'DependencyNode'>;
+export type Node = NodeType<
+	NodeData & Record<string, unknown>,
+	'DependencyNode'
+>;
+
 export type DependencyNodeProps = NodeProps<Node>;
 
 export const getDependencyGraph = query(
