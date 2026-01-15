@@ -38,7 +38,7 @@
 		{/snippet}
 
 		{#if registry}
-			<a href="/package/{name}">
+			<a href="/package/{name}@{version}">
 				{@render summary()}
 			</a>
 		{:else}
