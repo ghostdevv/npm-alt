@@ -19,6 +19,7 @@
 
 	const renderDocumented = cache({
 		ttl: 86_400,
+		version: 1,
 		async value(docPath: string) {
 			const url = `https://raw.githubusercontent.com/es-tooling/module-replacements/refs/heads/main/docs/modules/${docPath}.md`;
 			const res = await fetch(url);
