@@ -1,7 +1,6 @@
 <script lang="ts">
 	import '@xyflow/svelte/dist/style.css';
 	import { getDependencyTree, type NodeData } from './tree.remote';
-	import Pending from '$lib/components/Pending.svelte';
 	import Dagre from '@dagrejs/dagre';
 	import { page } from '$app/state';
 	import {
@@ -57,8 +56,7 @@
 	}
 </script>
 
-<div class="wrapper">
-	<Pending />
+<div class="graph">
 	<SvelteFlow bind:nodes bind:edges fitView colorMode="dark">
 		<Background
 			bgColor="var(--background-primary)"
@@ -68,14 +66,9 @@
 </div>
 
 <style>
-	.wrapper {
+	.graph {
 		width: 100%;
 		height: 500px;
-		position: relative;
-
-		border: 2px solid var(--background-tertiary);
-		border-radius: 12px;
-		overflow: clip;
 
 		--xy-handle-background-color: var(--background-tertiary);
 

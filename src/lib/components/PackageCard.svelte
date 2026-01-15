@@ -124,7 +124,7 @@
 		padding-block: 8px;
 		margin: 0px;
 
-		border: 2px solid var(--background-secondary);
+		border: 2px solid var(--background-tertiary);
 		border-radius: 12px;
 
 		display: grid;
