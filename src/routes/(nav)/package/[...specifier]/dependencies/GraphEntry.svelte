@@ -11,9 +11,11 @@
 <div class="entry">
 	{#if show}
 		<svelte:boundary {failed} {pending}>
-			{@const { default: Graph } = await import('./Graph.svelte')}
+			{@const { default: GraphProvider } =
+				await import('./GraphProvider.svelte')}
+
 			<Pending />
-			<Graph />
+			<GraphProvider />
 		</svelte:boundary>
 	{:else}
 		{@const href = `https://npmgraph.js.org/?q=${data.pkg.name}@${data.pkg.version}`}

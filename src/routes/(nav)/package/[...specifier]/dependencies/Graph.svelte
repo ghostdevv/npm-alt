@@ -1,59 +1,75 @@
 <script lang="ts">
 	import '@xyflow/svelte/dist/style.css';
-	import { getDependencyTree, type NodeData } from './tree.remote';
+	import IconRefresh from 'virtual:icons/lucide/refresh-cw';
+	import IconLink from 'virtual:icons/lucide/external-link';
+	import { getDependencyGraph } from './graph.remote';
+	import type { PageData } from './$types';
 	import Dagre from '@dagrejs/dagre';
 	import { page } from '$app/state';
 	import {
 		SvelteFlow,
 		Background,
-		type Node,
-		type Edge,
+		Position,
+		Controls,
+		ControlButton,
+		useSvelteFlow,
 	} from '@xyflow/svelte';
 
+	const pkg = $derived((page.data as PageData).pkg);
+	const { fitView } = useSvelteFlow();
+
 	let { nodes, edges } = $derived(
-		await getTree(page.data.pkg.name, page.data.pkg.version),
+		await getDependencyGraph({
+			name: pkg.name,
+			version: pkg.version,
+		}),
 	);
 
-	async function getTree(
-		name: string,
-		version: string,
-	): Promise<{ nodes: Node<NodeData>[]; edges: Edge[] }> {
-		const { nodes, edges } = await getDependencyTree({ name, version });
-		const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-		g.setGraph({ rankdir: 'LR' });
+	function position() {
+		const graph = new Dagre.graphlib.Graph()
+			.setDefaultEdgeLabel(() => ({}))
+			.setGraph({ rankdir: 'LR', nodesep: 15, ranksep: 25 });
+
+		const newNodes = structuredClone(nodes);
 
 		for (const edge of edges) {
-			g.setEdge(edge.source, edge.target);
+			graph.setEdge(edge.source, edge.target);
 		}
 
-		for (const node of nodes) {
-			g.setNode(node.id, {
+		for (const node of newNodes) {
+			graph.setNode(node.id, {
 				...node,
 				width: node.measured?.width ?? 150,
 				height: node.measured?.height ?? 40,
 			});
 		}
 
-		Dagre.layout(g);
+		Dagre.layout(graph);
 
-		return {
-			nodes: nodes.map((node) => {
-				const position = g.node(node.id);
-				// We are shifting the dagre node position (anchor=center center) to the top left
-				// so it matches the Svelte Flow node anchor point (top left).
-				const x = position.x - (node.measured?.width ?? 0) / 2;
-				const y = position.y - (node.measured?.height ?? 0) / 2;
+		for (const node of newNodes) {
+			const position = graph.node(node.id);
+			// We are shifting the dagre node position (anchor=center center) to the top left
+			// so it matches the Svelte Flow node anchor point (top left).
+			const x = position.x - (node.measured?.width ?? 0) / 2;
+			const y = position.y - (node.measured?.height ?? 0) / 2;
 
-				return {
-					...node,
-					position: { x, y },
-					sourcePosition: 'right',
-					targetPosition: 'left',
-				};
-			}),
-			edges,
-		};
+			node.position = { x, y };
+			node.sourcePosition = Position.Right;
+			node.targetPosition = Position.Left;
+		}
+
+		nodes = newNodes;
+		fitView({ minZoom: 0.75 });
 	}
+
+	let initiallyPositioned = $state(false);
+
+	$effect(() => {
+		if (nodes[0]?.measured && !initiallyPositioned) {
+			initiallyPositioned = true;
+			position();
+		}
+	});
 </script>
 
 <div class="graph">
@@ -62,6 +78,23 @@
 			bgColor="var(--background-primary)"
 			patternColor="var(--background-tertiary)"
 		/>
+
+		<Controls position="bottom-right" showFitView={false} showLock={false}>
+			<ControlButton title="Reposition" onclick={() => position()}>
+				<IconRefresh />
+			</ControlButton>
+			<ControlButton
+				title="Open in npmgraph"
+				onclick={() => {
+					window.open(
+						`https://npmgraph.js.org/?q=${pkg.name}@${pkg.version}`,
+						'_blank',
+					);
+				}}
+			>
+				<IconLink />
+			</ControlButton>
+		</Controls>
 	</SvelteFlow>
 </div>
 
