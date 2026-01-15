@@ -51,3 +51,13 @@ Inspired by jsr, very much a work in progress
 :p
 
 ![](./.github/images/file-viewer.png)
+
+### better dependency list
+
+accounts for regular/production, optional, peer, and dev dependencies.
+
+![](./.github/images/dependencies.png)
+
+also with built-in production dependency graph
+
+![](./.github/images/dependency-graph.png)
