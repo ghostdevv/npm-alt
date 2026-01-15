@@ -77,6 +77,7 @@ export const getDependencyGraph = query(
 					id: `${node.id}-${dep.id}`,
 					source: node.id,
 					target: dep.id,
+					animated: dep.data.optional,
 				});
 			}
 
