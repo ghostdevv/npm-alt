@@ -1,6 +1,8 @@
 <script lang="ts">
 	import PackageCard from '$lib/components/PackageCard.svelte';
+	import { failed, pending } from '$lib/boundary.svelte';
 	import type { Dependency } from '$lib/data/types';
+	import Tree from './Tree.svelte';
 
 	const NAME_MAP = {
 		prod: 'Dependencies',
@@ -14,6 +16,8 @@
 		Object.groupBy(data.pkg.dependencies, (dep) => dep.type),
 	);
 </script>
+
+<svelte:boundary {pending} {failed}><Tree /></svelte:boundary>
 
 {#each Object.entries(groups) as [group, deps]}
 	{#if deps.length}

@@ -192,7 +192,7 @@ interface ResolvedSpecifier {
 	pkg?: Packument;
 }
 
-type ResolvableSpecifier = { name: string; version: string } | Specifier;
+export type ResolvableSpecifier = { name: string; version: string } | Specifier;
 
 /**
  * "Resolve" a "specifier" (proper name?) to a real name and version.
