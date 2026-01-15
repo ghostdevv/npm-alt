@@ -30,7 +30,7 @@
 	</Notice>
 
 	{#if scores.error}
-		{@render failed(scores.error, scores.refresh)}
+		{@render failed(scores.error, () => scores.refresh())}
 	{/if}
 
 	<ul>

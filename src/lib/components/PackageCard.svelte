@@ -59,9 +59,8 @@
 					Package doesn't seem to exist, perhaps it's internal.
 				</p>
 			{:else}
-				{@render failed(
-					pkg.error || 'Failed to get package',
-					pkg.refresh,
+				{@render failed(pkg.error || 'Failed to get package', () =>
+					pkg.refresh(),
 				)}
 			{/if}
 		{:else if props.description || pkg.current?.description}
