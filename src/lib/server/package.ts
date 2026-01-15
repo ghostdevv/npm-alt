@@ -73,7 +73,10 @@ function isRegistryPackage(name: string, version: string): boolean {
 		parsePackage(`${name}@${version}`);
 		return true;
 	} catch (error) {
-		console.error('failed to parse a package', error);
+		console.error(
+			`failed to parse a package name="${name}" version="${version}"`,
+			error,
+		);
 		return false;
 	}
 }

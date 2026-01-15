@@ -20,6 +20,10 @@
 	const props: Props = $props();
 	const pkg = $derived(getPackageCore(`${props.name}@${props.version}`));
 
+	const registry = $derived(
+		pkg.current?.errorCode === 404 ? false : props.registry || true,
+	);
+
 	const license = $derived.by(() => {
 		if (props.license) {
 			return { text: props.license, colour: 'var(--green)' };
@@ -37,22 +41,33 @@
 
 <div class="package" class:deprecated={!!pkg.current?.deprecated}>
 	<div class="title">
-		<PackageCardHeader {...props} types={pkg.current?.types.status} />
+		<PackageCardHeader
+			{...props}
+			{registry}
+			types={pkg.current?.types?.status}
+		/>
 	</div>
 
-	{#if pkg.error}
-		{@render failed(pkg.error, pkg.refresh)}
-	{:else if props.description || pkg.current?.description}
-		<p class="description">
-			{props.description || pkg.current?.description}
-		</p>
-	{:else if pkg.loading}
-		{@render pending()}
-	{:else}
-		<p class="description" style="color: var(--text-grey)">
-			No description provided.
-		</p>
-	{/if}
+	<div class="description">
+		{#if pkg.error || pkg.current?.errorCode}
+			{#if pkg.current?.errorCode === 404}
+				<p class="none">
+					Package doesn't seem to exist, perhaps it's internal.
+				</p>
+			{:else}
+				{@render failed(
+					pkg.error || 'Failed to get package',
+					pkg.refresh,
+				)}
+			{/if}
+		{:else if props.description || pkg.current?.description}
+			<p>{props.description || pkg.current?.description}</p>
+		{:else if pkg.loading}
+			{@render pending()}
+		{:else}
+			<p class="none">No description provided.</p>
+		{/if}
+	</div>
 
 	<div class="tags">
 		<Tag
@@ -67,7 +82,7 @@
 			version={props.version}
 			homepage={props.links?.homepage || pkg.current?.homepage}
 			repo={props.links?.repository || pkg.current?.repo}
-			inspectValue={{ props, pkg: pkg.current }}
+			inspectValue={{ props, pkg: pkg.current, license, registry }}
 		/>
 	</div>
 </div>
@@ -97,6 +112,10 @@
 
 		.description {
 			margin-top: 0px;
+
+			.none {
+				color: var(--text-grey);
+			}
 		}
 
 		.tags {
