@@ -1,4 +1,4 @@
-import { getPackage } from './package.remote';
+import { getPackage } from '$lib/data/package.remote';
 
 export async function load({ params }) {
 	return {
