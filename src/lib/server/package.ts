@@ -98,7 +98,11 @@ export async function getInternalPackage(
 		ttl: 86400,
 		async value(): Promise<Omit<InternalPackage, 'name' | 'version'>> {
 			spec.pkg ||= await getPackument(spec.name);
-			const manifest = spec.pkg['versions'][spec.version];
+			const manifest = spec.pkg.versions[spec.version];
+
+			if (!manifest) {
+				error(404, 'Package version not found');
+			}
 
 			platform.ctx.waitUntil(
 				// Since we have the packument we call this with force=true

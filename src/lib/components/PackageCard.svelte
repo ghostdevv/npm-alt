@@ -56,7 +56,12 @@
 		{#if pkg.error || pkg.current?.errorCode}
 			{#if pkg.current?.errorCode === 404}
 				<p class="none">
-					Package doesn't seem to exist, perhaps it's internal.
+					{#if pkg.current.errorHint === 'version-not-found'}
+						Package version not found, perhaps it's not published
+						yet.
+					{:else}
+						Package doesn't seem to exist, perhaps it's internal.
+					{/if}
 				</p>
 			{:else}
 				{@render failed(pkg.error || 'Failed to get package', () =>

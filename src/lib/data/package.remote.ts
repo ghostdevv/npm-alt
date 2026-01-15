@@ -83,6 +83,14 @@ export const getPackageCore = query.batch(ve.specifier, async (specifiers) => {
 			} catch (error) {
 				return {
 					errorCode: isHttpError(error) ? error.status : 500,
+					errorHint:
+						isHttpError(error) && error.status === 404
+							? error.body.message === 'Package version not found'
+								? ('version-not-found' as const)
+								: error.body.message === 'Package not found'
+									? ('not-found' as const)
+									: null
+							: null,
 				};
 			}
 		}),
