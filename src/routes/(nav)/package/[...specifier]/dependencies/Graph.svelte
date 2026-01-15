@@ -80,6 +80,13 @@
 		fitView
 		colorMode="dark"
 		nodeTypes={{ DependencyNode }}
+		defaultEdgeOptions={{
+			markerEnd: {
+				type: 'arrow',
+				strokeWidth: 1.5,
+				color: 'var(--xy-edge-stroke)',
+			},
+		}}
 	>
 		<Background
 			bgColor="var(--background-primary)"
@@ -111,6 +118,11 @@
 		height: 500px;
 
 		--xy-handle-background-color: var(--background-tertiary);
+		--xy-edge-stroke: color-mix(
+			in oklab,
+			var(--background-tertiary),
+			white 15%
+		);
 
 		:global(.svelte-flow__attribution) {
 			color: var(--text);
