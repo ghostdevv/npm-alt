@@ -35,7 +35,7 @@
 		"@xyflow/svelte": "^1.5.0",
 		"comlink": "^4.4.2",
 		"date-fns": "^4.1.0",
-		"devalue": "^5.6.1",
+		"devalue": "^5.6.2",
 		"dompurify": "^3.3.1",
 		"ghostsui": "2.0.0-beta.6",
 		"hosted-git-info": "^9.0.2",
