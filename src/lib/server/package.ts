@@ -90,6 +90,7 @@ export async function getInternalPackage(
 
 	const core = await cached({
 		key: `pkg:${spec.name}@${spec.version}`,
+		version: 1,
 		platform,
 		ttl: 86400,
 		async value(): Promise<Omit<InternalPackage, 'name' | 'version'>> {
@@ -233,6 +234,7 @@ async function resolveSpecifier(
 
 	const result = await cached({
 		key: `specifier:${specifier.name}@${specifier.fetchSpec}`,
+		version: 1,
 		platform,
 		ttl: 300,
 		async value() {
@@ -292,6 +294,7 @@ export async function getInternalPackageVersions(
 
 	return await cached({
 		key: `versions:${spec.name}`,
+		version: 1,
 		platform,
 		ttl: 300,
 		force,

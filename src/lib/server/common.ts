@@ -22,6 +22,12 @@ interface CacheOptions<T> {
 	ttl: number;
 
 	/**
+	 * Version of the value shape, can be bumped to make sure value
+	 * is re-computed regardless of ttl when it changes shape.
+	 */
+	version: number;
+
+	/**
 	 * When enabled the value in the cache is ignored and
 	 * overwritten by the new `value` call.
 	 */
@@ -43,21 +49,33 @@ export async function cached<T>(o: CacheOptions<T>): Promise<T> {
 		return await o.value();
 	}
 
+	let versionMismatch = false;
+
 	if (!o.force) {
 		const hit = await o.platform.env.CACHE.get(o.key, 'text');
 
 		if (hit) {
-			console.log(`[kv-cache=${o.key}] HIT`);
-			return parse(hit) as T;
+			const data = parse(hit) as { version: number; value: T };
+			versionMismatch = data.version !== o.version;
+
+			if (!versionMismatch) {
+				console.log(`[kv-cache=${o.key}] HIT`);
+				return data.value;
+			}
 		}
 	}
 
 	const value = await o.value();
-	await o.platform.env.CACHE.put(o.key, stringify(value), {
-		expirationTtl: o.ttl,
-	});
+	await o.platform.env.CACHE.put(
+		o.key,
+		stringify({ version: o.version, value }),
+		{ expirationTtl: o.ttl },
+	);
 
-	console.log(`[kv-cache=${o.key}] ${o.force ? 'FORCE' : 'MISS'}`);
+	console.log(
+		`[kv-cache=${o.key}]`,
+		versionMismatch ? 'VERSION MISS' : o.force ? 'FORCE' : 'MISS',
+	);
 
 	return value;
 }

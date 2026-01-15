@@ -26,6 +26,7 @@ export async function getChangelog(
 ): Promise<PackageChangelog | null> {
 	return await cached({
 		key: `changelog:${name}@${version}`,
+		version: 1,
 		platform,
 		ttl: 86400,
 		async value() {
