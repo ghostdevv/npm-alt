@@ -24,5 +24,10 @@
 	],
 	"observability": {
 		"enabled": true,
+		"traces": {
+			"enabled": true,
+			"destinations": ["sentry"],
+			"persist": true,
+		},
 	},
 }
