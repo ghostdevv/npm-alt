@@ -73,10 +73,6 @@ function isRegistryPackage(name: string, version: string): boolean {
 		parsePackage(`${name}@${version}`);
 		return true;
 	} catch (error) {
-		console.error(
-			`failed to parse a package name="${name}" version="${version}"`,
-			error,
-		);
 		return false;
 	}
 }
@@ -301,19 +297,31 @@ export async function getInternalPackageVersions(
 	specifier: ResolvableSpecifier,
 	platform: App.Platform,
 	force = false,
-): Promise<InternalPackageVersions> {
+) {
 	const spec = await resolveSpecifier(specifier, platform);
 
-	return await cached({
+	const core = await cached<InternalPackageVersions>({
 		key: `versions:${spec.name}`,
-		version: 1,
+		version: 2,
 		platform,
 		ttl: 300,
 		force,
 		async value() {
 			const pkg = spec.pkg || (await getPackument(spec.name));
+			const distTags: Record<string, string> = {};
+
+			for (const [name, version] of Object.entries(pkg['dist-tags'])) {
+				const cleanedVersion = semver.clean(version, true);
+				if (!cleanedVersion) continue;
+
+				const validName = isRegistryPackage(name, cleanedVersion);
+				if (!validName) continue;
+
+				distTags[name] = cleanedVersion;
+			}
 
 			return {
+				distTags,
 				versions: Object.values(pkg.versions).map((pkv) => ({
 					version: pkv.version,
 					deprecated: !!pkv.deprecated,
@@ -324,4 +332,9 @@ export async function getInternalPackageVersions(
 			};
 		},
 	});
+
+	return {
+		resolvedVersion: spec.version,
+		...core,
+	};
 }

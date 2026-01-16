@@ -111,6 +111,7 @@ export interface Package {
  * See {@link InternalPackage} for more information.
  */
 export interface InternalPackageVersions {
+	distTags: Record<string, string>;
 	versions: {
 		version: string;
 		deprecated?: boolean;
@@ -130,6 +131,14 @@ export interface PackageVersion {
 	license?: string;
 	unpackedSize?: number;
 	publishedAt: Date;
+}
+
+/**
+ * Package versions representation used on the client.
+ */
+export interface PackageVersions {
+	distTags: { name: string; version: string; satisfied: boolean }[];
+	versions: PackageVersion[];
 }
 
 /**

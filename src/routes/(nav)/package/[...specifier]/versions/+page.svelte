@@ -10,7 +10,10 @@
 	import { resolve } from '$app/paths';
 
 	const { params, data } = $props();
-	const versions = $derived(await getPackageVersions(params.specifier));
+
+	const { distTags, versions } = $derived(
+		await getPackageVersions(params.specifier),
+	);
 
 	function getTitle(pkv: PackageVersion) {
 		if (pkv.version === data.pkg.version) {
@@ -28,7 +31,38 @@
 </script>
 
 <section>
-	<h4 class="count">{versions.length} Versions</h4>
+	<h4>Dist Tags</h4>
+
+	<table>
+		<thead>
+			<tr>
+				<th>Tag</th>
+				<th>Version</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{#each distTags as tag}
+				<tr class="tag" class:current={tag.satisfied}>
+					<td>
+						<a
+							href={resolve(
+								'/(nav)/package/[...specifier]/overview',
+								{ specifier: `${data.pkg.name}@${tag.name}` },
+							)}
+						>
+							{tag.name}
+						</a>
+					</td>
+					<td><code>{tag.version}</code></td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+</section>
+
+<section>
+	<h4>{versions.length} Versions</h4>
 
 	<div class="legend">
 		<div class="key lead">
@@ -100,10 +134,6 @@
 </section>
 
 <style>
-	.count {
-		margin-block-end: 8px;
-	}
-
 	.deprecated {
 		--border: color(from var(--red) srgb r g b / 0.75);
 		--background: color(from var(--red) srgb r g b / 0.15);
@@ -119,12 +149,39 @@
 		--background: color(from var(--primary) srgb r g b / 0.15);
 	}
 
+	table {
+		margin-block-start: 16px;
+
+		td,
+		th {
+			padding: 8px;
+		}
+
+		a {
+			color: var(--text);
+			text-decoration: underline;
+		}
+
+		tr.current {
+			background-color: var(--background);
+
+			td {
+				border-color: var(--border);
+			}
+		}
+
+		tr:has(+ tr.current) td,
+		&:has(tr.current) thead tr th {
+			border-bottom: 0px;
+		}
+	}
+
 	.legend {
 		display: flex;
 		align-items: center;
 		gap: 22px;
 
-		margin-block: 8px;
+		margin-block: 16px;
 
 		.key {
 			display: flex;
@@ -132,6 +189,10 @@
 			gap: 8px;
 
 			font-size: 0.9em;
+
+			p {
+				margin: 0px;
+			}
 
 			.vis {
 				width: 10px;

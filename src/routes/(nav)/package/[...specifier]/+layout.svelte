@@ -123,8 +123,7 @@
 		overflow-y: auto;
 	}
 
-	section,
-	.slot :global(> section) {
+	section {
 		margin-block: 8px;
 	}
 
