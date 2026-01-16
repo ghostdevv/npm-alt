@@ -26,7 +26,13 @@
 		"enabled": true,
 		"traces": {
 			"enabled": true,
-			"destinations": ["sentry"],
+			"destinations": ["sentry-traces"],
+			"persist": true,
+		},
+		"logs": {
+			"enabled": true,
+			"destinations": ["sentry-logs"],
+			"invocation_logs": true,
 			"persist": true,
 		},
 	},
