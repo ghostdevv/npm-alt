@@ -16,25 +16,29 @@
 	);
 </script>
 
-{#each Object.entries(groups) as [group, deps]}
-	{#if deps.length}
-		<details open>
-			<summary>
-				<h3>{NAME_MAP[group as Dependency['type']]}</h3>
-			</summary>
+{#if data.pkg.dependencies.length === 0}
+	<p>No dependencies found</p>
+{:else}
+	{#each Object.entries(groups) as [group, deps]}
+		{#if deps.length}
+			<details open>
+				<summary>
+					<h3>{NAME_MAP[group as Dependency['type']]}</h3>
+				</summary>
 
-			{#if group === 'prod'}
-				<GraphEntry />
-			{/if}
+				{#if group === 'prod'}
+					<GraphEntry />
+				{/if}
 
-			<div class="deps">
-				{#each deps as pkg}
-					<PackageCard {...pkg} />
-				{/each}
-			</div>
-		</details>
-	{/if}
-{/each}
+				<div class="deps">
+					{#each deps as pkg}
+						<PackageCard {...pkg} />
+					{/each}
+				</div>
+			</details>
+		{/if}
+	{/each}
+{/if}
 
 <style>
 	.deps {
