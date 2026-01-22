@@ -8,7 +8,7 @@ import * as ve from '$lib/server/valibot';
 import * as v from 'valibot';
 
 export type Node = NodeType<
-	NodeData & Record<string, unknown>,
+	Omit<NodeData, 'optional'> & Record<string, unknown>,
 	'DependencyNode'
 >;
 
@@ -39,10 +39,6 @@ export const getDependencyGraph = query(
 					},
 				};
 
-				if (dep.optional) {
-					node.data.state = 'optional';
-				}
-
 				nodes.set(node.id, node);
 				return node;
 			}
@@ -63,7 +59,6 @@ export const getDependencyGraph = query(
 					name: pkg.name,
 					version: pkg.version,
 					types: types.status,
-					optional: dep.optional,
 					deprecated: !!pkg.deprecated,
 				},
 			};
@@ -72,7 +67,7 @@ export const getDependencyGraph = query(
 
 			const deps = await Promise.all(
 				pkg.dependencies
-					.filter((dep) => dep.type === 'prod')
+					.filter((dep) => dep.type === 'prod' && !dep.optional)
 					.map(async (dep) => await createNode(dep)),
 			);
 
@@ -81,7 +76,6 @@ export const getDependencyGraph = query(
 					id: `${node.id}-${dep.id}`,
 					source: node.id,
 					target: dep.id,
-					animated: dep.data.optional,
 				});
 			}
 
