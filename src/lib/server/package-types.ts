@@ -1,21 +1,8 @@
 import type { InternalPackage, PackageTypeStatus } from '../data/types';
+import type { Manifest, PackageExports } from './manifest';
 import type { Specifier } from '$lib/server/valibot';
-import type { PackumentVersion } from '@npm/types';
 import { getInternalPackage } from './package';
 import parsePackage from 'npm-package-arg';
-
-type PackageExports =
-	| string
-	| Record<
-			string,
-			| string
-			| Record<string, string>
-			| (string | Record<string, string>)[]
-	  >;
-
-interface Manifest extends PackumentVersion {
-	exports?: PackageExports;
-}
 
 /**
  * See whether types are found in the package exports, whether by exporting
