@@ -8,6 +8,15 @@ importers:
 
   .:
     devDependencies:
+      prettier:
+        specifier: ^3.8.0
+        version: 3.8.0
+      prettier-plugin-svelte:
+        specifier: ^3.4.1
+        version: 3.4.1(prettier@3.8.0)(svelte@5.46.4)
+
+  packages/web:
+    devDependencies:
       '@dagrejs/dagre':
         specifier: ^1.1.8
         version: 1.1.8
