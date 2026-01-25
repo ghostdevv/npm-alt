@@ -6,15 +6,17 @@ const Link = v.string(); // will be fixed later
 const Email = v.pipe(v.string(), v.email());
 
 const Str = v.optional(
-	v.pipe(
-		v.string(),
-		v.transform((value) =>
-			value.replace(
-				/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]+/g,
-				'',
+	v.nullable(
+		v.pipe(
+			v.string(),
+			v.transform((value) =>
+				value.replace(
+					/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]+/g,
+					'',
+				),
 			),
+			v.transform((value) => (value?.trim() === '' ? undefined : value)),
 		),
-		v.transform((value) => (value?.trim() === '' ? undefined : value)),
 	),
 );
 
