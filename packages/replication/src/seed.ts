@@ -32,19 +32,22 @@ async function handleRow(row: Row) {
 
 	const res = await fetchPackument(row.id);
 
-	if (res.type === 'error') {
+	if (res.type === 'error' && res.code !== 'not-found') {
 		throw new Error(
 			`failed to fetch packument for ${row.id}: ${res.error.message}`,
 			{ cause: res.error },
 		);
 	}
 
+	const packument =
+		res.type === 'error' ? { __type: 'error', row } : res.packument;
+
 	await db
 		.insert(packumentTable)
-		.values({ id: row.id, data: res.packument })
+		.values({ id: row.id, data: packument })
 		.onConflictDoUpdate({
 			target: packumentTable.id,
-			set: { data: res.packument },
+			set: { data: packument },
 		})
 		.catch((error) => {
 			throw new Error(`db issue for ${row.id}: ${error}`, {
