@@ -37,7 +37,7 @@ async function handleRow(row: Row) {
 		.where(eq(packumentTable.id, row.id))
 		.catch(() => null);
 
-	if (exists) {
+	if (exists?.length) {
 		return;
 	}
 
