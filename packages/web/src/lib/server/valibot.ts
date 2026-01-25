@@ -3,7 +3,10 @@ import parsePackage from 'npm-package-arg';
 import * as v from 'valibot';
 import semv from 'semver';
 
-export const PackageNameSchema = v.pipe(
+// todo validate username chars
+export const username = v.pipe(v.string(), v.minLength(1));
+
+export const packageName = v.pipe(
 	v.string('must be a string'),
 	v.minLength(1, 'should be at least one character long'),
 	v.rawTransform(({ dataset, addIssue, NEVER }) => {
@@ -18,18 +21,18 @@ export const PackageNameSchema = v.pipe(
 	}),
 );
 
-export const SemverSchema = v.pipe(
+export const semver = v.pipe(
 	v.string('semver must be a string'),
 	v.transform((semver) => semv.valid(semver)),
 	v.string('semver failed to be parsed'),
 );
 
-export const SpecifierExactSchema = v.object({
-	name: PackageNameSchema,
-	version: SemverSchema,
+export const specifierExact = v.object({
+	name: packageName,
+	version: semver,
 });
 
-export const SpecifierSchema = v.pipe(
+export const specifier = v.pipe(
 	v.string('specifier must be a string'),
 	v.minLength(1, 'specifier should be at least one character long'),
 	v.rawTransform(({ dataset, addIssue, NEVER }) => {
@@ -51,9 +54,9 @@ export const SpecifierSchema = v.pipe(
 			[v.literal('tag'), v.literal('version'), v.literal('range')],
 			'specifier type must be range, tag, or version',
 		),
-		name: PackageNameSchema,
+		name: packageName,
 		fetchSpec: v.string(),
 	}),
 );
 
-export type Specifier = v.InferOutput<typeof SpecifierSchema>;
+export type Specifier = v.InferOutput<typeof specifier>;

@@ -1,8 +1,8 @@
-import { SpecifierExactSchema } from '@npm-alt/validate/package';
 import { getInternalPackage } from '$lib/server/package';
 import { cached, USER_AGENT } from '$lib/server/common';
 import { getRequestEvent, query } from '$app/server';
 import { join as joinPaths } from '@std/path';
+import * as ve from '$lib/server/valibot';
 import { ofetch } from 'ofetch';
 import mimes from 'mime-db';
 
@@ -48,79 +48,73 @@ function mimeToLang(mime: string) {
 	}
 }
 
-export const getPackageFiles = query(
-	SpecifierExactSchema,
-	async (specifier) => {
-		const event = getRequestEvent();
-		const pkg = await getInternalPackage(specifier, event.platform!);
+export const getPackageFiles = query(ve.specifierExact, async (specifier) => {
+	const event = getRequestEvent();
+	const pkg = await getInternalPackage(specifier, event.platform!);
 
-		return await cached({
-			key: `files:${pkg.name}@${pkg.version}`,
-			version: 1,
-			platform: event.platform!,
-			ttl: 86400,
-			async value() {
-				const res = await ofetch<UNPKGMetaResponse>(
-					`https://unpkg.com/${pkg.name}@${pkg.version}?meta`,
-					{ headers: { 'User-Agent': USER_AGENT } },
-				);
+	return await cached({
+		key: `files:${pkg.name}@${pkg.version}`,
+		version: 1,
+		platform: event.platform!,
+		ttl: 86400,
+		async value() {
+			const res = await ofetch<UNPKGMetaResponse>(
+				`https://unpkg.com/${pkg.name}@${pkg.version}?meta`,
+				{ headers: { 'User-Agent': USER_AGENT } },
+			);
 
-				const tree = new Map<string, RawTreeNode>();
+			const tree = new Map<string, RawTreeNode>();
 
-				for (const file of res.files) {
-					const path = file.path.replace(/^\//, '').split('/');
-					let current = tree;
+			for (const file of res.files) {
+				const path = file.path.replace(/^\//, '').split('/');
+				let current = tree;
 
-					for (let i = 0; i < path.length; i++) {
-						const segment = path[i]!;
-						const fullPath = joinPaths(
-							'/',
-							...path.slice(0, i + 1),
-						);
+				for (let i = 0; i < path.length; i++) {
+					const segment = path[i]!;
+					const fullPath = joinPaths('/', ...path.slice(0, i + 1));
 
-						if (i === path.length - 1) {
+					if (i === path.length - 1) {
+						current.set(segment, {
+							id: fullPath,
+							size: file.size,
+							lang: mimeToLang(file.type),
+						});
+					} else {
+						if (!current.has(segment)) {
 							current.set(segment, {
 								id: fullPath,
-								size: file.size,
-								lang: mimeToLang(file.type),
+								children: new Map(),
 							});
-						} else {
-							if (!current.has(segment)) {
-								current.set(segment, {
-									id: fullPath,
-									children: new Map(),
-								});
-							}
-							current = (current.get(segment) as RawDirectoryNode)
-								.children;
 						}
+						current = (current.get(segment) as RawDirectoryNode)
+							.children;
 					}
 				}
+			}
 
-				function mapToArray(map: Map<string, RawTreeNode>): TreeNode[] {
-					return map
-						.values()
-						.map((node): TreeNode => {
-							if (!('children' in node)) {
-								return node;
-							}
+			function mapToArray(map: Map<string, RawTreeNode>): TreeNode[] {
+				return map
+					.values()
+					.map((node): TreeNode => {
+						if (!('children' in node)) {
+							return node;
+						}
 
-							const children = mapToArray(node.children);
+						const children = mapToArray(node.children);
 
-							return {
-								id: node.id,
-								size: children.reduce(
-									(acc, child) => acc + child.size,
-									0,
-								),
-								children,
-							};
-						})
-						.toArray();
-				}
+						return {
+							id: node.id,
+							size: children.reduce(
+								(acc, child) => acc + child.size,
+								0,
+							),
+							children,
+						};
+					})
+					.toArray();
+			}
 
-				return mapToArray(tree);
-			},
-		});
-	},
-);
+			return mapToArray(tree);
+		},
+	});
+});

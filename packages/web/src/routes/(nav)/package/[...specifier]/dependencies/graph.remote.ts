@@ -4,11 +4,8 @@ import { packageTypeStatus } from '$lib/server/package-types';
 import { getInternalPackage } from '$lib/server/package';
 import { getRequestEvent, query } from '$app/server';
 import type { Dependency } from '$lib/data/types';
+import * as ve from '$lib/server/valibot';
 import * as v from 'valibot';
-import {
-	SpecifierExactSchema,
-	SpecifierSchema,
-} from '@npm-alt/validate/package';
 
 export type Node = NodeType<
 	Omit<NodeData, 'optional'> & Record<string, unknown>,
@@ -18,7 +15,7 @@ export type Node = NodeType<
 export type DependencyNodeProps = NodeProps<Node>;
 
 export const getDependencyGraph = query(
-	SpecifierExactSchema,
+	ve.specifierExact,
 	async (specifier) => {
 		const event = getRequestEvent();
 
@@ -27,7 +24,7 @@ export const getDependencyGraph = query(
 
 		async function createNode(dep: Dependency) {
 			const spec = v.safeParse(
-				SpecifierSchema,
+				ve.specifier,
 				`${dep.name}@${dep.version}`,
 			);
 
