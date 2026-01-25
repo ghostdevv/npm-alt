@@ -67,7 +67,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 }
 
 async function seed() {
-	if (!(await dbSeedPickup.get())) {
+	if (await dbSeedPickup.get()) {
 		const meta = await ofetch<MetaResponse>('/', {
 			baseURL: 'https://replicate.npmjs.com',
 			headers: {
