@@ -8,11 +8,11 @@
 		"knip": "knip"
 	},
 	"devDependencies": {
-		"@types/node": "^22.19.7",
+		"@types/node": "catalog:",
 		"knip": "^5.82.1",
-		"prettier": "^3.8.0",
+		"prettier": "catalog:",
 		"prettier-plugin-svelte": "^3.4.1",
-		"typescript": "^5.9.3"
+		"typescript": "catalog:"
 	},
 	"packageManager": "pnpm@10.28.1",
 	"volta": {
