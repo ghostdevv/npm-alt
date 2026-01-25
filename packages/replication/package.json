@@ -12,10 +12,10 @@
 		"ofetch": "^1.5.1",
 		"postgres": "^3.4.8",
 		"tsx": "^4.21.0",
-		"valibot": "catalog:"
+		"valibot": "^1.2.0"
 	},
 	"devDependencies": {
-		"@types/node": "catalog:",
+		"@types/node": "^22.19.7",
 		"drizzle-kit": "^0.31.8"
 	},
 	"packageManager": "pnpm@10.28.1",
