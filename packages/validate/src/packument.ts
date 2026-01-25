@@ -90,7 +90,7 @@ export const PackumentSchema = v.looseObject({
 	// 	v.strictObject({ latest: v.string() }),
 	// 	v.record(v.string(), v.string()),
 	// ]),
-	versions: v.record(v.string(), PackumentVersionSchema),
+	versions: v.optional(v.record(v.string(), PackumentVersionSchema)),
 	// time: v.intersect([
 	// 	v.strictObject({ created: Date, modified: Date }),
 	// 	v.record(v.string(), Date),
