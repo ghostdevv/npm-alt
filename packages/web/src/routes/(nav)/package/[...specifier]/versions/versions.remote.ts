@@ -1,11 +1,11 @@
 import { getInternalPackageVersions } from '$lib/server/package';
 import type { PackageVersion, PackageVersions } from '$lib/data/types';
+import { SpecifierSchema } from '@npm-alt/validate/package';
 import { getRequestEvent, query } from '$app/server';
-import * as ve from '$lib/server/valibot';
 import semver from 'semver';
 
 export const getPackageVersions = query(
-	ve.specifier,
+	SpecifierSchema,
 	async (specifier): Promise<PackageVersions> => {
 		const event = getRequestEvent();
 		const pkg = await getInternalPackageVersions(

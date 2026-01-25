@@ -1,6 +1,6 @@
 import type { InternalPackage, PackageTypeStatus } from '../data/types';
 import type { Manifest, PackageExports } from './manifest';
-import type { Specifier } from '$lib/server/valibot';
+import type { Specifier } from '@npm-alt/validate/package';
 import { getInternalPackage } from './package';
 import parsePackage from 'npm-package-arg';
 

@@ -1,6 +1,6 @@
 import type { Packument, PackumentVersion } from '@npm/types';
+import type { Specifier } from '@npm-alt/validate/package';
 import { cached, checkURL, USER_AGENT } from './common';
-import type { Specifier } from '$lib/server/valibot';
 import { typesIncluded } from './package-types';
 import { ofetch, FetchError } from 'ofetch';
 import parsePackage from 'npm-package-arg';

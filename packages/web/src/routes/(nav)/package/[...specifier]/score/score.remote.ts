@@ -1,10 +1,10 @@
+import { SpecifierExactSchema } from '@npm-alt/validate/package';
 import { getInternalPackage } from '$lib/server/package';
 import { USER_AGENT, cached } from '$lib/server/common';
 import type { InternalPackage } from '$lib/data/types';
 import { getChangelog } from '$lib/server/changelog';
 import { getRequestEvent, query } from '$app/server';
 import type { CriteriaId } from '$lib/data/scores';
-import * as ve from '$lib/server/valibot';
 
 type ScoreResults = Record<CriteriaId, number | null>;
 
@@ -17,7 +17,7 @@ async function fetchREADME(pkg: InternalPackage) {
 	return res === null ? null : res.ok ? 1 : 0;
 }
 
-export const getPackageScore = query(ve.specifierExact, async (spec) => {
+export const getPackageScore = query(SpecifierExactSchema, async (spec) => {
 	const event = getRequestEvent();
 
 	return await cached({

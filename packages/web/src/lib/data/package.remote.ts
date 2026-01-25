@@ -4,10 +4,10 @@ import native from 'module-replacements/manifests/native.json' with { type: 'jso
 import type { ModReplacement, Package } from '$lib/data/types';
 import { packageTypeStatus } from '$lib/server/package-types';
 import type { ModuleReplacement } from 'module-replacements';
+import { SpecifierSchema } from '@npm-alt/validate/package';
 import { getInternalPackage } from '$lib/server/package';
 import { getRequestEvent, query } from '$app/server';
 import hostedGitInfo from 'hosted-git-info';
-import * as ve from '$lib/server/valibot';
 import { isHttpError } from '@sveltejs/kit';
 
 const allModuleReplacements = [
@@ -17,7 +17,7 @@ const allModuleReplacements = [
 ] as ModuleReplacement[];
 
 export const getPackage = query(
-	ve.specifier,
+	SpecifierSchema,
 	async (specifier): Promise<Package> => {
 		const event = getRequestEvent();
 		const pkg = await getInternalPackage(specifier, event.platform!);
@@ -54,48 +54,52 @@ export const getPackage = query(
 	},
 );
 
-export const getPackageCore = query.batch(ve.specifier, async (specifiers) => {
-	const event = getRequestEvent();
+export const getPackageCore = query.batch(
+	SpecifierSchema,
+	async (specifiers) => {
+		const event = getRequestEvent();
 
-	const pkgs = await Promise.all(
-		specifiers.map(async (specifier) => {
-			try {
-				const pkg = await getInternalPackage(
-					specifier,
-					event.platform!,
-				);
+		const pkgs = await Promise.all(
+			specifiers.map(async (specifier) => {
+				try {
+					const pkg = await getInternalPackage(
+						specifier,
+						event.platform!,
+					);
 
-				const repo = pkg.repoURL
-					? hostedGitInfo.fromUrl(pkg.repoURL)
-					: undefined;
+					const repo = pkg.repoURL
+						? hostedGitInfo.fromUrl(pkg.repoURL)
+						: undefined;
 
-				return {
-					name: pkg.name,
-					version: pkg.version,
-					description: pkg.description,
-					repo: repo?.https({ noGitPlus: true }),
-					homepage: pkg.homepage,
-					funding: pkg.funding,
-					types: await packageTypeStatus(pkg, event.platform!),
-					deprecated: !!pkg.deprecated,
-					license: pkg.license,
-				};
-			} catch (error) {
-				return {
-					errorCode: isHttpError(error) ? error.status : 500,
-					errorHint:
-						isHttpError(error) && error.status === 404
-							? error.body.message === 'Package version not found'
-								? ('version-not-found' as const)
-								: error.body.message === 'Package not found'
-									? ('not-found' as const)
-									: null
-							: null,
-				};
-			}
-		}),
-	);
+					return {
+						name: pkg.name,
+						version: pkg.version,
+						description: pkg.description,
+						repo: repo?.https({ noGitPlus: true }),
+						homepage: pkg.homepage,
+						funding: pkg.funding,
+						types: await packageTypeStatus(pkg, event.platform!),
+						deprecated: !!pkg.deprecated,
+						license: pkg.license,
+					};
+				} catch (error) {
+					return {
+						errorCode: isHttpError(error) ? error.status : 500,
+						errorHint:
+							isHttpError(error) && error.status === 404
+								? error.body.message ===
+									'Package version not found'
+									? ('version-not-found' as const)
+									: error.body.message === 'Package not found'
+										? ('not-found' as const)
+										: null
+								: null,
+					};
+				}
+			}),
+		);
 
-	// @todo the type is wrong, should be schema input
-	return (_, index) => pkgs[index];
-});
+		// @todo the type is wrong, should be schema input
+		return (_, index) => pkgs[index];
+	},
+);
