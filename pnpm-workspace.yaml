@@ -5,6 +5,3 @@ onlyBuiltDependencies:
 
 packages:
     - packages/web
-    - packages/validate
-    - packages/packument
-    - packages/replication
