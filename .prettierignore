@@ -7,6 +7,3 @@ bun.lockb
 
 # Miscellaneous
 /static/
-.svelte-kit
-.wrangler
-/packages/web/worker-configuration.d.ts
