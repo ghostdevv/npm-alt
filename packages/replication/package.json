@@ -2,7 +2,6 @@
 	"name": "@npm-alt/replication",
 	"type": "module",
 	"private": true,
-	"packageManager": "pnpm@10.27.0",
 	"scripts": {
 		"seed": "tsx src/seed.ts"
 	},
@@ -18,5 +17,10 @@
 	"devDependencies": {
 		"@types/node": "^22.19.7",
 		"drizzle-kit": "^0.31.8"
+	},
+	"packageManager": "pnpm@10.28.1",
+	"volta": {
+		"node": "24.13.0",
+		"pnpm": "10.28.1"
 	}
 }

@@ -2,7 +2,7 @@
 
 Patches are very much welcome, all I ask is that the bigger ones are discussed first in an issue.
 
-To get the repo running locally, you'll need Node 22/24 and pnpm 10 (a tool that understands `packageManager` like corepack/volta is recommended).
+To get the repo running locally, you'll need Node 24 and pnpm 10 (a tool that understands `packageManager` like corepack/volta is recommended).
 
 1. Run `pnpm install`.
 2. Copy `.env.example` to `.env` and fill in the values.
