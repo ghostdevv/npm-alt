@@ -31,7 +31,7 @@ export async function getChangelog(
 		ttl: 86400,
 		async value() {
 			const npmChangelog = await ofetch(
-				`https://unpkg.com/${name}@${version}/CHANGELOG.md`,
+				`https://cdn.jsdelivr.net/npm/${name}@${version}/CHANGELOG.md`,
 				{
 					headers: { 'User-Agent': USER_AGENT },
 					responseType: 'text',

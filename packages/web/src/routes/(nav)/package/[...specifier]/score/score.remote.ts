@@ -10,7 +10,7 @@ type ScoreResults = Record<CriteriaId, number | null>;
 
 async function fetchREADME(pkg: InternalPackage) {
 	const res = await fetch(
-		`https://unpkg.com/${pkg.name}@${pkg.version}/README.md`,
+		`https://cdn.jsdelivr.net/npm/${pkg.name}@${pkg.version}/README.md`,
 		{ headers: { 'User-Agent': USER_AGENT } },
 	).catch(() => null);
 

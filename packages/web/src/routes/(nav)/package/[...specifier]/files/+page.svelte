@@ -54,7 +54,7 @@
 	const renderAndFetchContent = cache({
 		version: 2,
 		async value(file: FileNode) {
-			const url = `https://unpkg.com/${data.pkg.name}@${data.pkg.version}${file.id}`;
+			const url = `https://cdn.jsdelivr.net/npm/${data.pkg.name}@${data.pkg.version}${file.id}`;
 			const res = await fetch(url);
 			const code = await res.text();
 

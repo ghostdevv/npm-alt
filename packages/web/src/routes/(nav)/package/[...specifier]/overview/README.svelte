@@ -16,7 +16,7 @@
 		version: 1,
 		async value(pkg: Package): Promise<string> {
 			const res = await fetch(
-				`https://unpkg.com/${pkg.name}@${pkg.version}/README.md`,
+				`https://cdn.jsdelivr.net/npm/${pkg.name}@${pkg.version}/README.md`,
 			);
 
 			const md = await res.text();
