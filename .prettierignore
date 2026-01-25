@@ -9,6 +9,4 @@ bun.lockb
 /static/
 .svelte-kit
 .wrangler
-/target
-/rs/.sqlx
 /packages/web/worker-configuration.d.ts
