@@ -67,15 +67,19 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 }
 
 async function seed() {
-	const meta = await ofetch<MetaResponse>('/', {
-		baseURL: 'https://replicate.npmjs.com',
-		headers: {
-			'User-Agent': `npm-alt (+https://github.com/ghostdevv/npm-alt)`,
-		},
-	});
+	if (!(await dbSeedPickup.get())) {
+		const meta = await ofetch<MetaResponse>('/', {
+			baseURL: 'https://replicate.npmjs.com',
+			headers: {
+				'User-Agent': `npm-alt (+https://github.com/ghostdevv/npm-alt)`,
+			},
+		});
 
-	console.log(`Starting seed`, meta);
-	await dbSeedPickup.set(meta);
+		console.log(`Starting seed`, meta);
+		await dbSeedPickup.set(meta);
+	} else {
+		console.log('Picking up seed');
+	}
 
 	let startKey = await dbStartKey.get();
 	let count = 0;
@@ -99,7 +103,7 @@ async function seed() {
 
 		for (const chunk of chunkArray(response.rows, 15)) {
 			console.log(
-				`Processing: ${count}/${response.total_rows - response.offset}`,
+				`Processing: ${count}/${response.total_rows - response.offset} (${Math.round((count / (response.total_rows - response.offset)) * 100)}%)`,
 			);
 
 			count += chunk.length;
