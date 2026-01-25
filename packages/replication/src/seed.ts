@@ -30,31 +30,27 @@ async function handleRow(row: Row) {
 		console.info('found case where row.id !== row.key', row);
 	}
 
-	let packument;
+	const res = await fetchPackument(row.id);
 
-	try {
-		packument = await fetchPackument(row.id);
-
-		await db
-			.insert(packumentTable)
-			.values({ id: row.id, data: packument })
-			.onConflictDoUpdate({
-				target: packumentTable.id,
-				set: { data: packument },
-			});
-	} catch (e) {
-		const error =
-			e instanceof Error
-				? e
-				: new Error('failed to handle row', { cause: e });
-
-		if (error.message.includes('Invalid string length')) {
-			console.log('weird string thing pak:', { packument });
-		}
-
-		error.message += ` (${row.id})`;
-		throw error;
+	if (res.type === 'error') {
+		throw new Error(
+			`failed to fetch packument for ${row.id}: ${res.error.message}`,
+			{ cause: res.error },
+		);
 	}
+
+	await db
+		.insert(packumentTable)
+		.values({ id: row.id, data: res.packument })
+		.onConflictDoUpdate({
+			target: packumentTable.id,
+			set: { data: res.packument },
+		})
+		.catch((error) => {
+			throw new Error(`db issue for ${row.id}: ${error}`, {
+				cause: error,
+			});
+		});
 }
 
 function chunkArray<T>(array: T[], size: number): T[][] {
