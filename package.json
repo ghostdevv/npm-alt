@@ -4,12 +4,9 @@
 	"private": true,
 	"scripts": {
 		"format": "prettier --write .",
-		"lint": "prettier --check .",
-		"knip": "knip"
+		"lint": "prettier --check ."
 	},
 	"devDependencies": {
-		"@types/node": "^22.19.7",
-		"knip": "^5.82.1",
 		"prettier": "^3.8.0",
 		"prettier-plugin-svelte": "^3.4.1",
 		"typescript": "^5.9.3"
