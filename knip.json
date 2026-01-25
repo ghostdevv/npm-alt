@@ -1,0 +1,15 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	"tags": ["-lintignore"],
+	"workspaces": {
+		".": {},
+		"packages/web": {
+			"ignoreDependencies": [
+				"@iconify-json/catppuccin",
+				"@iconify-json/lucide",
+				"ghostsui"
+			],
+			"ignoreUnresolved": ["\\$env/static/private"]
+		}
+	}
+}

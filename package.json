@@ -4,11 +4,15 @@
 	"private": true,
 	"scripts": {
 		"format": "prettier --write .",
-		"lint": "prettier --check ."
+		"lint": "prettier --check .",
+		"knip": "knip"
 	},
 	"packageManager": "pnpm@10.27.0",
 	"devDependencies": {
+		"@types/node": "^22.19.7",
+		"knip": "^5.82.1",
 		"prettier": "^3.8.0",
-		"prettier-plugin-svelte": "^3.4.1"
+		"prettier-plugin-svelte": "^3.4.1",
+		"typescript": "^5.9.3"
 	}
 }
