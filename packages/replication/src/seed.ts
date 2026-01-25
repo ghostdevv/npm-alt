@@ -2,6 +2,7 @@ import { packumentTable } from './schema';
 import { fetchPackument } from './fetch';
 import { createState, db } from './db';
 import { ofetch } from 'ofetch';
+import { eq } from 'drizzle-orm';
 
 interface Row {
 	id: string;
@@ -28,6 +29,16 @@ const dbStartKey = createState<string>('seed-last-key');
 async function handleRow(row: Row) {
 	if (row.id !== row.key) {
 		console.info('found case where row.id !== row.key', row);
+	}
+
+	const exists = await db
+		.select({ id: packumentTable.id })
+		.from(packumentTable)
+		.where(eq(packumentTable.id, row.id))
+		.catch(() => null);
+
+	if (exists) {
+		return;
 	}
 
 	const res = await fetchPackument(row.id);
