@@ -9,15 +9,23 @@
 		children: Snippet;
 		colour: string;
 		permanent?: boolean;
+		floating?: boolean;
+		fill?: boolean;
 	}
 
-	const { id, children, colour, permanent = false }: Props = $props();
+	const {
+		id,
+		children,
+		colour,
+		permanent = false,
+		floating = false,
+	}: Props = $props();
 
 	const ignored = new PersistedState<string[]>('ignored-notices', []);
 </script>
 
 {#if permanent || !ignored.current.includes(id)}
-	<div class="notice" style:--colour={colour} out:slide>
+	<div class="notice" style:--colour={colour} out:slide class:floating>
 		{@render children()}
 
 		{#if !permanent}
@@ -50,6 +58,17 @@
 			top: 8px;
 			right: 8px;
 			z-index: 20;
+		}
+
+		&.floating {
+			position: fixed;
+			bottom: 0px;
+			left: 50%;
+			transform: translateX(-50%);
+			width: calc(100vw - 32px);
+			max-width: 800px;
+			backdrop-filter: blur(12px);
+			z-index: 100;
 		}
 	}
 </style>

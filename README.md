@@ -1,10 +1,11 @@
-# npm-alt (name tbd)
-
-An alternative frontend for npm that aims to provide a better experience, with more useful supplemental information.
+# npm-alt
 
 > [!NOTE]
-> There is an instance up at https://npm.willow.sh until I find it a permenant home.
-> Mobile users beware...
+> Go checkout [npmx.dev](https://npmx.dev) for the spiritual successor to npm-alt, with tons more features and a vibrant community.
+>
+> If you're interested in the data aspect, you can also join the #data channel on the [e18e discord](https://chat.e18e.dev) where some of us are working on npm.rest, which includes a lot of the data work from here.
+
+An alternative frontend for npm that aims to provide a better experience, with more useful supplemental information.
 
 ## Extra Features
 
