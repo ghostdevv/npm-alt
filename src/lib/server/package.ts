@@ -233,7 +233,6 @@ async function resolveSpecifier(
 	if (specifier.type === 'version') {
 		return {
 			name: specifier.name,
-			// todo patch upstream
 			version: semver.clean(specifier.fetchSpec, { loose: true })!,
 		};
 	}
