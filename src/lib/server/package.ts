@@ -4,6 +4,7 @@ import type { Specifier } from '$lib/server/valibot';
 import { typesIncluded } from './package-types';
 import { ofetch, FetchError } from 'ofetch';
 import parsePackage from 'npm-package-arg';
+import type { Manifest } from './manifest';
 import { error } from '@sveltejs/kit';
 import semver from 'semver';
 import {
@@ -94,7 +95,7 @@ export async function getInternalPackage(
 		ttl: 86400,
 		async value(): Promise<Omit<InternalPackage, 'name' | 'version'>> {
 			spec.pkg ||= await getPackument(spec.name);
-			const manifest = spec.pkg.versions[spec.version];
+			const manifest: Manifest = spec.pkg.versions[spec.version];
 
 			if (!manifest) {
 				error(404, 'Package version not found');
